@@ -157,6 +157,47 @@
   .clone-opts select{width:100%}
   .msg.warn{display:block;background:#fff8e6;color:var(--gold);border:1px solid #f0dcae}
   @media(max-width:520px){ .clone-opts{grid-template-columns:1fr} }
+
+  /* ===== CHỌN NGUỒN GIỌNG (VIP / Clone) + TUỲ CHỈNH ===== */
+  .vs-lbl{font-weight:800;font-size:15px;margin:18px 0 8px}
+  .vsrc-tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .vsrc{flex:1;min-width:170px;border:1.5px solid var(--line2);background:var(--field);color:var(--ink2);
+    font-family:inherit;font-weight:700;font-size:14.5px;padding:12px 14px;border-radius:12px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:7px;transition:.14s}
+  .vsrc:hover{border-color:var(--gold)}
+  .vsrc.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .vsrc-vip{font-size:9.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--gold),#a06c12);padding:2px 6px;border-radius:6px;letter-spacing:.05em}
+  .add-voice{margin-top:12px;width:100%;border:1.5px dashed var(--line2);background:var(--field);color:var(--ink2);
+    font-family:inherit;font-weight:700;font-size:14.5px;padding:13px;border-radius:12px;cursor:pointer;transition:.14s}
+  .add-voice:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-soft)}
+  .gen-opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+  .gen-opts select{width:100%}
+  @media(max-width:520px){ .gen-opts{grid-template-columns:1fr} }
+  .mvcard{display:flex;align-items:center;gap:11px;background:var(--card);border:1.5px solid var(--line2);
+    border-radius:14px;padding:12px 14px;cursor:pointer;transition:.14s}
+  .mvcard:hover{border-color:var(--gold)}
+  .mvcard.on{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold-soft)}
+  .mv-ava{width:40px;height:40px;border-radius:11px;flex:0 0 auto;display:grid;place-items:center;font-size:19px;
+    background:linear-gradient(135deg,#9775fa,#7048e8);color:#fff}
+  .mv-name{font-weight:800;font-size:15px;line-height:1.2}
+  .mv-sub{color:var(--muted);font-size:12px}
+  .mv-del{margin-left:auto;border:0;background:#fdecea;color:var(--red);width:30px;height:30px;border-radius:8px;
+    cursor:pointer;font-size:14px;flex:0 0 auto}
+  .mv-empty{color:var(--muted);font-size:13.5px;text-align:center;padding:22px 10px;border:1px dashed var(--line2);border-radius:12px;background:var(--field)}
+  /* trang quản lý nhân bản */
+  .clone-mgr{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  @media(max-width:760px){ .clone-mgr{grid-template-columns:1fr} }
+  .up-zone.drag{border-color:var(--gold);background:var(--gold-soft)}
+  .up-btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;justify-content:center}
+  .up-btn{border:1px solid var(--line2);background:var(--card);color:var(--ink);font-family:inherit;font-weight:700;
+    font-size:13.5px;padding:9px 15px;border-radius:10px;cursor:pointer}
+  .up-btn:hover{border-color:var(--gold);color:var(--gold)}
+  .up-btn.rec{background:var(--red);color:#fff;border-color:var(--red)}
+  .tips{background:var(--field);border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-top:14px}
+  .tips-h{font-weight:700;font-size:13px;margin-bottom:6px}
+  .tip{color:var(--ink2);font-size:13px;padding-left:18px;position:relative;margin-top:3px}
+  .tip:before{content:"•";position:absolute;left:4px;color:var(--gold);font-weight:800}
+  .mv-list{margin-top:14px;display:flex;flex-direction:column;gap:10px;min-height:110px}
 </style>
 
 <nav><div class="nav-in">
@@ -223,17 +264,36 @@
     <div id="audioView">
       <div class="box">
         <div class="k">🎙️ Văn bản thành giọng nói</div>
-        <textarea id="ttsText" placeholder="Dán kịch bản cần đọc vào đây... (tối đa 5000 ký tự)" maxlength="5000"></textarea>
-        <div class="voice-pick">
+        <textarea id="ttsText" placeholder="Dán kịch bản cần đọc vào đây... (tối đa 200.000 ký tự)" maxlength="200000"></textarea>
+        <!-- CHỌN GIỌNG NÓI: 2 nguồn — Tân Seven VIP hoặc Clone -->
+        <div class="vs-lbl">🎙️ Chọn giọng nói</div>
+        <div class="vsrc-tabs">
+          <button type="button" id="vsVip" class="vsrc on" onclick="setVoiceSrc('vip')">🌟 Giọng Tân Seven <span class="vsrc-vip">VIP</span></button>
+          <button type="button" id="vsClone" class="vsrc" onclick="setVoiceSrc('clone')">🧬 Giọng Clone của bạn</button>
+        </div>
+
+        <div id="vipPane" class="voice-pick">
           <div class="vp-head">🎭 Chọn giọng đọc <span id="vpCount" class="mono"></span></div>
           <div class="vp-chips" id="vpChips"></div>
           <div class="vp-grid" id="vpGrid"></div>
         </div>
-        <label style="margin-top:14px">⚡ Tốc độ đọc: <b id="ttsSpeedVal" style="color:var(--gold)">1.00x</b> <span style="font-weight:400;color:var(--muted);font-size:12px">(trái = chậm · phải = nhanh)</span></label>
+
+        <div id="clonePane" style="display:none">
+          <div class="vp-head">🧬 Giọng clone của bạn <span id="myVoiceCount" class="mono"></span></div>
+          <div class="vp-grid" id="myVoicesGrid" style="max-height:340px"></div>
+          <button type="button" class="add-voice" onclick="showView('clone')">➕ Tạo / quản lý giọng clone</button>
+        </div>
+
+        <!-- ==== TUỲ CHỈNH TẠO AUDIO (chung cho mọi giọng) ==== -->
+        <div id="genOpts" class="gen-opts" style="display:none">
+          <div><label style="margin:0 0 5px">🎭 Cảm xúc</label><select id="cloneStyle" onchange="onCloneStyle()"></select></div>
+          <div><label style="margin:0 0 5px">🌍 Ngôn ngữ</label><select id="cloneLang"></select></div>
+        </div>
+        <label style="margin-top:16px">⚡ Tốc độ đọc: <b id="ttsSpeedVal" style="color:var(--gold)">1.00x</b> <span style="font-weight:400;color:var(--muted);font-size:12px">(trái = chậm · phải = nhanh)</span></label>
         <input type="range" id="ttsSpeed" min="0.7" max="1.5" step="0.01" value="1" oninput="el('ttsSpeedVal').textContent=(+this.value).toFixed(2)+'x'">
         <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px">
           <span id="ttsCount" style="color:var(--muted);font-size:13px">0 ký tự</span>
-          <button class="btn" id="ttsBtn" style="margin:0;width:auto;padding:12px 26px" onclick="doTTS()">🎙️ Tạo giọng</button>
+          <button class="btn" id="ttsBtn" style="margin:0;width:auto;padding:12px 26px" onclick="doGenerate()">🎙️ Tạo audio</button>
         </div>
         <div class="msg" id="ttsMsg"></div>
         <div id="ttsResult" style="display:none;margin-top:14px">
@@ -246,55 +306,39 @@
       </div>
     </div>
 
-    <!-- ===== TAB: NHÂN BẢN GIỌNG (viXTTS clone) ===== -->
+    <!-- ===== TAB: NHÂN BẢN GIỌNG (quản lý giọng clone) ===== -->
     <div id="cloneView" style="display:none">
-      <div class="box">
-        <div class="k">🧬 Nhân bản giọng nói (VIP)</div>
-        <p class="desc" style="margin-top:6px">Tải lên <b>10–30 giây</b> một giọng nói bất kỳ (của bạn, người thân, nhân vật…) → AI học rồi đọc <b>mọi văn bản</b> bằng <b>chính giọng đó</b>. Hỗ trợ <b>18 ngôn ngữ</b> + 10 sắc thái cảm xúc.</p>
-
-        <div class="step-h"><span class="step-n">1</span> Chọn mẫu giọng</div>
-        <div class="vp-chips" style="margin-bottom:12px">
-          <button type="button" class="vp-chip on" id="crcUpload" onclick="cloneSrc('upload')">📤 Tải giọng của bạn</button>
-          <button type="button" class="vp-chip" id="crcSample" onclick="cloneSrc('sample')">⭐ Giọng mẫu T‑Seven</button>
-        </div>
-
-        <div id="cloneUploadPane">
-          <label class="up-zone" id="upZone">
+      <div class="clone-mgr">
+        <div class="box">
+          <div class="k">🧬 Tạo giọng nhân bản</div>
+          <label style="margin-top:14px">Tên giọng nói <span style="color:var(--red)">*</span></label>
+          <input id="cvName" placeholder="Nhập tên giọng nói (VD: Giọng của tôi)" maxlength="40">
+          <label style="margin-top:16px">Tải lên tệp âm thanh <span style="color:var(--red)">*</span></label>
+          <div class="up-zone" id="upZone" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="onDropFile(event)">
             <input type="file" id="cloneFile" accept="audio/*,.wav,.mp3,.m4a,.ogg" style="display:none" onchange="onCloneFile(this)">
-            <div class="up-ico">🎤</div>
-            <div class="up-t"><b>Bấm để chọn file âm thanh</b></div>
-            <div class="up-s">WAV, MP3, M4A… · nên 10–30 giây · 1 người nói · rõ ràng, ít tạp âm</div>
-          </label>
+            <div class="up-ico">⬆️</div>
+            <div class="up-t"><b>Nhấp hoặc kéo thả tệp vào đây</b></div>
+            <div class="up-s">Thời lượng 3s – 30s · tối đa 10MB · .mp3 .wav</div>
+            <div class="up-btns">
+              <button type="button" class="up-btn" onclick="el('cloneFile').click()">📁 Chọn File</button>
+              <button type="button" class="up-btn" id="recBtn" onclick="toggleRecord()">🎙️ Ghi âm</button>
+            </div>
+          </div>
           <div id="cloneFileInfo" style="display:none;margin-top:10px">
             <div class="file-row"><span id="cloneFileName" class="mono"></span><button class="mini-x" onclick="clearCloneFile()">✕</button></div>
             <audio id="cloneRefAudio" controls style="width:100%;margin-top:8px"></audio>
           </div>
+          <div class="tips">
+            <div class="tips-h">💡 Lưu ý cho giọng mẫu</div>
+            <div class="tip">Âm thanh sạch, một người nói, không tạp âm.</div>
+            <div class="tip">Chất lượng mẫu quyết định chất lượng clone.</div>
+          </div>
+          <button class="btn" id="cvSaveBtn" onclick="saveVoice()">💾 Tạo &amp; lưu giọng</button>
+          <div class="msg" id="cvMsg"></div>
         </div>
-
-        <div id="cloneSamplePane" style="display:none">
-          <div class="vp-chips" id="cloneSampleChips"></div>
-          <div class="samp-note">Chọn 1 giọng mẫu có sẵn của Tân Seven để nhân bản ngay — không cần tải file.</div>
-        </div>
-
-        <div class="step-h" style="margin-top:20px"><span class="step-n">2</span> Nội dung cần đọc</div>
-        <textarea id="cloneText" placeholder="Nhập/dán văn bản cần đọc bằng giọng nhân bản… (tối đa 5000 ký tự)" maxlength="5000"></textarea>
-        <div style="color:var(--muted);font-size:13px;margin-top:6px"><span id="cloneCount">0</span> ký tự · tính phí <b>×2</b> ký tự (nhân bản nặng hơn)</div>
-
-        <div class="step-h" style="margin-top:20px"><span class="step-n">3</span> Cảm xúc · Ngôn ngữ · Tốc độ</div>
-        <div class="clone-opts">
-          <div><label style="margin:0 0 5px">🎭 Cảm xúc</label><select id="cloneStyle" onchange="onCloneStyle()"></select></div>
-          <div><label style="margin:0 0 5px">🌍 Ngôn ngữ</label><select id="cloneLang"></select></div>
-        </div>
-        <label style="margin-top:14px">⚡ Tốc độ đọc: <b id="cloneSpeedVal" style="color:var(--gold)">1.00x</b> <span style="font-weight:400;color:var(--muted);font-size:12px">(tự đặt theo cảm xúc, có thể chỉnh)</span></label>
-        <input type="range" id="cloneSpeed" min="0.7" max="1.5" step="0.01" value="1" oninput="el('cloneSpeedVal').textContent=(+this.value).toFixed(2)+'x'">
-
-        <div style="margin-top:18px">
-          <button class="btn" id="cloneBtn" style="margin:0;width:auto;padding:13px 30px" onclick="doClone()">🧬 Nhân bản giọng — Tạo audio</button>
-        </div>
-        <div class="msg" id="cloneMsg"></div>
-        <div id="cloneResult" style="display:none;margin-top:14px">
-          <audio id="cloneAudio" controls style="width:100%"></audio>
-          <div style="margin-top:10px"><a id="cloneDownload" class="act" download="giong-nhan-ban.mp3" style="margin:0">⬇️ Tải MP3</a></div>
+        <div class="box">
+          <div class="k">🎧 Giọng của tôi <span id="myVoiceCount2" class="mono" style="color:var(--muted);font-weight:600"></span></div>
+          <div id="myVoicesList" class="mv-list"></div>
         </div>
       </div>
     </div>
@@ -423,6 +467,8 @@
   function showView(v){
     var views = { audio:'audioView', clone:'cloneView', affiliate:'affiliateView', account:'accountView' };
     var navs  = { audio:'navAudio',  clone:'navClone',  affiliate:'navAffiliate',  account:'navAccount'  };
+    if(v==='audio') setVoiceSrc(voiceSrc);
+    if(v==='clone') loadMyVoices();
     for(var k in views){
       if(el(views[k])) el(views[k]).style.display = (k===v) ? 'block' : 'none';
       if(el(navs[k]))  el(navs[k]).classList.toggle('on', k===v);
@@ -521,7 +567,9 @@
         body: JSON.stringify({ text: text, voice: voice, lang: lang, speed: speed })
       });
       var d = await r.json();
-      if(!r.ok || !d.audio_base64){
+      if(r.status===202 || d.warming){
+        msg.className='msg warn'; msg.textContent='⏳ Máy chủ đang xử lý (văn bản dài có thể lâu hơn). Bấm “Tạo audio” lại sau chút nhé.';
+      } else if(!r.ok || !d.audio_base64){
         msg.className='msg err'; msg.textContent = 'Lỗi: ' + (d.error || ('HTTP '+r.status));
       } else {
         var src = 'data:audio/mpeg;base64,' + d.audio_base64;
@@ -743,76 +791,154 @@
     ["tr","🇹🇷 Thổ Nhĩ Kỳ"],["nl","🇳🇱 Hà Lan"],["cs","🇨🇿 Tiếng Séc"],["ar","🇸🇦 Ả Rập"],
     ["hu","🇭🇺 Hungary"],["hi","🇮🇳 Hindi"]
   ];
-  var CLONE_SAMPLES = [
-    ["a_hung","Anh Hùng","Nam · trầm ấm, kể chuyện"],
-    ["tin_tuc","MC Tin tức","Chuẩn, dứt khoát"],
-    ["kinh_thanh","Kinh Thánh","Trang nghiêm, sâu lắng"],
-    ["nam_calm","Nam điềm đạm","Nhẹ nhàng, tâm sự"],
-    ["nu_nhe_nhang","Nữ nhẹ nhàng","Êm dịu, dễ nghe"]
-  ];
-  var cloneSrcMode="upload", cloneRefB64=null, cloneRefName=null, cloneBusy=false;
+  var voiceSrc="vip", cloneRefB64=null, cloneBusy=false;
+  var myVoices=[], selCloneId=null, selCloneName="";
 
   function fillCloneUI(){
     var st=el('cloneStyle'); if(st) st.innerHTML=CLONE_STYLES.map(function(s){ return '<option value="'+s[0]+'">'+s[0]+'</option>'; }).join('');
     var lg=el('cloneLang'); if(lg) lg.innerHTML=CLONE_LANGS.map(function(l){ return '<option value="'+l[0]+'">'+l[1]+'</option>'; }).join('');
-    var ch=el('cloneSampleChips');
-    if(ch) ch.innerHTML=CLONE_SAMPLES.map(function(s){ return '<button type="button" class="vp-chip" onclick="pickSample(this,\''+s[0]+'\')" title="'+s[2]+'">'+s[1]+'</button>'; }).join('');
   }
   function onCloneStyle(){
     var m={}; CLONE_STYLES.forEach(function(s){ m[s[0]]=s[1]; });
     var sp=m[el('cloneStyle').value]||1.0;
-    el('cloneSpeed').value=sp; el('cloneSpeedVal').textContent=sp.toFixed(2)+'x';
+    el('ttsSpeed').value=sp; el('ttsSpeedVal').textContent=sp.toFixed(2)+'x';
   }
-  function cloneSrc(mode){
-    cloneSrcMode=mode;
-    el('crcUpload').classList.toggle('on',mode==='upload');
-    el('crcSample').classList.toggle('on',mode==='sample');
-    el('cloneUploadPane').style.display=mode==='upload'?'block':'none';
-    el('cloneSamplePane').style.display=mode==='sample'?'block':'none';
+  // Đổi nguồn giọng: VIP (giọng có sẵn) hoặc Clone (giọng bạn tự tạo)
+  function setVoiceSrc(m){
+    voiceSrc=m;
+    if(el('vsVip')) el('vsVip').classList.toggle('on',m==='vip');
+    if(el('vsClone')) el('vsClone').classList.toggle('on',m==='clone');
+    if(el('vipPane')) el('vipPane').style.display=m==='vip'?'block':'none';
+    if(el('clonePane')) el('clonePane').style.display=m==='clone'?'block':'none';
+    if(el('genOpts')) el('genOpts').style.display=m==='clone'?'grid':'none';
+    if(m==='clone') loadMyVoices();
   }
-  function onCloneFile(inp){
-    var f=inp.files&&inp.files[0]; if(!f) return;
-    var m=el('cloneMsg');
-    if(f.size>12*1024*1024){ m.className='msg err'; m.textContent='File quá lớn (>12MB). Hãy cắt còn 10–30 giây.'; inp.value=''; return; }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  // ---- Thư viện "Giọng clone của tôi" ----
+  async function loadMyVoices(){
+    if(!sb){ myVoices=[]; renderMyVoices(); return; }
+    try{ var r=await sb.from('user_voices').select('id,name,created_at').order('created_at',{ascending:false}); myVoices=(r&&r.data)||[]; }
+    catch(e){ myVoices=[]; }
+    renderMyVoices();
+  }
+  function mvCard(v,pick){
+    var on=pick && selCloneId===v.id;
+    var click=pick?(' onclick="selectMyVoice(\''+v.id+'\')"'):'';
+    return '<div class="mvcard'+(on?' on':'')+'"'+click+'>'+
+      '<span class="mv-ava">🧬</span>'+
+      '<div><div class="mv-name">'+esc(v.name)+'</div><div class="mv-sub">'+(on?'Đang chọn ✓':(pick?'Bấm để chọn đọc':'Giọng clone của bạn'))+'</div></div>'+
+      '<button class="mv-del" title="Xoá" onclick="event.stopPropagation();deleteMyVoice(\''+v.id+'\')">🗑</button>'+
+    '</div>';
+  }
+  function renderMyVoices(){
+    if(el('myVoiceCount')) el('myVoiceCount').textContent=myVoices.length+' giọng';
+    if(el('myVoiceCount2')) el('myVoiceCount2').textContent='('+myVoices.length+')';
+    var g=el('myVoicesGrid');
+    if(g) g.innerHTML=myVoices.length?myVoices.map(function(v){return mvCard(v,true);}).join('')
+      :'<div class="mv-empty">Chưa có giọng clone nào.<br>Bấm “➕ Tạo / quản lý giọng clone”.</div>';
+    var l=el('myVoicesList');
+    if(l) l.innerHTML=myVoices.length?myVoices.map(function(v){return mvCard(v,false);}).join('')
+      :'<div class="mv-empty">Chưa có giọng nói nào.<br>Tải lên tệp âm thanh để tạo giọng đầu tiên.</div>';
+  }
+  function selectMyVoice(id){
+    selCloneId=id; var v=myVoices.filter(function(x){return x.id===id;})[0]; selCloneName=v?v.name:'';
+    renderMyVoices();
+  }
+  async function deleteMyVoice(id){
+    if(!sb) return;
+    if(!confirm('Xoá giọng clone này khỏi thư viện?')) return;
+    try{ await sb.from('user_voices').delete().eq('id',id); }catch(e){}
+    if(selCloneId===id){ selCloneId=null; selCloneName=''; }
+    loadMyVoices();
+  }
+
+  // ---- Tải mẫu giọng (file / kéo-thả / ghi âm) ----
+  function useAudioFile(f){
+    var m=el('cvMsg'); if(!f) return;
+    if(f.size>12*1024*1024){ m.className='msg err'; m.textContent='File quá lớn (>12MB).'; return; }
     var rd=new FileReader();
     rd.onload=function(){
-      cloneRefB64=String(rd.result).split(',')[1]||''; cloneRefName=null;
-      el('cloneFileName').textContent=f.name;
+      cloneRefB64=String(rd.result).split(',')[1]||'';
+      el('cloneFileName').textContent=f.name||'ghi-am.wav';
       el('cloneRefAudio').src=rd.result;
       el('cloneFileInfo').style.display='block';
       m.className='msg';
     };
     rd.readAsDataURL(f);
   }
-  function clearCloneFile(){ cloneRefB64=null; el('cloneFile').value=''; el('cloneFileInfo').style.display='none'; }
-  function pickSample(btn,name){
-    cloneRefName=name; cloneRefB64=null;
-    var chips=el('cloneSampleChips').querySelectorAll('.vp-chip');
-    for(var i=0;i<chips.length;i++) chips[i].classList.remove('on');
-    btn.classList.add('on');
+  function onCloneFile(inp){ var f=inp.files&&inp.files[0]; if(f) useAudioFile(f); }
+  function onDropFile(e){ e.preventDefault(); if(el('upZone'))el('upZone').classList.remove('drag');
+    var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) useAudioFile(f); }
+  function clearCloneFile(){ cloneRefB64=null; if(el('cloneFile'))el('cloneFile').value=''; el('cloneFileInfo').style.display='none'; }
+
+  // ---- Ghi âm micro -> WAV ----
+  var _rec=null,_recChunks=[],_recStream=null,_recTimer=null,_recSec=0;
+  async function toggleRecord(){
+    var b=el('recBtn');
+    if(_rec && _rec.state==='recording'){ stopRecord(); return; }
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ el('cvMsg').className='msg err'; el('cvMsg').textContent='Trình duyệt không hỗ trợ ghi âm.'; return; }
+    try{ _recStream=await navigator.mediaDevices.getUserMedia({audio:true}); }
+    catch(e){ el('cvMsg').className='msg err'; el('cvMsg').textContent='Cần cho phép quyền micro để ghi âm.'; return; }
+    _recChunks=[]; _rec=new MediaRecorder(_recStream);
+    _rec.ondataavailable=function(ev){ if(ev.data&&ev.data.size) _recChunks.push(ev.data); };
+    _rec.onstop=function(){ var blob=new Blob(_recChunks,{type:(_recChunks[0]&&_recChunks[0].type)||'audio/webm'}); blobToWav(blob);
+      if(_recStream){ _recStream.getTracks().forEach(function(t){t.stop();}); _recStream=null; } };
+    _rec.start(); _recSec=0; b.classList.add('rec'); b.textContent='⏹ Dừng (0s)';
+    _recTimer=setInterval(function(){ _recSec++; b.textContent='⏹ Dừng ('+_recSec+'s)'; if(_recSec>=30) stopRecord(); },1000);
   }
-  async function doClone(){
+  function stopRecord(){ if(_recTimer){clearInterval(_recTimer);_recTimer=null;} var b=el('recBtn'); if(b){b.classList.remove('rec');b.textContent='🎙️ Ghi âm';}
+    if(_rec&&_rec.state==='recording') _rec.stop(); }
+  async function blobToWav(blob){
+    try{
+      var buf=await blob.arrayBuffer();
+      var AC=window.AudioContext||window.webkitAudioContext; var ac=new AC();
+      var ab=await ac.decodeAudioData(buf); var wav=encodeWAV(ab); ac.close();
+      useAudioFile(new File([wav],'ghi-am.wav',{type:'audio/wav'}));
+    }catch(e){ el('cvMsg').className='msg err'; el('cvMsg').textContent='Lỗi xử lý ghi âm: '+String(e); }
+  }
+  function encodeWAV(ab){
+    var ch0=ab.getChannelData(0), sr=ab.sampleRate, n=ch0.length;
+    var buffer=new ArrayBuffer(44+n*2), view=new DataView(buffer);
+    function ws(o,s){ for(var i=0;i<s.length;i++) view.setUint8(o+i,s.charCodeAt(i)); }
+    ws(0,'RIFF'); view.setUint32(4,36+n*2,true); ws(8,'WAVE'); ws(12,'fmt ');
+    view.setUint32(16,16,true); view.setUint16(20,1,true); view.setUint16(22,1,true);
+    view.setUint32(24,sr,true); view.setUint32(28,sr*2,true); view.setUint16(32,2,true); view.setUint16(34,16,true);
+    ws(36,'data'); view.setUint32(40,n*2,true);
+    var o=44; for(var i=0;i<n;i++){ var s=Math.max(-1,Math.min(1,ch0[i])); view.setInt16(o,s<0?s*0x8000:s*0x7FFF,true); o+=2; }
+    return buffer;
+  }
+
+  async function saveVoice(){
+    if(!sb) return;
+    var name=el('cvName').value.trim(), m=el('cvMsg'), btn=el('cvSaveBtn');
+    if(!cloneRefB64){ m.className='msg err'; m.textContent='Hãy tải lên (hoặc ghi âm) 1 mẫu giọng.'; return; }
+    if(!name){ m.className='msg err'; m.textContent='Hãy đặt tên cho giọng.'; return; }
+    btn.disabled=true; btn.textContent='Đang lưu...'; m.className='msg';
+    try{
+      var r=await sb.from('user_voices').insert({ name:name, ref_b64:cloneRefB64 });
+      if(r.error){ m.className='msg err'; m.textContent='Lỗi lưu: '+r.error.message; }
+      else { m.className='msg ok'; m.textContent='✅ Đã tạo giọng “'+name+'”! Qua tab “Văn bản thành giọng nói” để dùng.';
+        cloneRefB64=null; el('cvName').value=''; el('cloneFileInfo').style.display='none'; loadMyVoices(); }
+    }catch(e){ m.className='msg err'; m.textContent='Lỗi: '+String(e); }
+    btn.disabled=false; btn.textContent='💾 Tạo & lưu giọng';
+  }
+
+  // ---- Tạo audio: điều hướng VIP / Clone ----
+  function doGenerate(){ if(voiceSrc==='clone') return doCloneGen(); return doTTS(); }
+  async function doCloneGen(){
     if(!sb){ alert('Vui lòng đăng nhập.'); return; }
     if(cloneBusy) return;
-    var text=el('cloneText').value.trim();
-    var msg=el('cloneMsg'), res=el('cloneResult'), btn=el('cloneBtn');
+    var text=el('ttsText').value.trim();
+    var msg=el('ttsMsg'), res=el('ttsResult'), btn=el('ttsBtn');
     if(!text){ msg.className='msg err'; msg.textContent='Nhập nội dung cần đọc.'; return; }
-    var ref_b64=null, ref_name=null;
-    if(cloneSrcMode==='upload'){
-      if(!cloneRefB64){ msg.className='msg err'; msg.textContent='Hãy tải lên 1 file giọng mẫu (10–30 giây).'; return; }
-      ref_b64=cloneRefB64;
-    } else {
-      if(!cloneRefName){ msg.className='msg err'; msg.textContent='Hãy chọn 1 giọng mẫu T‑Seven.'; return; }
-      ref_name=cloneRefName;
-    }
-    cloneBusy=true; btn.disabled=true; btn.textContent='🧬 Đang nhân bản...';
+    if(!selCloneId){ msg.className='msg err'; msg.textContent='Hãy chọn 1 giọng clone (hoặc bấm ➕ tạo giọng mới).'; return; }
+    cloneBusy=true; btn.disabled=true; btn.textContent='🧬 Đang tạo...';
     msg.className='msg'; res.style.display='none';
     try{
       var s=await sb.auth.getSession(); var token=s.data.session.access_token;
-      var payload={ text:text, language:el('cloneLang').value, style:el('cloneStyle').value,
-        speed:parseFloat(el('cloneSpeed').value)||1.0, format:'mp3' };
-      if(ref_b64) payload.ref_b64=ref_b64;
-      if(ref_name) payload.ref_name=ref_name;
+      var payload={ text:text, voice_id:selCloneId, language:el('cloneLang').value,
+        style:el('cloneStyle').value, speed:parseFloat(el('ttsSpeed').value)||1.0, format:'mp3' };
       var r=await fetch(SUPABASE_URL+'/functions/v1/clone-voice',{
         method:'POST',
         headers:{'Authorization':'Bearer '+token,'apikey':SUPABASE_ANON_KEY,'Content-Type':'application/json'},
@@ -821,22 +947,23 @@
       var d=await r.json();
       if(r.status===202 || d.warming){
         msg.className='msg warn';
-        msg.textContent='⏳ Máy chủ AI vừa "ngủ dậy", đang khởi động (~1 phút). Bấm "Nhân bản" lại sau khoảng 1 phút nhé.';
+        msg.textContent='⏳ Máy chủ AI đang khởi động (~1 phút). Bấm “Tạo audio” lại sau chút nhé.';
       } else if(!r.ok || !d.audio_base64){
         msg.className='msg err'; msg.textContent='Lỗi: '+(d.error||('HTTP '+r.status));
       } else {
         var src='data:audio/mpeg;base64,'+d.audio_base64;
-        el('cloneAudio').src=src; el('cloneDownload').href=src; res.style.display='block';
+        el('ttsAudio').src=src; el('ttsDownload').href=src;
+        if(el('ttsSrt')) el('ttsSrt').style.display='none';
+        res.style.display='block';
         msg.className='msg ok';
-        msg.textContent='🎉 Nhân bản xong! Trừ '+d.cost+' ký tự. Còn lại: '+Number(d.credits).toLocaleString('vi-VN')+' ký tự';
+        msg.textContent='🎉 Xong! Giọng “'+selCloneName+'”. Trừ '+d.cost+' ký tự. Còn lại: '+Number(d.credits).toLocaleString('vi-VN')+' ký tự';
         var cv=Number(d.credits).toLocaleString('vi-VN');
         el('creditNum').innerHTML=cv+'<small> ký tự</small>'; if(el('creditMini')) el('creditMini').textContent=cv;
       }
     }catch(e){ msg.className='msg err'; msg.textContent='Lỗi: '+String(e); }
-    cloneBusy=false; btn.disabled=false; btn.textContent='🧬 Nhân bản giọng — Tạo audio';
+    cloneBusy=false; btn.disabled=false; btn.textContent='🎙️ Tạo audio';
   }
-  fillCloneUI(); onCloneStyle();
-  var _ct=el('cloneText'); if(_ct) _ct.addEventListener('input',function(){ el('cloneCount').textContent=this.value.length; });
+  fillCloneUI();
 
   // ====== MẬT KHẨU ======
   async function changePass(){
