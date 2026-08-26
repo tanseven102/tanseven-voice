@@ -59,6 +59,7 @@
     font-family:inherit;font-size:15px;background:var(--field);outline:none;resize:vertical;margin-top:12px;line-height:1.5}
   textarea:focus{border-color:var(--ink);background:#fff}
   select{padding:10px 12px;border:1px solid var(--line2);border-radius:10px;font-family:inherit;font-size:14.5px;background:var(--field);cursor:pointer}
+  input[type=range]{width:100%;padding:0;border:0;background:transparent;accent-color:var(--gold);cursor:pointer;margin-top:6px}
   #ttsResult audio{width:100%;margin-top:2px}
   .logout{background:none;border:1px solid var(--line2);color:var(--ink2);padding:8px 14px;border-radius:10px;
     font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit}
@@ -121,6 +122,7 @@
       <label>Mật khẩu</label>
       <input id="lgPass" type="password" placeholder="••••••••">
       <button class="btn" id="lgBtn" onclick="doLogin()">Đăng nhập</button>
+      <div style="text-align:center;margin-top:14px"><a href="#" onclick="forgotPass();return false" style="color:var(--muted);font-size:13.5px;text-decoration:underline">Quên mật khẩu?</a></div>
     </div>
 
     <div id="regForm" style="display:none">
@@ -136,6 +138,16 @@
     </div>
 
     <div class="msg" id="authMsg"></div>
+  </div>
+
+  <!-- ====== ĐẶT LẠI MẬT KHẨU (mở từ link trong email) ====== -->
+  <div class="auth" id="resetBox" style="display:none">
+    <h1>🔑 Đặt lại mật khẩu</h1>
+    <p class="sub">Nhập mật khẩu mới cho tài khoản của bạn.</p>
+    <label>Mật khẩu mới (≥ 6 ký tự)</label>
+    <input id="resetPass" type="password" placeholder="••••••••">
+    <button class="btn" onclick="doReset()">Đổi mật khẩu</button>
+    <div class="msg" id="resetMsg"></div>
   </div>
 
   <!-- ====== ĐÃ ĐĂNG NHẬP: dashboard ====== -->
@@ -162,11 +174,17 @@
     <div class="box" style="margin-top:16px">
       <div class="k">🎙️ Tạo giọng</div>
       <textarea id="ttsText" placeholder="Dán kịch bản cần đọc vào đây... (tối đa 5000 ký tự)" maxlength="5000"></textarea>
-      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:10px">
-        <select id="ttsVoice">
-          <option value="Minh Đức">🇻🇳 Minh Đức · Nam</option>
-          <option value="Lan Anh">🇻🇳 Lan Anh · Nữ</option>
-        </select>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+        <label style="margin:0;flex:1;min-width:150px">🌍 Ngôn ngữ
+          <select id="ttsLang" onchange="fillVoices()" style="width:100%;margin-top:4px"></select>
+        </label>
+        <label style="margin:0;flex:1;min-width:150px">🎭 Giọng đọc
+          <select id="ttsVoice" style="width:100%;margin-top:4px"></select>
+        </label>
+      </div>
+      <label style="margin-top:14px">⚡ Tốc độ đọc: <b id="ttsSpeedVal" style="color:var(--gold)">1.00x</b> <span style="font-weight:400;color:var(--muted);font-size:12px">(trái = chậm · phải = nhanh)</span></label>
+      <input type="range" id="ttsSpeed" min="0.7" max="1.5" step="0.05" value="1" oninput="el('ttsSpeedVal').textContent=(+this.value).toFixed(2)+'x'">
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px">
         <span id="ttsCount" style="color:var(--muted);font-size:13px">0 ký tự</span>
         <button class="btn" id="ttsBtn" style="margin:0;width:auto;padding:12px 26px" onclick="doTTS()">🎙️ Tạo giọng</button>
       </div>
@@ -185,6 +203,15 @@
         <button class="btn" id="affCopyBtn" style="margin:0;width:auto;padding:12px 22px" onclick="copyAff()">📋 Copy</button>
       </div>
       <div class="msg" id="affMsg"></div>
+    </div>
+
+    <div class="box" style="margin-top:16px">
+      <div class="k">🔒 Đổi mật khẩu</div>
+      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+        <input id="newPass" type="password" placeholder="Mật khẩu mới (≥ 6 ký tự)" style="flex:1;min-width:200px">
+        <button class="btn" style="margin:0;width:auto;padding:12px 24px" onclick="changePass()">Đổi mật khẩu</button>
+      </div>
+      <div class="msg" id="passMsg"></div>
     </div>
   </div>
 
@@ -267,12 +294,25 @@
     el('authMsg').className='msg';
   }
 
+  var IS_RECOVERY = location.hash.indexOf('type=recovery') > -1;
+  function showReset(){
+    el('authBox').style.display='none';
+    el('dashBox').style.display='none';
+    el('resetBox').style.display='block';
+    el('logoutBtn').style.display='none';
+  }
+
   if (!configured) {
     el('configWarn').style.display = 'block';
   } else {
     sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    sb.auth.onAuthStateChange((_e, session) => renderState(session));
-    sb.auth.getSession().then(({data}) => renderState(data.session));
+    fillLangs();
+    sb.auth.onAuthStateChange((event, session) => {
+      if(event === 'PASSWORD_RECOVERY'){ showReset(); return; }
+      if(IS_RECOVERY) return;   // đang trong luồng đặt lại mật khẩu → đợi sự kiện recovery
+      renderState(session);
+    });
+    sb.auth.getSession().then(({data}) => { if(!IS_RECOVERY) renderState(data.session); });
   }
 
   async function renderState(session){
@@ -302,8 +342,7 @@
     const { data, error } = await sb.auth.signUp({ email, password: pass, options:{ data:{ name, ref_by: refBy } } });
     el('rgBtn').disabled=false; el('rgBtn').textContent='Đăng ký miễn phí →';
     if(error){ showMsg(error.message); return; }
-    showMsg('🎉 Tạo tài khoản thành công! Kiểm tra email xác nhận (nếu có) rồi đăng nhập.', true);
-    switchTab('login');
+    showMsg('🎉 Tạo tài khoản thành công! Đang vào tài khoản...', true);
   }
 
   async function doLogin(){
@@ -329,6 +368,8 @@
     if(!sb) return;
     var text = document.getElementById('ttsText').value.trim();
     var voice = document.getElementById('ttsVoice').value;
+    var lang = document.getElementById('ttsLang').value;
+    var speed = parseFloat(document.getElementById('ttsSpeed').value) || 1.0;
     var msg = document.getElementById('ttsMsg');
     var res = document.getElementById('ttsResult');
     if(!text){ msg.className='msg err'; msg.textContent='Nhập nội dung cần đọc.'; return; }
@@ -341,7 +382,7 @@
       var r = await fetch(SUPABASE_URL + '/functions/v1/smart-api', {
         method: 'POST',
         headers: { 'Authorization': 'Bearer '+token, 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text, voice: voice })
+        body: JSON.stringify({ text: text, voice: voice, lang: lang, speed: speed })
       });
       var d = await r.json();
       if(!r.ok || !d.audio_base64){
@@ -429,5 +470,58 @@
         if(s.data.session) renderState(s.data.session);
       }
     }catch(e){}
+  }
+
+  // ====== NGÔN NGỮ & GIỌNG (mở khóa động cơ) ======
+  var TTS_LANGS = [
+    ['vi','🇻🇳 Tiếng Việt'], ['en','🇬🇧 Tiếng Anh'], ['e','🇪🇸 Tây Ban Nha'],
+    ['p','🇵🇹 Bồ Đào Nha'], ['f','🇫🇷 Tiếng Pháp'], ['i','🇮🇹 Tiếng Ý'], ['h','🇮🇳 Hindi']
+  ];
+  var TTS_VOICES = {
+    vi: [['Minh Đức','Minh Đức · Nam'],['Lan Anh','Lan Anh · Nữ']],
+    en: [['Ava','Ava · Nữ (Mỹ)'],['Bella','Bella · Nữ (Mỹ)'],['Nicole','Nicole · Nữ (Mỹ)'],['Sky','Sky · Nữ (Mỹ)'],['Luna','Luna · Nữ (Mỹ)'],['Jessica','Jessica · Nữ (Mỹ)'],['Kaia','Kaia · Nữ (Mỹ)'],['Nova','Nova · Nữ (Mỹ)'],['River','River · Nữ (Mỹ)'],['Sarah','Sarah · Nữ (Mỹ)'],['Aria','Aria · Nữ (Mỹ)'],['Ethan','Ethan · Nam (Mỹ)'],['Marcus','Marcus · Nam (Mỹ)'],['Jack','Jack · Nam (Mỹ)'],['Mason','Mason · Nam (Mỹ)'],['Adam','Adam · Nam (Mỹ)'],['Leo','Leo · Nam (Mỹ)'],['Eric','Eric · Nam (Mỹ)'],['Liam','Liam · Nam (Mỹ)'],['Nick','Nick · Nam (Mỹ)'],['Lily','Lily · Nữ (Anh-Anh)'],['Rose','Rose · Nữ (Anh-Anh)'],['Alice','Alice · Nữ (Anh-Anh)'],['Ivy','Ivy · Nữ (Anh-Anh)'],['Oliver','Oliver · Nam (Anh-Anh)'],['Henry','Henry · Nam (Anh-Anh)'],['Daniel','Daniel · Nam (Anh-Anh)'],['Lewis','Lewis · Nam (Anh-Anh)']],
+    e: [['Sofía','Sofía · Nữ'],['Alejandro','Alejandro · Nam']],
+    p: [['Beatriz','Beatriz · Nữ'],['Tiago','Tiago · Nam']],
+    f: [['Chloé','Chloé · Nữ']],
+    i: [['Giulia','Giulia · Nữ'],['Marco','Marco · Nam']],
+    h: [['Aisha','Aisha · Nữ'],['Arjun','Arjun · Nam']]
+  };
+  function fillLangs(){
+    var s = el('ttsLang'); if(!s) return;
+    s.innerHTML = TTS_LANGS.map(function(l){ return '<option value="'+l[0]+'">'+l[1]+'</option>'; }).join('');
+    fillVoices();
+  }
+  function fillVoices(){
+    var s = el('ttsVoice'); if(!s) return;
+    var vs = TTS_VOICES[el('ttsLang').value] || [];
+    s.innerHTML = vs.map(function(v){ return '<option value="'+v[0]+'">'+v[1]+'</option>'; }).join('');
+  }
+
+  // ====== MẬT KHẨU ======
+  async function changePass(){
+    if(!sb) return;
+    var np = el('newPass').value, m = el('passMsg');
+    if(np.length < 6){ m.className='msg err'; m.textContent='Mật khẩu phải ≥ 6 ký tự.'; return; }
+    var { error } = await sb.auth.updateUser({ password: np });
+    if(error){ m.className='msg err'; m.textContent='Lỗi: '+error.message; }
+    else { m.className='msg ok'; m.textContent='✅ Đã đổi mật khẩu thành công!'; el('newPass').value=''; }
+  }
+  async function forgotPass(){
+    if(!sb) return;
+    var email = prompt('Nhập email đã đăng ký để nhận link đặt lại mật khẩu:');
+    if(!email) return;
+    var base = location.origin + location.pathname;
+    var { error } = await sb.auth.resetPasswordForEmail(email.trim(), { redirectTo: base });
+    if(error){ showMsg('Lỗi: '+error.message); }
+    else { showMsg('📧 Đã gửi link đặt lại tới '+email.trim()+'. Mở email (xem cả mục Spam) rồi bấm link trong đó.', true); }
+  }
+  async function doReset(){
+    if(!sb) return;
+    var np = el('resetPass').value, m = el('resetMsg');
+    if(np.length < 6){ m.className='msg err'; m.textContent='Mật khẩu phải ≥ 6 ký tự.'; return; }
+    var { error } = await sb.auth.updateUser({ password: np });
+    if(error){ m.className='msg err'; m.textContent='Lỗi: '+error.message; }
+    else { m.className='msg ok'; m.textContent='✅ Đổi mật khẩu thành công! Đang vào tài khoản...';
+      setTimeout(function(){ location.href = location.origin + location.pathname; }, 1500); }
   }
 </script>
