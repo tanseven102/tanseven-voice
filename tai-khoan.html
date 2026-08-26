@@ -884,18 +884,16 @@
   }
 
   // ---- Tải mẫu giọng (file / kéo-thả / ghi âm) ----
+  function arrayBufferToBase64(buf){ var b=new Uint8Array(buf),s='',n=b.length,i; for(i=0;i<n;i+=8192){ s+=String.fromCharCode.apply(null,b.subarray(i,i+8192)); } return btoa(s); }
+  async function decodeToWav(arrbuf){ var AC=window.AudioContext||window.webkitAudioContext; var ac=new AC(); var ab=await ac.decodeAudioData(arrbuf); try{ac.close();}catch(e){} return encodeWAV(ab); }
+  function setRefFromWav(wav,name){ cloneRefB64=arrayBufferToBase64(wav); el('cloneFileName').textContent=name;
+    el('cloneRefAudio').src=URL.createObjectURL(new Blob([wav],{type:'audio/wav'})); el('cloneFileInfo').style.display='block'; el('cvMsg').className='msg'; }
   function useAudioFile(f){
     var m=el('cvMsg'); if(!f) return;
     if(f.size>12*1024*1024){ m.className='msg err'; m.textContent='File quá lớn (>12MB).'; return; }
-    var rd=new FileReader();
-    rd.onload=function(){
-      cloneRefB64=String(rd.result).split(',')[1]||'';
-      el('cloneFileName').textContent=f.name||'ghi-am.wav';
-      el('cloneRefAudio').src=rd.result;
-      el('cloneFileInfo').style.display='block';
-      m.className='msg';
-    };
-    rd.readAsDataURL(f);
+    m.className='msg'; el('cloneFileName').textContent='(đang xử lý…)'; el('cloneFileInfo').style.display='block';
+    f.arrayBuffer().then(decodeToWav).then(function(wav){ setRefFromWav(wav, (f.name||'ghi-am').replace(/\.[^.]+$/,'')+'.wav'); })
+      .catch(function(e){ el('cloneFileInfo').style.display='none'; m.className='msg err'; m.textContent='Không đọc được file này. Hãy thử file .mp3 hoặc .wav khác.'; });
   }
   function onCloneFile(inp){ var f=inp.files&&inp.files[0]; if(f) useAudioFile(f); }
   function onDropFile(e){ e.preventDefault(); if(el('upZone'))el('upZone').classList.remove('drag');
@@ -920,12 +918,8 @@
   function stopRecord(){ if(_recTimer){clearInterval(_recTimer);_recTimer=null;} var b=el('recBtn'); if(b){b.classList.remove('rec');b.textContent='🎙️ Ghi âm';}
     if(_rec&&_rec.state==='recording') _rec.stop(); }
   async function blobToWav(blob){
-    try{
-      var buf=await blob.arrayBuffer();
-      var AC=window.AudioContext||window.webkitAudioContext; var ac=new AC();
-      var ab=await ac.decodeAudioData(buf); var wav=encodeWAV(ab); ac.close();
-      useAudioFile(new File([wav],'ghi-am.wav',{type:'audio/wav'}));
-    }catch(e){ el('cvMsg').className='msg err'; el('cvMsg').textContent='Lỗi xử lý ghi âm: '+String(e); }
+    try{ var wav=await decodeToWav(await blob.arrayBuffer()); setRefFromWav(wav,'ghi-am.wav'); }
+    catch(e){ el('cvMsg').className='msg err'; el('cvMsg').textContent='Lỗi xử lý ghi âm: '+String(e); }
   }
   function encodeWAV(ab){
     var ch0=ab.getChannelData(0), sr=ab.sampleRate, n=ch0.length;
