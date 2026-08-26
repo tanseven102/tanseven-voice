@@ -66,6 +66,29 @@
   textarea:focus{border-color:var(--ink);background:#fff}
   select{padding:10px 12px;border:1px solid var(--line2);border-radius:10px;font-family:inherit;font-size:14.5px;background:var(--field);cursor:pointer}
   input[type=range]{width:100%;padding:0;border:0;background:transparent;accent-color:var(--gold);cursor:pointer;margin-top:6px}
+  /* voice picker */
+  .voice-pick{margin-top:14px}
+  .vp-head{font-weight:700;font-size:13px;margin-bottom:8px}
+  .vp-head .mono{color:var(--muted);font-weight:600;font-size:12px}
+  .vp-chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+  .vp-chip{border:1px solid var(--line2);background:var(--field);color:var(--ink2);cursor:pointer;
+    font-family:inherit;font-weight:600;font-size:12.5px;padding:6px 12px;border-radius:99px}
+  .vp-chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .vp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(188px,1fr));gap:9px;
+    max-height:290px;overflow-y:auto;padding:4px;border:1px solid var(--line);border-radius:13px;background:var(--field)}
+  .vcard{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--line2);
+    border-radius:12px;padding:9px 11px;cursor:pointer;transition:.13s;text-align:left;font-family:inherit}
+  .vcard:hover{border-color:var(--gold)}
+  .vcard.on{border-color:var(--gold);background:var(--gold-soft)}
+  .vc-ava{width:38px;height:38px;border-radius:10px;flex:0 0 auto;display:grid;place-items:center;
+    font-weight:800;font-size:15px;color:#fff}
+  .vc-info{min-width:0;flex:1}
+  .vc-name{font-weight:700;font-size:14px;line-height:1.2;display:flex;align-items:center;gap:5px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .vc-vip{font-size:9px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--gold),#a06c12);
+    padding:1px 5px;border-radius:5px;letter-spacing:.05em}
+  .vc-meta{color:var(--muted);font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .vcard.on .vc-meta{color:var(--gold)}
   #ttsResult audio{width:100%;margin-top:2px}
   .logout{background:none;border:1px solid var(--line2);color:var(--ink2);padding:8px 14px;border-radius:10px;
     font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit}
@@ -170,13 +193,10 @@
       <div class="box">
         <div class="k">🎙️ Văn bản thành giọng nói</div>
         <textarea id="ttsText" placeholder="Dán kịch bản cần đọc vào đây... (tối đa 5000 ký tự)" maxlength="5000"></textarea>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
-          <label style="margin:0;flex:1;min-width:150px">🌍 Ngôn ngữ
-            <select id="ttsLang" onchange="fillVoices()" style="width:100%;margin-top:4px"></select>
-          </label>
-          <label style="margin:0;flex:1;min-width:150px">🎭 Giọng đọc
-            <select id="ttsVoice" style="width:100%;margin-top:4px"></select>
-          </label>
+        <div class="voice-pick">
+          <div class="vp-head">🎭 Chọn giọng đọc <span id="vpCount" class="mono"></span></div>
+          <div class="vp-chips" id="vpChips"></div>
+          <div class="vp-grid" id="vpGrid"></div>
         </div>
         <label style="margin-top:14px">⚡ Tốc độ đọc: <b id="ttsSpeedVal" style="color:var(--gold)">1.00x</b> <span style="font-weight:400;color:var(--muted);font-size:12px">(trái = chậm · phải = nhanh)</span></label>
         <input type="range" id="ttsSpeed" min="0.7" max="1.5" step="0.01" value="1" oninput="el('ttsSpeedVal').textContent=(+this.value).toFixed(2)+'x'">
@@ -399,8 +419,8 @@
   async function doTTS(){
     if(!sb) return;
     var text = document.getElementById('ttsText').value.trim();
-    var voice = document.getElementById('ttsVoice').value;
-    var lang = document.getElementById('ttsLang').value;
+    var voice = selVoice;
+    var lang = selLang;
     var speed = parseFloat(document.getElementById('ttsSpeed').value) || 1.0;
     var msg = document.getElementById('ttsMsg');
     var res = document.getElementById('ttsResult');
@@ -533,7 +553,53 @@
     var vs = TTS_VOICES[el('ttsLang').value] || [];
     s.innerHTML = vs.map(function(v){ return '<option value="'+v[0]+'">'+v[1]+'</option>'; }).join('');
   }
-  fillLangs();  // đổ danh sách 7 tiếng + giọng (chạy sau khi đã định nghĩa dữ liệu ở trên)
+  fillLangs();  // (cũ — vô hại, ttsLang/ttsVoice không còn nên tự bỏ qua)
+
+  // ====== KHO GIỌNG VIP (14 giọng Việt + ~28 giọng ngoại — đúng catalog động cơ) ======
+  var VI_CAT = {
+    "Minh Đức":["📰 Tin tức","Nam · Bắc"],"Minh Triết":["📰 Tin tức","Nam · Nam"],
+    "Mai Anh":["📰 Tin tức","Nữ · Bắc"],"Thùy Dung":["📰 Tin tức","Nữ · Nam"],
+    "Thái Sơn":["📖 Kể chuyện","Nam · Nam"],"Thanh Bình":["📖 Kể chuyện","Nam · Bắc"],
+    "Ngọc Linh":["📖 Kể chuyện","Nữ · Bắc"],"Thục Đoan":["📖 Kể chuyện","Nữ · Nam"],
+    "Phạm Tuyên":["🎧 Tự nhiên","Nam · Bắc"],"Xuân Vĩnh":["🎧 Tự nhiên","Nam · Nam"],
+    "Quang Sơn":["🎧 Tự nhiên","Nam · Trung"],"Trúc Ly":["🎧 Tự nhiên","Nữ · Bắc"],
+    "Đoan Trang":["🎧 Tự nhiên","Nữ · Bắc"],"Ngọc Trân":["🎧 Tự nhiên","Nữ · Trung"]
+  };
+  var KOK_CAT = {
+    en:{"Ava":["📖 Kể chuyện","Mỹ · Nữ"],"Bella":["📣 Quảng cáo","Mỹ · Nữ"],"Nicole":["🧘 Thư giãn","Mỹ · Nữ"],"Sky":["🎬 Vlog","Mỹ · Nữ"],"Luna":["📖 Kể chuyện","Mỹ · Nữ"],"Jessica":["🎧 Tự nhiên","Mỹ · Nữ"],"Kaia":["📰 Tin tức","Mỹ · Nữ"],"Nova":["📣 Quảng cáo","Mỹ · Nữ"],"River":["🧘 Thư giãn","Mỹ · Nữ"],"Sarah":["🎧 Tự nhiên","Mỹ · Nữ"],"Aria":["🎬 Vlog","Mỹ · Nữ"],"Ethan":["📰 Tin tức","Mỹ · Nam"],"Marcus":["🎬 Trailer","Mỹ · Nam"],"Jack":["📣 Quảng cáo","Mỹ · Nam"],"Mason":["📚 Tài liệu","Mỹ · Nam"],"Adam":["🎧 Tự nhiên","Mỹ · Nam"],"Leo":["📰 Tin tức","Mỹ · Nam"],"Eric":["📣 Quảng cáo","Mỹ · Nam"],"Liam":["📖 Kể chuyện","Mỹ · Nam"],"Nick":["🎄 Lễ hội","Mỹ · Nam"],"Lily":["📖 Kể chuyện","Anh · Nữ"],"Rose":["📰 Tin tức","Anh · Nữ"],"Alice":["🎧 Tự nhiên","Anh · Nữ"],"Ivy":["📖 Kể chuyện","Anh · Nữ"],"Oliver":["📖 Truyện","Anh · Nam"],"Henry":["📚 Sách nói","Anh · Nam"],"Daniel":["📰 Tin tức","Anh · Nam"],"Lewis":["📚 Sách nói","Anh · Nam"]},
+    e:{"Sofía":["🎧 Đa dụng","Nữ"],"Alejandro":["🎧 Đa dụng","Nam"]},
+    p:{"Beatriz":["🎧 Đa dụng","Nữ"],"Tiago":["🎧 Đa dụng","Nam"]},
+    h:{"Aisha":["🎧 Đa dụng","Nữ"],"Arjun":["🎧 Đa dụng","Nam"]},
+    f:{"Chloé":["🎧 Đa dụng","Nữ"]},
+    i:{"Giulia":["🎧 Đa dụng","Nữ"],"Marco":["🎧 Đa dụng","Nam"]}
+  };
+  var ALL_VOICES = [];
+  Object.keys(VI_CAT).forEach(function(n){ ALL_VOICES.push({name:n,lang:"vi",genre:VI_CAT[n][0],info:VI_CAT[n][1]}); });
+  Object.keys(KOK_CAT).forEach(function(lg){ Object.keys(KOK_CAT[lg]).forEach(function(n){ ALL_VOICES.push({name:n,lang:lg,genre:KOK_CAT[lg][n][0],info:KOK_CAT[lg][n][1]}); }); });
+
+  var GRADS=["linear-gradient(135deg,#5b78ea,#3b5bdb)","linear-gradient(135deg,#f6884a,#e8590c)","linear-gradient(135deg,#22c79a,#0ca678)","linear-gradient(135deg,#9775fa,#7048e8)","linear-gradient(135deg,#e64980,#c2255c)","linear-gradient(135deg,#f6b93b,#e8890c)"];
+  function gradFor(v){ var s=0,i; for(i=0;i<v.name.length;i++) s+=v.name.charCodeAt(i); return GRADS[s%GRADS.length]; }
+  function initsOf(n){ var p=n.trim().split(/\s+/); return (p[p.length-1][0]||"").toUpperCase(); }
+
+  var vpFilter="all", selVoice="Minh Đức", selLang="vi";
+  function vpIn(v){ if(vpFilter==="all")return true; if(vpFilter==="vi")return v.lang==="vi"; if(vpFilter==="en")return v.lang==="en"; return v.lang!=="vi"&&v.lang!=="en"; }
+  function renderVoices(){
+    var chips=[["all","🌐 Tất cả"],["vi","🇻🇳 Việt"],["en","🇬🇧🇺🇸 Anh"],["other","🌍 Khác"]];
+    if(el('vpChips')) el('vpChips').innerHTML = chips.map(function(c){ return '<button type="button" class="vp-chip'+(vpFilter===c[0]?' on':'')+'" onclick="setVpFilter(\''+c[0]+'\')">'+c[1]+'</button>'; }).join('');
+    var list = ALL_VOICES.filter(vpIn);
+    if(el('vpCount')) el('vpCount').textContent = list.length+' giọng';
+    if(!el('vpGrid')) return;
+    el('vpGrid').innerHTML = list.map(function(v){
+      return '<button type="button" class="vcard'+(selVoice===v.name?' on':'')+'" onclick="selectVoice(\''+v.name.replace(/'/g,"\\'")+'\',\''+v.lang+'\')">'+
+        '<span class="vc-ava" style="background:'+gradFor(v)+'">'+initsOf(v.name)+'</span>'+
+        '<span class="vc-info"><span class="vc-name">'+v.name+' <span class="vc-vip">VIP</span></span>'+
+        '<span class="vc-meta">'+v.genre+' · '+v.info+'</span></span>'+
+      '</button>';
+    }).join('');
+  }
+  function setVpFilter(f){ vpFilter=f; renderVoices(); }
+  function selectVoice(n,lg){ selVoice=n; selLang=lg; renderVoices(); }
+  renderVoices();
 
   // ====== MẬT KHẨU ======
   async function changePass(){
