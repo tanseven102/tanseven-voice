@@ -117,9 +117,13 @@
         <div class="desc">Mỗi ký tự = 1 lần đọc. Hết thì nạp thêm.</div>
         <a class="act" href="#" onclick="alert('Phase 4: nạp credit — sắp có');return false">+ Nạp thêm</a>
       </div>
-      <div class="box soon">
-        <div class="k">💰 Affiliate <span class="tag">Phase 3</span></div>
-        <div class="desc">Lấy link giới thiệu, theo dõi hoa hồng 12% real-time.</div>
+      <div class="box">
+        <div class="k">🤝 Affiliate — hoa hồng 12%</div>
+        <div style="display:flex;gap:26px;margin-top:8px">
+          <div><div class="credit" style="font-size:30px" id="affCount">0</div><div class="desc" style="margin:0">Người giới thiệu</div></div>
+          <div><div class="credit" style="font-size:30px;color:var(--gold)" id="affComm">0đ</div><div class="desc" style="margin:0">Hoa hồng</div></div>
+        </div>
+        <a class="act" href="#affBox" onclick="var e=document.getElementById('affBox');if(e)e.scrollIntoView({behavior:'smooth'});return false">↓ Lấy link giới thiệu</a>
       </div>
     </div>
 
@@ -140,6 +144,16 @@
         <a id="ttsDownload" class="act" download="giong-tanseven.mp3" style="margin-top:10px">⬇️ Tải file MP3</a>
       </div>
     </div>
+
+    <div class="box" id="affBox" style="margin-top:16px">
+      <div class="k">🤝 Link giới thiệu của bạn — kiếm 12% hoa hồng</div>
+      <div class="desc">Chia sẻ link này cho bạn bè, hội nhóm. Ai bấm vào rồi <b>đăng ký + mua ký tự</b>, bạn nhận ngay <b>12%</b> số tiền họ mua — khách vẫn trả giá như thường, bạn có thêm thu nhập.</div>
+      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+        <input id="affLink" readonly style="flex:1;min-width:220px;font-size:13px" value="Đăng nhập để lấy link...">
+        <button class="btn" id="affCopyBtn" style="margin:0;width:auto;padding:12px 22px" onclick="copyAff()">📋 Copy</button>
+      </div>
+      <div class="msg" id="affMsg"></div>
+    </div>
   </div>
 
   <!-- Cảnh báo chưa cấu hình Supabase -->
@@ -156,6 +170,14 @@
   const SUPABASE_ANON_KEY = "sb_publishable_Subrht5w8KLv8WC95UbriQ_XlO8QNYW";
   const FREE_CREDITS = 10000; // tặng khi đăng ký
   // ==========================================================
+
+  // Bắt mã giới thiệu từ URL (?ref=CODE) → lưu lại để dùng khi đăng ký
+  (function(){
+    try {
+      var ref = new URLSearchParams(location.search).get('ref');
+      if(ref){ localStorage.setItem('ts_ref', ref); }
+    } catch(e){}
+  })();
 
   let sb = null;
   const configured = !SUPABASE_URL.startsWith("DAN_") && !SUPABASE_ANON_KEY.startsWith("DAN_");
@@ -189,6 +211,7 @@
       const { data: prof } = await sb.from('profiles').select('name, credits').eq('id', session.user.id).single();
       el('userName').textContent = (prof && prof.name) ? prof.name : session.user.email.split('@')[0];
       el('creditNum').innerHTML = (prof ? Number(prof.credits).toLocaleString('vi-VN') : '0') + '<small> ký tự</small>';
+      loadAffiliate();
     } else {
       el('authBox').style.display='block';
       el('dashBox').style.display='none';
@@ -201,7 +224,8 @@
     const name=el('rgName').value.trim(), email=el('rgEmail').value.trim(), pass=el('rgPass').value;
     if(!name||!email||pass.length<6){ showMsg('Điền đủ tên, email, mật khẩu ≥6 ký tự.'); return; }
     el('rgBtn').disabled=true; el('rgBtn').textContent='Đang tạo...';
-    const { data, error } = await sb.auth.signUp({ email, password: pass, options:{ data:{ name } } });
+    var refBy = null; try { refBy = localStorage.getItem('ts_ref'); } catch(e){}
+    const { data, error } = await sb.auth.signUp({ email, password: pass, options:{ data:{ name, ref_by: refBy } } });
     el('rgBtn').disabled=false; el('rgBtn').textContent='Đăng ký miễn phí →';
     if(error){ showMsg(error.message); return; }
     showMsg('🎉 Tạo tài khoản thành công! Kiểm tra email xác nhận (nếu có) rồi đăng nhập.', true);
@@ -259,5 +283,29 @@
       }
     }catch(e){ msg.className='msg err'; msg.textContent='Lỗi: '+String(e); }
     btn.disabled=false; btn.textContent='🎙️ Tạo giọng';
+  }
+
+  // ====== AFFILIATE ======
+  async function loadAffiliate(){
+    if(!sb) return;
+    try {
+      const { data, error } = await sb.rpc('my_affiliate_stats');
+      if(error || !data || !data[0]) return;
+      var a = data[0];
+      var base = location.origin + location.pathname.replace(/[^/]*$/, '');
+      if(el('affLink'))  el('affLink').value = base + '?ref=' + a.aff_code;
+      if(el('affCount')) el('affCount').textContent = Number(a.referral_count||0).toLocaleString('vi-VN');
+      if(el('affComm'))  el('affComm').textContent  = Number(a.commission_total||0).toLocaleString('vi-VN') + 'đ';
+    } catch(e){}
+  }
+
+  function copyAff(){
+    var i = el('affLink'); if(!i) return;
+    var m = el('affMsg');
+    i.select(); i.setSelectionRange(0, 99999);
+    var done = function(){ if(m){ m.className='msg ok'; m.textContent='✅ Đã copy link! Gửi cho bạn bè để kiếm hoa hồng.'; } };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(i.value).then(done, function(){ try{document.execCommand('copy');}catch(e){} done(); });
+    } else { try{document.execCommand('copy');}catch(e){} done(); }
   }
 </script>

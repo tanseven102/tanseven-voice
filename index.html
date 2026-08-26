@@ -282,6 +282,9 @@
 </div></footer>
 
 <script>
+  // Bắt mã giới thiệu affiliate từ URL (?ref=CODE) → lưu để dùng khi đăng ký
+  (function(){ try{ var r=new URLSearchParams(location.search).get('ref'); if(r) localStorage.setItem('ts_ref', r); }catch(e){} })();
+
   // voice pills toggle
   document.querySelectorAll('#vrow .vpill').forEach(b=>b.onclick=()=>{
     document.querySelectorAll('#vrow .vpill').forEach(x=>x.classList.remove('on')); b.classList.add('on');
