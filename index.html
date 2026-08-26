@@ -1,0 +1,636 @@
+<meta charset="utf-8">
+<title>Tân Seven Voice</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  /* ===== Committed light look (ElevenLabs-inspired) — explicit colors ===== */
+  :root{
+    --bg:#fbfaf8; --bg2:#f3f1ec; --card:#ffffff;
+    --ink:#0b0b0c; --ink2:#2a2a2e; --muted:#71706c;
+    --line:#e8e5df; --line2:#dcd8d0;
+    --btn:#0b0b0c; --btn-ink:#ffffff;
+    --amber:#e39a2b; --amber-soft:#f6e9cf; --good:#1f9d55;
+    --maxw:1080px; --r:16px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+    font-size:17px; line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden}
+  h1,h2,h3{margin:0; line-height:1.06; letter-spacing:-.025em; font-weight:800; text-wrap:balance}
+  p{margin:0}
+  a{color:inherit; text-decoration:none}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 22px}
+  .muted{color:var(--muted)}
+  .eyebrow{font-size:12.5px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--muted)}
+
+  .btn{display:inline-flex; align-items:center; gap:8px; font-weight:700; font-size:15.5px; cursor:pointer;
+    padding:12px 22px; border-radius:999px; border:1px solid transparent; transition:transform .14s, background .2s, box-shadow .2s}
+  .btn:hover{transform:translateY(-1px)}
+  .btn-dark{background:var(--btn); color:var(--btn-ink)}
+  .btn-dark:hover{box-shadow:0 8px 24px rgba(0,0,0,.18)}
+  .btn-out{background:var(--card); color:var(--ink); border-color:var(--line2)}
+  .btn-out:hover{background:var(--bg2)}
+  .btn-sm{padding:9px 17px; font-size:14px}
+
+  /* nav */
+  nav{position:sticky; top:0; z-index:60; background:rgba(251,250,248,.82); backdrop-filter:blur(12px); border-bottom:1px solid var(--line)}
+  .nav-in{height:64px; display:flex; align-items:center; justify-content:space-between; gap:20px}
+  .brand{display:flex; align-items:center; gap:10px; font-weight:800; font-size:18px; letter-spacing:-.02em}
+  .brand .mk{width:30px;height:30px;border-radius:9px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:16px}
+  .nav-links{display:flex; gap:26px; font-size:15px; font-weight:600}
+  .nav-links a{color:var(--ink2)} .nav-links a:hover{color:var(--ink)}
+  .nav-cta{display:flex; gap:10px; align-items:center}
+  @media(max-width:820px){.nav-links{display:none} .nav-cta .ghost{display:none}}
+
+  /* language switcher (i18n) */
+  .langsw{position:relative; margin-right:auto}
+  .langsw-btn{display:inline-flex; align-items:center; gap:7px; font-family:inherit; font-size:14px; font-weight:600;
+    color:var(--ink2); background:var(--card); border:1px solid var(--line2); padding:7px 13px; border-radius:999px;
+    cursor:pointer; line-height:1; transition:border-color .15s, color .15s, box-shadow .2s}
+  .langsw-btn:hover{border-color:#bdb8ae; color:var(--ink)}
+  .langsw.open .langsw-btn{border-color:var(--ink)}
+  .langsw-globe{font-size:15px; line-height:1}
+  .langsw-cur{white-space:nowrap}
+  .langsw-chev{font-size:10px; color:var(--muted); transition:transform .18s}
+  .langsw.open .langsw-chev{transform:rotate(180deg)}
+  .langsw-menu{position:absolute; top:calc(100% + 8px); left:0; min-width:178px; background:var(--card);
+    border:1px solid var(--line2); border-radius:14px; padding:6px; display:none; flex-direction:column; gap:2px;
+    box-shadow:0 18px 44px -20px rgba(20,20,20,.34); z-index:80}
+  .langsw.open .langsw-menu{display:flex}
+  .langsw-item{display:flex; align-items:center; gap:10px; width:100%; font-family:inherit; font-size:14.5px;
+    font-weight:600; color:var(--ink2); background:transparent; border:0; padding:9px 11px; border-radius:9px;
+    cursor:pointer; text-align:left; transition:background .13s, color .13s}
+  .langsw-item:hover{background:var(--bg2); color:var(--ink)}
+  .langsw-flag{font-size:16px; flex:0 0 auto; line-height:1}
+  .langsw-name{flex:1}
+  .langsw-check{color:var(--good); font-weight:800; opacity:0; flex:0 0 auto}
+  .langsw-item.on{color:var(--ink)}
+  .langsw-item.on .langsw-check{opacity:1}
+  @media(max-width:820px){.nav-in{gap:12px}}
+  @media(max-width:480px){.langsw-cur{display:none} .nav-cta .btn-sm{padding:8px 13px; font-size:13.5px}}
+
+  /* hero */
+  header{padding:64px 0 28px; text-align:center}
+  .pill{display:inline-flex; align-items:center; gap:8px; font-size:13.5px; font-weight:600; color:var(--ink2);
+    background:var(--card); border:1px solid var(--line2); padding:7px 15px; border-radius:999px}
+  .pill .d{width:7px;height:7px;border-radius:50%;background:var(--good)}
+  h1{font-size:clamp(40px,6.4vw,68px); margin:22px auto 0; max-width:760px}
+  .sub{max-width:600px; margin:20px auto 0; font-size:clamp(17px,2.2vw,20px); color:var(--muted)}
+  .hero-cta{display:flex; gap:12px; justify-content:center; margin-top:28px; flex-wrap:wrap}
+
+  /* demo widget — the ElevenLabs star */
+  .demo{max-width:760px; margin:44px auto 0; background:var(--card); border:1px solid var(--line2);
+    border-radius:22px; padding:10px; box-shadow:0 30px 60px -34px rgba(20,20,20,.28); text-align:left}
+  .demo-in{border-radius:16px; background:var(--bg); border:1px solid var(--line); padding:20px}
+  .demo textarea{width:100%; border:0; background:transparent; resize:none; color:var(--ink); font:inherit; font-size:19px; line-height:1.5; outline:none; min-height:84px}
+  .voices-row{display:flex; gap:8px; flex-wrap:wrap; margin:6px 0 2px}
+  .vpill{font-size:13.5px; font-weight:600; padding:8px 14px; border-radius:999px; border:1px solid var(--line2); background:var(--card); cursor:pointer; transition:.15s; color:var(--ink2)}
+  .vpill:hover{border-color:#bdb8ae}
+  .vpill.on{background:var(--ink); color:#fff; border-color:var(--ink)}
+  .demo-bar{display:flex; align-items:center; gap:14px; margin-top:16px; padding-top:16px; border-top:1px solid var(--line)}
+  .play{width:46px;height:46px;border-radius:50%;background:var(--ink);color:#fff;border:0;cursor:pointer;display:grid;place-items:center;font-size:16px; flex:0 0 auto; transition:.15s}
+  .play:hover{transform:scale(1.05)}
+  .prog{flex:1; height:38px}
+  .time{font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; flex:0 0 auto}
+  .demo-note{display:flex; align-items:center; justify-content:space-between; padding:12px 12px 6px; font-size:12.5px; color:var(--muted)}
+
+  .logos{margin-top:40px; text-align:center}
+  .logos p{font-size:12.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:14px}
+  .logos .row{display:flex; gap:30px; justify-content:center; flex-wrap:wrap; opacity:.7; font-weight:700; font-size:15px}
+
+  section{padding:76px 0}
+  .sec-head{max-width:620px; margin:0 auto 44px; text-align:center}
+  .sec-head h2{font-size:clamp(30px,4.4vw,44px); margin-top:12px}
+  .sec-head p{margin-top:14px; color:var(--muted); font-size:18px}
+
+  /* language pills */
+  .lang-pills{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width:740px; margin:-22px auto 44px}
+  .lp{display:inline-flex; align-items:center; gap:7px; font-size:15px; font-weight:600; color:var(--ink2);
+    background:var(--card); border:1px solid var(--line2); padding:9px 16px; border-radius:999px; transition:.15s}
+  .lp:hover{border-color:var(--ink); transform:translateY(-1px)}
+  .lp.hide{display:none}
+  .lang-pills.open .lp.hide{display:inline-flex}
+  .lp-more{font-size:14.5px; font-weight:700; color:var(--ink); background:var(--bg2); border:1px dashed var(--line2);
+    padding:9px 17px; border-radius:999px; cursor:pointer; transition:.15s; font-family:inherit}
+  .lp-more:hover{background:var(--card); border-color:var(--ink)}
+  .lang-pills.open .lp-more{display:none}
+
+  /* voices grid */
+  .vgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+  @media(max-width:820px){.vgrid{grid-template-columns:1fr 1fr}}
+  @media(max-width:540px){.vgrid{grid-template-columns:1fr}}
+  .vcard{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:18px; display:flex; align-items:center; gap:14px; transition:.18s}
+  .vcard:hover{border-color:var(--line2); box-shadow:0 12px 30px -22px rgba(0,0,0,.3)}
+  .vcard .pp{width:40px;height:40px;border-radius:50%;background:var(--bg2);border:1px solid var(--line2);display:grid;place-items:center;font-size:15px;cursor:pointer;flex:0 0 auto}
+  .vcard .pp:hover{background:var(--ink);color:#fff}
+  .vcard .nm{font-weight:700; font-size:16px} .vcard .tg{font-size:13px; color:var(--muted)}
+  .mini{margin-left:auto; display:flex; gap:2px; align-items:center; height:26px}
+  .mini i{width:3px; background:var(--line2); border-radius:2px; display:block}
+
+  /* features */
+  .fgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--r); overflow:hidden}
+  @media(max-width:760px){.fgrid{grid-template-columns:1fr}}
+  .feat{background:var(--card); padding:30px 26px}
+  .feat .ic{font-size:22px; margin-bottom:12px; display:block}
+  .feat h3{font-size:18px; margin-bottom:7px} .feat p{color:var(--muted); font-size:15px}
+
+  /* pricing */
+  .pgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; align-items:stretch}
+  @media(max-width:820px){.pgrid{grid-template-columns:1fr}}
+  .plan{background:var(--card); border:1px solid var(--line2); border-radius:20px; padding:30px 26px; display:flex; flex-direction:column; gap:6px}
+  .plan.hot{border-color:var(--ink); box-shadow:0 0 0 1px var(--ink)}
+  .plan .badge{align-self:flex-start; font-size:11.5px; font-weight:800; letter-spacing:.05em; background:var(--amber-soft); color:#8a5a12; padding:4px 11px; border-radius:999px; margin-bottom:6px}
+  .plan .nm{font-weight:700; font-size:17px}
+  .plan .amt{font-size:36px; font-weight:800; letter-spacing:-.03em; margin-top:4px}
+  .plan .amt small{font-size:15px; color:var(--muted); font-weight:600}
+  .plan .quota{font-size:14.5px; color:var(--ink2); font-weight:600; margin:6px 0}
+  .plan ul{list-style:none; padding:0; margin:6px 0 18px; display:flex; flex-direction:column; gap:8px; font-size:14.5px; color:var(--muted)}
+  .plan li{display:flex; gap:8px; align-items:flex-start}
+  .plan li::before{content:"✓"; color:var(--good); font-weight:800}
+  .plan .btn{width:100%; justify-content:center; margin-top:auto}
+
+  /* cta */
+  .final{background:var(--ink); color:#fff; border-radius:26px; padding:64px 30px; text-align:center}
+  .final h2{font-size:clamp(30px,4.6vw,46px)} .final p{color:#c7c6c2; margin:14px auto 0; max-width:460px}
+  .final .btn-dark{background:#fff; color:var(--ink)}
+
+  footer{border-top:1px solid var(--line); padding:40px 0 60px; font-size:14.5px; color:var(--muted)}
+  .foot-in{display:flex; justify-content:space-between; gap:18px; flex-wrap:wrap; align-items:center}
+  .foot-in a{color:var(--muted)} .foot-in a:hover{color:var(--ink)}
+  .foot-links{display:flex; gap:20px; flex-wrap:wrap}
+
+  .reveal{opacity:0; transform:translateY(20px); transition:.6s ease}
+  .reveal.in{opacity:1; transform:none}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+</style>
+
+<nav><div class="wrap nav-in">
+  <div class="brand"><span class="mk">🎙️</span> Tân Seven <span style="color:var(--muted);font-weight:700">Voice</span></div>
+  <div class="langsw" id="langsw">
+    <button class="langsw-btn" id="langswBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Chọn ngôn ngữ / Select language">
+      <span class="langsw-globe">🌐</span><span class="langsw-cur" id="langswCur">Tiếng Việt</span><span class="langsw-chev">▾</span>
+    </button>
+    <div class="langsw-menu" id="langswMenu" role="menu">
+      <button class="langsw-item" type="button" role="menuitem" data-lang="vi"><span class="langsw-flag">🇻🇳</span><span class="langsw-name">Tiếng Việt</span><span class="langsw-check">✓</span></button>
+      <button class="langsw-item" type="button" role="menuitem" data-lang="en"><span class="langsw-flag">🇺🇸</span><span class="langsw-name">English</span><span class="langsw-check">✓</span></button>
+      <button class="langsw-item" type="button" role="menuitem" data-lang="hi"><span class="langsw-flag">🇮🇳</span><span class="langsw-name">हिन्दी</span><span class="langsw-check">✓</span></button>
+      <button class="langsw-item" type="button" role="menuitem" data-lang="ko"><span class="langsw-flag">🇰🇷</span><span class="langsw-name">한국어</span><span class="langsw-check">✓</span></button>
+    </div>
+  </div>
+  <div class="nav-links"><a href="#giongnoi" data-i18n="nav.voices">Giọng nói</a><a href="#tinhnang" data-i18n="nav.features">Tính năng</a><a href="#gia" data-i18n="nav.pricing">Bảng giá</a><a href="affiliate.html" data-i18n="nav.affiliate">Affiliate</a></div>
+  <div class="nav-cta"><a href="tai-khoan.html" class="btn btn-out btn-sm ghost" data-i18n="nav.login">Đăng nhập</a><a href="tai-khoan.html" class="btn btn-dark btn-sm" data-i18n="nav.start">Bắt đầu miễn phí</a></div>
+</div></nav>
+
+<header><div class="wrap">
+  <span class="pill"><span class="d"></span><span data-i18n="hero.pill">Dành riêng cho dân làm YouTube 🎬</span></span>
+  <h1 data-i18n="hero.h1">Giọng đọc AI dành riêng cho dân YouTube</h1>
+  <p class="sub" data-i18n="hero.sub">Biến kịch bản thành giọng lồng tiếng studio — giọng Việt cảm xúc như người thật, cùng nhiều thứ tiếng — chỉ trong vài giây. Không cần thu âm, không cần MC. Clone giọng, xuất phụ đề, dùng ngay trên trình duyệt.</p>
+  <div class="hero-cta">
+    <a href="tai-khoan.html" class="btn btn-dark" data-i18n="hero.cta1">Tạo giọng miễn phí</a>
+    <a href="#giongnoi" class="btn btn-out" data-i18n="hero.cta2">Nghe thử giọng</a>
+  </div>
+
+  <!-- DEMO widget -->
+  <div class="demo reveal">
+    <div class="demo-in">
+      <textarea id="ta" spellcheck="false">Xin chào, mình là Tân Seven. Hôm nay chúng ta sẽ cùng khám phá cách tạo giọng nói AI cực hay cho kênh YouTube của bạn.</textarea>
+      <div class="voices-row" id="vrow">
+        <button class="vpill on">🇻🇳 Minh Đức · Tiếng Việt</button>
+        <button class="vpill">🇻🇳 Lan Anh · Tiếng Việt</button>
+        <button class="vpill">🇺🇸 Adam · English</button>
+        <button class="vpill">🇫🇷 Chloé · Français</button>
+        <button class="vpill">🇪🇸 Sofía · Español</button>
+        <button class="vpill">🇵🇹 Beatriz · Português</button>
+        <button class="vpill">🇮🇳 Aarav · Hindi</button>
+      </div>
+      <div class="demo-bar">
+        <button class="play" id="play">▶</button>
+        <canvas class="prog" id="prog" width="1200" height="76"></canvas>
+        <span class="time" id="time">0:00 / 0:08</span>
+      </div>
+    </div>
+    <div class="demo-note"><span data-i18n="demo.note1">⚡ Tạo trong ~1 giây trên GPU</span><span data-i18n="demo.note2">🎧 Chất lượng 48kHz</span></div>
+  </div>
+
+  <div class="logos"><p data-i18n="logos.for">Dành cho dân làm nội dung</p>
+    <div class="row"><span>▶ YouTube</span><span>🎧 Podcast</span><span>📕 Sách nói</span><span>🎬 Lồng tiếng</span><span>📱 TikTok</span></div>
+  </div>
+</div></header>
+
+<section id="giongnoi" style="background:var(--bg2)">
+  <div class="wrap">
+    <div class="sec-head reveal"><p class="eyebrow" data-i18n="voices.eyebrow">Thư viện giọng</p><h2 data-i18n="voices.h2">Giọng thật · 16+ ngôn ngữ</h2><p data-i18n="voices.sub">Chọn giọng hợp video của bạn — hoặc clone giọng riêng.</p></div>
+    <div class="lang-pills reveal" id="langPills">
+      <span class="lp">🇻🇳 Tiếng Việt</span><span class="lp">🇺🇸 English</span><span class="lp">🇫🇷 Français</span><span class="lp">🇪🇸 Español</span><span class="lp">🇵🇹 Português</span><span class="lp">🇮🇹 Italiano</span><span class="lp">🇮🇳 Hindi</span><span class="lp">🇯🇵 日本語</span><span class="lp hide">🇰🇷 한국어</span><span class="lp hide">🇨🇳 中文</span><span class="lp hide">🇩🇪 Deutsch</span><span class="lp hide">🇷🇺 Русский</span><span class="lp hide">🇸🇦 العربية</span><span class="lp hide">🇵🇱 Polski</span><span class="lp hide">🇹🇷 Türkçe</span><span class="lp hide">🇳🇱 Nederlands</span><button class="lp-more" id="langMore" data-i18n="voices.more">+ Xem thêm 8 ngôn ngữ</button>
+    </div>
+    <div class="vgrid" id="vgrid"></div>
+  </div>
+</section>
+
+<section id="tinhnang">
+  <div class="wrap">
+    <div class="sec-head reveal"><p class="eyebrow" data-i18n="features.eyebrow">Tính năng</p><h2 data-i18n="features.h2">Đủ đồ nghề làm video</h2></div>
+    <div class="fgrid reveal">
+      <div class="feat"><span class="ic">🧬</span><h3 data-i18n="feat.clone.h3">Clone giọng như thật</h3><p data-i18n="feat.clone.p">Bỏ file giọng mẫu vào, AI clone lại <b style="color:var(--ink2)">giống hệt — giọng VIP, cảm xúc như người thật</b>. Chỉ vài giây là có giọng riêng cho kênh.</p></div>
+      <div class="feat"><span class="ic">🌍</span><h3 data-i18n="feat.multi.h3">Đa ngôn ngữ</h3><p data-i18n="feat.multi.p">Việt, Anh, TBN, Pháp, Ý, Bồ, Hindi… <b style="color:var(--ink2)">liên tục thêm tiếng mới</b> — chinh phục khán giả toàn cầu.</p></div>
+      <div class="feat"><span class="ic">📦</span><h3 data-i18n="feat.batch.h3">Tạo hàng loạt</h3><p data-i18n="feat.batch.p">Bỏ nhiều kịch bản, AI đọc lần lượt ra từng file.</p></div>
+      <div class="feat"><span class="ic">📝</span><h3 data-i18n="feat.srt.h3">Phụ đề SRT</h3><p data-i18n="feat.srt.p">Có luôn file .SRT — kéo thẳng vào video, khỏi làm tay.</p></div>
+      <div class="feat"><span class="ic">⚡</span><h3 data-i18n="feat.fast.h3">Nhanh tức thì</h3><p data-i18n="feat.fast.p">Chạy trên GPU — vài giây có ngay giọng, không chờ.</p></div>
+      <div class="feat"><span class="ic">🎬</span><h3 data-i18n="feat.topic.h3">Hợp mọi chủ đề</h3><p data-i18n="feat.topic.p">Tin tức, kinh thánh, kể chuyện, sách nói, thiếu nhi… chỉnh giọng <b style="color:var(--ink2)">vui – buồn – trầm ấm</b> hợp từng video.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="gia" style="background:var(--bg2)">
+  <div class="wrap">
+    <div class="sec-head reveal"><p class="eyebrow" data-i18n="pricing.eyebrow">Bảng giá</p><h2 data-i18n="pricing.h2">Mua ký tự — dùng vĩnh viễn</h2><p data-i18n="pricing.sub">Mua 1 lần, ký tự <b>dùng vĩnh viễn — không hết hạn</b>. Giá tốt nhất thị trường — giọng đọc VIP, cảm xúc như người thật.</p></div>
+    <div class="pgrid">
+      <div class="plan reveal"><span class="nm" data-i18n="plan.free.nm">Miễn phí</span><span class="amt">0<small>đ</small></span>
+        <span class="quota" data-i18n="plan.free.quota">10.000 ký tự · dùng thử</span>
+        <ul><li data-i18n="plan.free.li1">Nghe thử mọi giọng</li><li data-i18n="plan.free.li2">Tải file MP3</li></ul>
+        <a href="tai-khoan.html" class="btn btn-out" data-i18n="plan.free.btn">Bắt đầu</a></div>
+      <div class="plan hot reveal"><span class="badge" data-i18n="plan.popular">PHỔ BIẾN</span><span class="nm" data-i18n="plan.basic.nm">Cơ bản</span><span class="amt" data-i18n="plan.basic.amt">99.000<small>đ</small></span>
+        <span class="quota" data-i18n="plan.basic.quota">1.200.000 ký tự · vĩnh viễn (~20 giờ audio)</span>
+        <ul><li data-i18n="plan.basic.li1">Full tính năng</li><li data-i18n="plan.basic.li2">Clone giọng</li><li data-i18n="plan.basic.li3">Xuất phụ đề SRT</li></ul>
+        <a href="tai-khoan.html" class="btn btn-dark" data-i18n="plan.subscribe">Mua ngay</a></div>
+      <div class="plan reveal"><span class="nm" data-i18n="plan.pro.nm">Pro</span><span class="amt" data-i18n="plan.pro.amt">299.000<small>đ</small></span>
+        <span class="quota" data-i18n="plan.pro.quota">3.000.000 ký tự · vĩnh viễn (~50 giờ audio)</span>
+        <ul><li data-i18n="plan.pro.li1">Tất cả gói Cơ bản</li><li data-i18n="plan.pro.li2">Tạo hàng loạt</li><li data-i18n="plan.pro.li3">Ưu tiên tốc độ</li><li data-i18n="plan.pro.li4">Mua thêm ký tự bất kỳ lúc nào</li></ul>
+        <a href="tai-khoan.html" class="btn btn-out" data-i18n="plan.subscribe">Mua ngay</a></div>
+    </div>
+    <p class="muted" style="text-align:center;margin-top:30px;font-size:14px" data-i18n="pricing.note">Tất cả gói chạy ngay trên trình duyệt — không cần cài đặt, không cần card. Cần nhiều hơn? <a href="#" style="color:var(--ink);font-weight:600;text-decoration:underline">Liên hệ Tân Seven</a> để có gói riêng.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap"><div class="final reveal">
+    <h2 data-i18n="final.h2">Sẵn sàng lên sóng chưa?</h2>
+    <p data-i18n="final.p">Đăng ký miễn phí — có ngay giọng lồng tiếng AI đẳng cấp cho kênh YouTube của bạn.</p>
+    <div class="hero-cta" style="margin-top:26px"><a href="tai-khoan.html" class="btn btn-dark" data-i18n="final.btn">Tạo giọng miễn phí</a></div>
+  </div></div>
+</section>
+
+<footer><div class="wrap">
+  <div class="foot-in">
+    <div class="brand" style="font-size:16px"><span class="mk" style="width:26px;height:26px;font-size:14px">🎙️</span> Tân Seven Voice</div>
+    <div class="foot-links"><a href="#">Facebook</a><a href="#" data-i18n="footer.zalo">Nhóm Zalo</a><a href="#gia" data-i18n="nav.pricing">Bảng giá</a><a href="dieu-khoan.html" data-i18n="footer.terms">Điều khoản</a></div>
+    <div>© 2026 Tân Seven</div>
+  </div>
+  <p style="margin-top:20px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);max-width:660px" data-i18n="footer.disclaimer">
+    ⚠️ <b>Về tính năng Clone giọng:</b> bạn chỉ được clone <b>giọng của mình</b> hoặc giọng <b>bạn có quyền sử dụng</b>. Không dùng để mạo danh, lừa đảo hay mục đích trái pháp luật. Người dùng tự chịu trách nhiệm về giọng mình clone.
+  </p>
+</div></footer>
+
+<script>
+  // voice pills toggle
+  document.querySelectorAll('#vrow .vpill').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('#vrow .vpill').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  });
+
+  // language pills "see more" toggle
+  var langMore=document.getElementById('langMore');
+  if(langMore){ langMore.onclick=function(){ document.getElementById('langPills').classList.add('open'); }; }
+
+  // hero progress waveform (mock playback)
+  const cv=document.getElementById('prog'),cx=cv.getContext('2d');
+  let W,H,DPR=Math.min(2,devicePixelRatio||1);
+  function size(){W=cv.clientWidth;H=cv.clientHeight;cv.width=W*DPR;cv.height=H*DPR;cx.setTransform(DPR,0,0,DPR,0,0);}
+  const NB=90, amps=Array.from({length:NB},(_,i)=>{const e=Math.sin(i/NB*Math.PI);return .18+e*(.35+Math.random()*.5);});
+  let playing=false, pos=0, raf=0;
+  function drawProg(){
+    cx.clearRect(0,0,W,H); const bw=W/NB, mid=H/2;
+    for(let i=0;i<NB;i++){const h=amps[i]*H*.92, x=i*bw+bw*.28, w=Math.max(2,bw*.42), y=mid-h/2;
+      cx.fillStyle=(i/NB<=pos)?'#0b0b0c':'#d9d5cd';
+      cx.beginPath(); cx.roundRect(x,y,w,h,w/2); cx.fill();}
+  }
+  function tick(){ if(!playing)return; pos+=1/(8*60); if(pos>=1){pos=0;playing=false;document.getElementById('play').textContent='▶';}
+    document.getElementById('time').textContent='0:0'+Math.min(8,Math.floor(pos*8))+' / 0:08';
+    drawProg(); raf=requestAnimationFrame(tick);}
+  document.getElementById('play').onclick=function(){ playing=!playing; this.textContent=playing?'❚❚':'▶'; if(playing)tick(); };
+  size(); drawProg(); addEventListener('resize',()=>{size();drawProg();});
+
+  // voice cards
+  const VS=[['🇻🇳','Minh Đức','Tiếng Việt · Nam Bắc · Tin tức'],['🇻🇳','Lan Anh','Tiếng Việt · Nữ Nam · Kể chuyện'],['🇻🇳','Trọng Khang','Tiếng Việt · Nam trầm · Phim'],
+    ['🇺🇸','Adam','English · Nam · Deep'],['🇺🇸','Bella','English · Nữ · Warm'],
+    ['🇫🇷','Chloé','Français · Nữ · Tự nhiên'],['🇪🇸','Sofía','Español · Nữ · Đa dụng'],['🇵🇹','Beatriz','Português · Nữ · Đa dụng'],['🇮🇹','Giulia','Italiano · Nữ · Đa dụng'],
+    ['🇮🇳','Aarav','हिन्दी Hindi · Nam']];
+  document.getElementById('vgrid').innerHTML=VS.map(v=>`<div class="vcard reveal"><span class="pp">▶</span>
+    <div><div class="nm">${v[1]}</div><div class="tg">${v[2]}</div></div>
+    <span class="mini">${Array.from({length:16},()=>`<i style="height:${6+Math.random()*20|0}px"></i>`).join('')}</span></div>`).join('');
+
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+
+<script>
+  /* ===== i18n — multi-language switcher (self-contained, no libraries) ===== */
+  const I18N = {
+    vi: {
+      'nav.voices':'Giọng nói',
+      'nav.features':'Tính năng',
+      'nav.pricing':'Bảng giá',
+      'nav.affiliate':'Affiliate',
+      'nav.login':'Đăng nhập',
+      'nav.start':'Bắt đầu miễn phí',
+      'hero.pill':'Dành riêng cho dân làm YouTube 🎬',
+      'hero.h1':'Giọng đọc AI dành riêng cho dân YouTube',
+      'hero.sub':'Biến kịch bản thành giọng lồng tiếng studio — giọng Việt cảm xúc như người thật, cùng nhiều thứ tiếng — chỉ trong vài giây. Không cần thu âm, không cần MC. Clone giọng, xuất phụ đề, dùng ngay trên trình duyệt.',
+      'hero.cta1':'Tạo giọng miễn phí',
+      'hero.cta2':'Nghe thử giọng',
+      'demo.note1':'⚡ Tạo trong ~1 giây trên GPU',
+      'demo.note2':'🎧 Chất lượng 48kHz',
+      'logos.for':'Dành cho dân làm nội dung',
+      'voices.eyebrow':'Thư viện giọng',
+      'voices.h2':'Giọng thật · 16+ ngôn ngữ',
+      'voices.sub':'Chọn giọng hợp video của bạn — hoặc clone giọng riêng.',
+      'voices.more':'+ Xem thêm 8 ngôn ngữ',
+      'features.eyebrow':'Tính năng',
+      'features.h2':'Đủ đồ nghề làm video',
+      'feat.clone.h3':'Clone giọng như thật',
+      'feat.clone.p':'Bỏ file giọng mẫu vào, AI clone lại <b style="color:var(--ink2)">giống hệt — giọng VIP, cảm xúc như người thật</b>. Chỉ vài giây là có giọng riêng cho kênh.',
+      'feat.multi.h3':'Đa ngôn ngữ',
+      'feat.multi.p':'Việt, Anh, TBN, Pháp, Ý, Bồ, Hindi… <b style="color:var(--ink2)">liên tục thêm tiếng mới</b> — chinh phục khán giả toàn cầu.',
+      'feat.batch.h3':'Tạo hàng loạt',
+      'feat.batch.p':'Bỏ nhiều kịch bản, AI đọc lần lượt ra từng file.',
+      'feat.srt.h3':'Phụ đề SRT',
+      'feat.srt.p':'Có luôn file .SRT — kéo thẳng vào video, khỏi làm tay.',
+      'feat.fast.h3':'Nhanh tức thì',
+      'feat.fast.p':'Chạy trên GPU — vài giây có ngay giọng, không chờ.',
+      'feat.topic.h3':'Hợp mọi chủ đề',
+      'feat.topic.p':'Tin tức, kinh thánh, kể chuyện, sách nói, thiếu nhi… chỉnh giọng <b style="color:var(--ink2)">vui – buồn – trầm ấm</b> hợp từng video.',
+      'pricing.eyebrow':'Bảng giá',
+      'pricing.h2':'Mua ký tự — dùng vĩnh viễn',
+      'pricing.sub':'Mua 1 lần, ký tự <b>dùng vĩnh viễn — không hết hạn</b>. Giá tốt nhất thị trường — giọng đọc VIP, cảm xúc như người thật.',
+      'plan.free.nm':'Miễn phí',
+      'plan.basic.nm':'Cơ bản',
+      'plan.pro.nm':'Pro',
+      'plan.popular':'PHỔ BIẾN',
+      'plan.free.quota':'10.000 ký tự · dùng thử',
+      'plan.basic.quota':'1.200.000 ký tự · vĩnh viễn (~20 giờ audio)',
+      'plan.pro.quota':'3.000.000 ký tự · vĩnh viễn (~50 giờ audio)',
+      'plan.basic.amt':'99.000<small>đ</small>',
+      'plan.pro.amt':'299.000<small>đ</small>',
+      'plan.free.btn':'Bắt đầu',
+      'plan.subscribe':'Mua ngay',
+      'plan.free.li1':'Nghe thử mọi giọng',
+      'plan.free.li2':'Tải file MP3',
+      'plan.basic.li1':'Full tính năng',
+      'plan.basic.li2':'Clone giọng',
+      'plan.basic.li3':'Xuất phụ đề SRT',
+      'plan.pro.li1':'Tất cả gói Cơ bản',
+      'plan.pro.li2':'Tạo hàng loạt',
+      'plan.pro.li3':'Ưu tiên tốc độ',
+      'plan.pro.li4':'Mua thêm ký tự bất kỳ lúc nào',
+      'pricing.note':'Tất cả gói chạy ngay trên trình duyệt — không cần cài đặt, không cần card. Cần nhiều hơn? <a href="#" style="color:var(--ink);font-weight:600;text-decoration:underline">Liên hệ Tân Seven</a> để có gói riêng.',
+      'final.h2':'Sẵn sàng lên sóng chưa?',
+      'final.p':'Đăng ký miễn phí — có ngay giọng lồng tiếng AI đẳng cấp cho kênh YouTube của bạn.',
+      'final.btn':'Tạo giọng miễn phí',
+      'footer.zalo':'Nhóm Zalo',
+      'footer.terms':'Điều khoản',
+      'footer.disclaimer':'⚠️ <b>Về tính năng Clone giọng:</b> bạn chỉ được clone <b>giọng của mình</b> hoặc giọng <b>bạn có quyền sử dụng</b>. Không dùng để mạo danh, lừa đảo hay mục đích trái pháp luật. Người dùng tự chịu trách nhiệm về giọng mình clone.'
+    },
+    en: {
+      'nav.voices':'Voices',
+      'nav.features':'Features',
+      'nav.pricing':'Pricing',
+      'nav.affiliate':'Affiliate',
+      'nav.login':'Log in',
+      'nav.start':'Start free',
+      'hero.pill':'Built for YouTube creators 🎬',
+      'hero.h1':'AI voiceovers built for YouTube creators',
+      'hero.sub':'Turn your script into studio-quality voiceovers — natural, human-like Vietnamese plus many more languages — in just seconds. No recording, no voice actors. Clone voices, export subtitles, all right in your browser.',
+      'hero.cta1':'Create voice for free',
+      'hero.cta2':'Listen to voices',
+      'demo.note1':'⚡ Generated in ~1s on GPU',
+      'demo.note2':'🎧 48kHz quality',
+      'logos.for':'Made for content creators',
+      'voices.eyebrow':'Voice library',
+      'voices.h2':'Real voices · 16+ languages',
+      'voices.sub':'Pick the voice that fits your video — or clone your own.',
+      'voices.more':'+ See 8 more languages',
+      'features.eyebrow':'Features',
+      'features.h2':'Everything you need to make videos',
+      'feat.clone.h3':'Lifelike voice cloning',
+      'feat.clone.p':'Drop in a voice sample and the AI clones it <b style="color:var(--ink2)">perfectly — premium quality, human-like emotion</b>. Your channel gets its own voice in seconds.',
+      'feat.multi.h3':'Multilingual',
+      'feat.multi.p':'Vietnamese, English, Spanish, French, Italian, Portuguese, Hindi… <b style="color:var(--ink2)">with new languages added all the time</b> — win over a global audience.',
+      'feat.batch.h3':'Batch generation',
+      'feat.batch.p':'Add multiple scripts and the AI voices each one into its own file.',
+      'feat.srt.h3':'SRT subtitles',
+      'feat.srt.p':'Get a ready .SRT file — drag it straight into your video, no manual work.',
+      'feat.fast.h3':'Instantly fast',
+      'feat.fast.p':'Runs on GPU — voices in seconds, no waiting.',
+      'feat.topic.h3':'Fits any topic',
+      'feat.topic.p':'News, scripture, storytelling, audiobooks, kids content… tune the voice to be <b style="color:var(--ink2)">cheerful, sad, or warm</b> to fit every video.',
+      'pricing.eyebrow':'Pricing',
+      'pricing.h2':'Buy characters — yours forever',
+      'pricing.sub':'Pay once — characters <b>never expire, yours forever</b>. The best price on the market — premium voices with human-like emotion.',
+      'plan.free.nm':'Free',
+      'plan.basic.nm':'Basic',
+      'plan.pro.nm':'Pro',
+      'plan.popular':'POPULAR',
+      'plan.free.quota':'10,000 characters · trial',
+      'plan.basic.quota':'1,200,000 characters · lifetime (~20 hours audio)',
+      'plan.pro.quota':'3,000,000 characters · lifetime (~50 hours audio)',
+      'plan.basic.amt':'99,000<small>đ</small>',
+      'plan.pro.amt':'299,000<small>đ</small>',
+      'plan.free.btn':'Get started',
+      'plan.subscribe':'Buy now',
+      'plan.free.li1':'Preview every voice',
+      'plan.free.li2':'Download MP3 files',
+      'plan.basic.li1':'All features',
+      'plan.basic.li2':'Voice cloning',
+      'plan.basic.li3':'SRT subtitle export',
+      'plan.pro.li1':'Everything in Basic',
+      'plan.pro.li2':'Batch generation',
+      'plan.pro.li3':'Priority speed',
+      'plan.pro.li4':'Buy extra characters anytime',
+      'pricing.note':'Every plan runs right in your browser — no install, no graphics card needed. Need more? <a href="#" style="color:var(--ink);font-weight:600;text-decoration:underline">Contact Tân Seven</a> for a custom plan.',
+      'final.h2':'Ready to go live?',
+      'final.p':'Sign up free — get world-class AI voiceovers for your YouTube channel right away.',
+      'final.btn':'Create voice for free',
+      'footer.zalo':'Zalo group',
+      'footer.terms':'Terms',
+      'footer.disclaimer':'⚠️ <b>About voice cloning:</b> you may only clone <b>your own voice</b> or a voice <b>you have the rights to use</b>. Do not use it for impersonation, fraud, or any unlawful purpose. Users are responsible for the voices they clone.'
+    },
+    hi: {
+      'nav.voices':'आवाज़ें',
+      'nav.features':'फ़ीचर्स',
+      'nav.pricing':'मूल्य',
+      'nav.affiliate':'एफ़िलिएट',
+      'nav.login':'लॉग इन',
+      'nav.start':'मुफ़्त शुरू करें',
+      'hero.pill':'यूट्यूब क्रिएटर्स के लिए ख़ास 🎬',
+      'hero.h1':'यूट्यूब क्रिएटर्स के लिए बनी AI आवाज़',
+      'hero.sub':'अपनी स्क्रिप्ट को सेकंडों में स्टूडियो-क्वालिटी वॉइसओवर में बदलें — असली इंसान जैसी वियतनामी आवाज़ और कई भाषाओं में। न रिकॉर्डिंग, न कोई एंकर। आवाज़ क्लोन करें, सबटाइटल एक्सपोर्ट करें, सब कुछ सीधे ब्राउज़र में।',
+      'hero.cta1':'मुफ़्त में आवाज़ बनाएं',
+      'hero.cta2':'आवाज़ें सुनें',
+      'demo.note1':'⚡ GPU पर ~1 सेकंड में तैयार',
+      'demo.note2':'🎧 48kHz क्वालिटी',
+      'logos.for':'कंटेंट क्रिएटर्स के लिए',
+      'voices.eyebrow':'आवाज़ लाइब्रेरी',
+      'voices.h2':'असली आवाज़ें · 16+ भाषाएं',
+      'voices.sub':'अपने वीडियो के लिए सही आवाज़ चुनें — या अपनी आवाज़ क्लोन करें।',
+      'voices.more':'+ 8 और भाषाएं देखें',
+      'features.eyebrow':'फ़ीचर्स',
+      'features.h2':'वीडियो बनाने के लिए हर ज़रूरी टूल',
+      'feat.clone.h3':'हूबहू आवाज़ क्लोनिंग',
+      'feat.clone.p':'एक सैंपल आवाज़ डालें और AI उसे <b style="color:var(--ink2)">हूबहू क्लोन करता है — प्रीमियम क्वालिटी, इंसान जैसी भावनाएं</b>। कुछ ही सेकंड में आपके चैनल की अपनी आवाज़।',
+      'feat.multi.h3':'बहुभाषी',
+      'feat.multi.p':'वियतनामी, अंग्रेज़ी, स्पेनिश, फ़्रेंच, इतालवी, पुर्तगाली, हिंदी… <b style="color:var(--ink2)">नई भाषाएं लगातार जुड़ती रहती हैं</b> — दुनिया भर के दर्शकों को जीतें।',
+      'feat.batch.h3':'बैच जनरेशन',
+      'feat.batch.p':'कई स्क्रिप्ट डालें, AI हर एक को अलग फ़ाइल में पढ़ देता है।',
+      'feat.srt.h3':'SRT सबटाइटल',
+      'feat.srt.p':'तैयार .SRT फ़ाइल पाएं — सीधे वीडियो में खींचें, कोई मैनुअल काम नहीं।',
+      'feat.fast.h3':'बिजली सी तेज़',
+      'feat.fast.p':'GPU पर चलता है — कुछ सेकंड में आवाज़, कोई इंतज़ार नहीं।',
+      'feat.topic.h3':'हर विषय के लिए',
+      'feat.topic.p':'न्यूज़, धर्मग्रंथ, कहानियां, ऑडियोबुक, बच्चों का कंटेंट… हर वीडियो के लिए आवाज़ को <b style="color:var(--ink2)">खुशनुमा, उदास या गर्मजोश</b> बनाएं।',
+      'pricing.eyebrow':'मूल्य',
+      'pricing.h2':'कैरेक्टर खरीदें — हमेशा के लिए आपके',
+      'pricing.sub':'एक बार भुगतान करें — कैरेक्टर <b>कभी एक्सपायर नहीं, हमेशा आपके</b>। बाज़ार में सबसे अच्छी कीमत — इंसान जैसी भावनाओं वाली प्रीमियम आवाज़ें।',
+      'plan.free.nm':'मुफ़्त',
+      'plan.basic.nm':'बेसिक',
+      'plan.pro.nm':'प्रो',
+      'plan.popular':'लोकप्रिय',
+      'plan.free.quota':'10,000 कैरेक्टर · ट्रायल',
+      'plan.basic.quota':'1,200,000 कैरेक्टर · लाइफटाइम (~20 घंटे ऑडियो)',
+      'plan.pro.quota':'3,000,000 कैरेक्टर · लाइफटाइम (~50 घंटे ऑडियो)',
+      'plan.basic.amt':'99,000<small>đ</small>',
+      'plan.pro.amt':'299,000<small>đ</small>',
+      'plan.free.btn':'शुरू करें',
+      'plan.subscribe':'अभी खरीदें',
+      'plan.free.li1':'हर आवाज़ सुनें',
+      'plan.free.li2':'MP3 फ़ाइलें डाउनलोड करें',
+      'plan.basic.li1':'सभी फ़ीचर्स',
+      'plan.basic.li2':'आवाज़ क्लोनिंग',
+      'plan.basic.li3':'SRT सबटाइटल एक्सपोर्ट',
+      'plan.pro.li1':'बेसिक की सभी सुविधाएं',
+      'plan.pro.li2':'बैच जनरेशन',
+      'plan.pro.li3':'प्रायोरिटी स्पीड',
+      'plan.pro.li4':'कभी भी अतिरिक्त कैरेक्टर खरीदें',
+      'pricing.note':'सभी प्लान सीधे ब्राउज़र में चलते हैं — न इंस्टॉल, न ग्राफ़िक्स कार्ड ज़रूरी। और चाहिए? कस्टम प्लान के लिए <a href="#" style="color:var(--ink);font-weight:600;text-decoration:underline">Tân Seven से संपर्क करें</a>।',
+      'final.h2':'लाइव जाने के लिए तैयार?',
+      'final.p':'मुफ़्त साइन अप करें — अपने यूट्यूब चैनल के लिए तुरंत बेहतरीन AI वॉइसओवर पाएं।',
+      'final.btn':'मुफ़्त में आवाज़ बनाएं',
+      'footer.zalo':'ज़ालो ग्रुप',
+      'footer.terms':'नियम व शर्तें',
+      'footer.disclaimer':'⚠️ <b>वॉइस क्लोनिंग के बारे में:</b> आप केवल <b>अपनी आवाज़</b> या ऐसी आवाज़ क्लोन कर सकते हैं <b>जिसका उपयोग करने का आपको अधिकार है</b>। इसका उपयोग किसी की नकल, धोखाधड़ी या किसी गैरकानूनी काम के लिए न करें। क्लोन की गई आवाज़ों की ज़िम्मेदारी उपयोगकर्ता की है।'
+    },
+    ko: {
+      'nav.voices':'음성',
+      'nav.features':'기능',
+      'nav.pricing':'요금제',
+      'nav.affiliate':'제휴',
+      'nav.login':'로그인',
+      'nav.start':'무료로 시작',
+      'hero.pill':'유튜브 크리에이터 전용 🎬',
+      'hero.h1':'유튜브 크리에이터를 위한 AI 보이스',
+      'hero.sub':'대본을 몇 초 만에 스튜디오급 더빙으로 — 사람처럼 자연스러운 베트남어와 여러 언어로 만들어 보세요. 녹음도, 성우도 필요 없습니다. 음성 복제와 자막 내보내기까지 브라우저에서 바로.',
+      'hero.cta1':'무료로 음성 만들기',
+      'hero.cta2':'음성 미리 듣기',
+      'demo.note1':'⚡ GPU에서 약 1초 만에 생성',
+      'demo.note2':'🎧 48kHz 고음질',
+      'logos.for':'콘텐츠 크리에이터를 위해',
+      'voices.eyebrow':'음성 라이브러리',
+      'voices.h2':'리얼 보이스 · 16개 이상 언어',
+      'voices.sub':'영상에 어울리는 음성을 고르거나, 나만의 음성을 복제하세요.',
+      'voices.more':'+ 8개 언어 더 보기',
+      'features.eyebrow':'기능',
+      'features.h2':'영상 제작에 필요한 모든 것',
+      'feat.clone.h3':'진짜 같은 음성 복제',
+      'feat.clone.p':'샘플 음성만 넣으면 AI가 <b style="color:var(--ink2)">완벽하게 복제합니다 — 프리미엄 음질, 사람 같은 감정 표현</b>. 몇 초 만에 채널만의 목소리가 완성됩니다.',
+      'feat.multi.h3':'다국어 지원',
+      'feat.multi.p':'베트남어, 영어, 스페인어, 프랑스어, 이탈리아어, 포르투갈어, 힌디어… <b style="color:var(--ink2)">새로운 언어가 계속 추가됩니다</b> — 전 세계 시청자를 사로잡으세요.',
+      'feat.batch.h3':'일괄 생성',
+      'feat.batch.p':'여러 대본을 넣으면 AI가 각각을 개별 파일로 만들어 줍니다.',
+      'feat.srt.h3':'SRT 자막',
+      'feat.srt.p':'완성된 .SRT 파일 제공 — 영상에 바로 끌어다 넣으면 끝, 수작업이 필요 없습니다.',
+      'feat.fast.h3':'즉각적인 속도',
+      'feat.fast.p':'GPU로 구동 — 몇 초 만에 음성 완성, 기다림이 없습니다.',
+      'feat.topic.h3':'모든 주제에 어울림',
+      'feat.topic.p':'뉴스, 성경, 스토리텔링, 오디오북, 어린이 콘텐츠… 영상에 맞게 목소리를 <b style="color:var(--ink2)">밝게, 슬프게, 따뜻하게</b> 조절하세요.',
+      'pricing.eyebrow':'요금제',
+      'pricing.h2':'글자 수 구매 — 평생 소장',
+      'pricing.sub':'한 번만 결제하면 글자 수가 <b>만료 없이 평생</b> 유지됩니다. 시장 최고의 가격 — 사람 같은 감정의 프리미엄 음성.',
+      'plan.free.nm':'무료',
+      'plan.basic.nm':'베이직',
+      'plan.pro.nm':'프로',
+      'plan.popular':'인기',
+      'plan.free.quota':'10,000자 · 체험',
+      'plan.basic.quota':'1,200,000자 · 평생 (오디오 약 20시간)',
+      'plan.pro.quota':'3,000,000자 · 평생 (오디오 약 50시간)',
+      'plan.basic.amt':'99,000<small>đ</small>',
+      'plan.pro.amt':'299,000<small>đ</small>',
+      'plan.free.btn':'시작하기',
+      'plan.subscribe':'구매하기',
+      'plan.free.li1':'모든 음성 미리 듣기',
+      'plan.free.li2':'MP3 파일 다운로드',
+      'plan.basic.li1':'모든 기능 이용',
+      'plan.basic.li2':'음성 복제',
+      'plan.basic.li3':'SRT 자막 내보내기',
+      'plan.pro.li1':'베이직의 모든 기능',
+      'plan.pro.li2':'일괄 생성',
+      'plan.pro.li3':'우선 처리 속도',
+      'plan.pro.li4':'언제든 글자 수 추가 구매',
+      'pricing.note':'모든 요금제는 브라우저에서 바로 실행됩니다 — 설치도, 그래픽 카드도 필요 없습니다. 더 필요하신가요? 맞춤 요금제는 <a href="#" style="color:var(--ink);font-weight:600;text-decoration:underline">Tân Seven에 문의</a>하세요.',
+      'final.h2':'이제 방송할 준비 되셨나요?',
+      'final.p':'무료로 가입하고, 유튜브 채널을 위한 최고급 AI 더빙을 바로 만나보세요.',
+      'final.btn':'무료로 음성 만들기',
+      'footer.zalo':'Zalo 그룹',
+      'footer.terms':'이용약관',
+      'footer.disclaimer':'⚠️ <b>음성 복제 안내:</b> <b>본인의 음성</b> 또는 <b>사용 권한이 있는 음성</b>만 복제할 수 있습니다. 사칭, 사기 또는 불법적인 용도로 사용하지 마세요. 복제한 음성에 대한 책임은 사용자에게 있습니다.'
+    }
+  };
+
+  const LANG_NAMES = { vi:'Tiếng Việt', en:'English', hi:'हिन्दी', ko:'한국어' };
+
+  function setLang(code){
+    if(!I18N[code]) code = 'vi';
+    document.documentElement.lang = code;
+    var dict = I18N[code], base = I18N.vi;
+    document.querySelectorAll('[data-i18n]').forEach(function(el){
+      var k = el.getAttribute('data-i18n');
+      var val = (dict && dict[k] != null) ? dict[k] : base[k];
+      if(val != null) el.innerHTML = val;
+    });
+    var cur = document.getElementById('langswCur');
+    if(cur) cur.textContent = LANG_NAMES[code] || code;
+    document.querySelectorAll('.langsw-item').forEach(function(it){
+      it.classList.toggle('on', it.getAttribute('data-lang') === code);
+    });
+    try{ localStorage.setItem('ts_lang', code); }catch(e){}
+  }
+
+  (function(){
+    var langsw = document.getElementById('langsw');
+    var langswBtn = document.getElementById('langswBtn');
+    function close(){ if(langsw) langsw.classList.remove('open'); if(langswBtn) langswBtn.setAttribute('aria-expanded','false'); }
+    if(langswBtn){
+      langswBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var open = langsw.classList.toggle('open');
+        langswBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    }
+    document.querySelectorAll('.langsw-item').forEach(function(it){
+      it.addEventListener('click', function(e){
+        e.stopPropagation();
+        setLang(it.getAttribute('data-lang'));
+        close();
+      });
+    });
+    // click outside closes the dropdown
+    document.addEventListener('click', function(e){
+      if(langsw && !langsw.contains(e.target)) close();
+    });
+    // Esc closes the dropdown
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape') close();
+    });
+    // load saved choice (default 'vi')
+    var saved = 'vi';
+    try{ saved = localStorage.getItem('ts_lang') || 'vi'; }catch(e){}
+    setLang(saved);
+  })();
+</script>

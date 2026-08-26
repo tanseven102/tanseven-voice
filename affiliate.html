@@ -1,0 +1,440 @@
+<meta charset="utf-8">
+<title>Affiliate Tân Seven Voice</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  :root{
+    --bg:#fbfaf8; --bg2:#f3f1ec; --card:#ffffff; --ink:#0b0b0c; --ink2:#33322f; --muted:#78766f;
+    --line:#e9e6df; --line2:#dbd7ce; --field:#f6f4ef;
+    --gold:#c98a1e; --gold-soft:#fbf1dd; --green:#1f9d55; --green-soft:#e7f5ec;
+    --btn:#0b0b0c; --btn-ink:#fbfaf8;
+    --shadow:0 26px 60px -34px rgba(30,22,10,.45);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0e0d10; --bg2:#17161a; --card:#181619; --ink:#f5f3ef; --ink2:#d8d5ce; --muted:#9a988f;
+      --line:#26242a; --line2:#33303a; --field:#201e24;
+      --gold:#e6b357; --gold-soft:#2a2213; --green:#4ecb86; --green-soft:#14261b;
+      --btn:#f5f3ef; --btn-ink:#0e0d10;
+      --shadow:0 30px 70px -34px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e0d10; --bg2:#17161a; --card:#181619; --ink:#f5f3ef; --ink2:#d8d5ce; --muted:#9a988f;
+    --line:#26242a; --line2:#33303a; --field:#201e24;
+    --gold:#e6b357; --gold-soft:#2a2213; --green:#4ecb86; --green-soft:#14261b;
+    --btn:#f5f3ef; --btn-ink:#0e0d10;
+    --shadow:0 30px 70px -34px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth; -webkit-text-size-adjust:100%}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Be Vietnam Pro",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px; margin:0 auto; padding:0 22px}
+  a{color:inherit; text-decoration:none}
+  h1,h2,h3{letter-spacing:-.02em; text-wrap:balance; margin:0}
+  .mono{font-family:"JetBrains Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums}
+
+  .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:13px 22px; border-radius:12px; font-weight:700; font-size:15px; cursor:pointer;
+    border:1px solid transparent; transition:transform .12s, box-shadow .15s}
+  .btn:hover{transform:translateY(-1px)}
+  .btn-dark{background:var(--btn); color:var(--btn-ink)}
+  .btn-out{background:transparent; color:var(--ink); border-color:var(--line2)}
+
+  nav{border-bottom:1px solid var(--line); background:color-mix(in srgb,var(--bg) 82%,transparent);
+    backdrop-filter:blur(10px); position:sticky; top:0; z-index:20}
+  .nav-in{max-width:1000px; margin:0 auto; padding:0 22px; height:66px; display:flex; align-items:center; justify-content:space-between; gap:14px}
+  .brand{display:flex; align-items:center; gap:11px; font-weight:800; font-size:17px; flex:0 0 auto}
+  .brand .mk{width:34px;height:34px;border-radius:10px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-size:17px}
+  .brand span{color:var(--muted); font-weight:600}
+
+  /* language switcher (i18n) */
+  .langsw{position:relative; margin-right:auto}
+  .langsw-btn{display:inline-flex; align-items:center; gap:7px; font-family:inherit; font-size:14px; font-weight:600;
+    color:var(--ink2); background:var(--card); border:1px solid var(--line2); padding:7px 13px; border-radius:999px;
+    cursor:pointer; line-height:1; transition:border-color .15s, color .15s, box-shadow .2s}
+  .langsw-btn:hover{border-color:#bdb8ae; color:var(--ink)}
+  .langsw.open .langsw-btn{border-color:var(--ink)}
+  .langsw-globe{font-size:15px; line-height:1}
+  .langsw-cur{white-space:nowrap}
+  .langsw-chev{font-size:10px; color:var(--muted); transition:transform .18s}
+  .langsw.open .langsw-chev{transform:rotate(180deg)}
+  .langsw-menu{position:absolute; top:calc(100% + 8px); left:0; min-width:178px; background:var(--card);
+    border:1px solid var(--line2); border-radius:14px; padding:6px; display:none; flex-direction:column; gap:2px;
+    box-shadow:0 18px 44px -20px rgba(20,20,20,.34); z-index:80}
+  .langsw.open .langsw-menu{display:flex}
+  .langsw-item{display:flex; align-items:center; gap:10px; width:100%; font-family:inherit; font-size:14.5px;
+    font-weight:600; color:var(--ink2); background:transparent; border:0; padding:9px 11px; border-radius:9px;
+    cursor:pointer; text-align:left; transition:background .13s, color .13s}
+  .langsw-item:hover{background:var(--bg2); color:var(--ink)}
+  .langsw-flag{font-size:16px; flex:0 0 auto; line-height:1}
+  .langsw-name{flex:1}
+  .langsw-check{color:var(--green); font-weight:800; opacity:0; flex:0 0 auto}
+  .langsw-item.on{color:var(--ink)}
+  .langsw-item.on .langsw-check{opacity:1}
+  @media(max-width:520px){.langsw-cur{display:none}}
+
+  /* HERO */
+  header{padding:70px 0 48px}
+  .eyebrow{display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--gold);
+    background:var(--gold-soft); border:1px solid color-mix(in srgb,var(--gold) 30%,transparent);
+    padding:6px 13px; border-radius:999px}
+  .hero-grid{display:grid; grid-template-columns:1.15fr .85fr; gap:40px; align-items:center; margin-top:22px}
+  @media(max-width:820px){.hero-grid{grid-template-columns:1fr; gap:30px}}
+  h1{font-size:clamp(34px,5.4vw,56px); line-height:1.05; font-weight:800}
+  h1 .u{background:linear-gradient(120deg,var(--gold),var(--green)); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .lead{color:var(--ink2); font-size:18px; margin-top:18px; max-width:30em}
+  .hero-cta{display:flex; gap:12px; margin-top:26px; flex-wrap:wrap}
+
+  .badge12{background:var(--card); border:1px solid var(--line); border-radius:24px; padding:32px 28px;
+    box-shadow:var(--shadow); text-align:center}
+  .badge12 .big{font-size:96px; font-weight:800; line-height:.9; letter-spacing:-.04em;
+    background:linear-gradient(135deg,var(--gold),var(--green)); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .badge12 .lbl{font-size:15px; color:var(--muted); margin-top:8px; font-weight:600}
+  .badge12 .hr{height:1px; background:var(--line); margin:20px 0}
+  .badge12 .rows{display:flex; flex-direction:column; gap:10px; text-align:left; font-size:14.5px}
+  .badge12 .rows div{display:flex; align-items:center; gap:10px; color:var(--ink2)}
+  .badge12 .rows .ck{color:var(--green); font-weight:800}
+
+  /* STEPS */
+  section{padding:52px 0}
+  .sec-head{text-align:center; max-width:620px; margin:0 auto 38px}
+  .sec-head h2{font-size:clamp(26px,3.6vw,38px); font-weight:800}
+  .sec-head p{color:var(--muted); margin-top:12px; font-size:16.5px}
+  .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+  @media(max-width:760px){.steps{grid-template-columns:1fr}}
+  .step{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:26px 22px}
+  .step .no{font-family:"JetBrains Mono",monospace; font-size:13px; font-weight:700; color:var(--gold)}
+  .step h3{font-size:19px; font-weight:700; margin-top:10px}
+  .step p{color:var(--ink2); margin-top:8px; font-size:14.5px}
+  .step .ic{font-size:26px}
+
+  /* CALCULATOR */
+  .calc-sec{background:var(--bg2); border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
+  .calc{background:var(--card); border:1px solid var(--line); border-radius:22px; padding:30px; box-shadow:var(--shadow); max-width:760px; margin:0 auto}
+  .calc .toprow{display:flex; justify-content:space-between; gap:16px; align-items:center; flex-wrap:wrap}
+  .plans{display:inline-flex; background:var(--field); border:1px solid var(--line2); border-radius:12px; padding:4px; gap:4px}
+  .plans button{border:0; background:transparent; color:var(--muted); font-family:inherit; font-weight:700;
+    font-size:14px; padding:8px 15px; border-radius:9px; cursor:pointer; transition:.15s}
+  .plans button.on{background:var(--card); color:var(--ink); box-shadow:0 2px 8px -4px rgba(0,0,0,.3)}
+  .calc label{display:block; font-size:13px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color:var(--muted); margin:26px 0 4px}
+  .cust{display:flex; align-items:baseline; gap:10px}
+  .cust .n{font-family:"JetBrains Mono",monospace; font-size:34px; font-weight:700}
+  .cust .t{color:var(--muted); font-size:15px}
+  input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:8px; border-radius:99px;
+    background:var(--field); border:1px solid var(--line2); margin-top:14px; outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:26px; height:26px; border-radius:50%;
+    background:var(--ink); border:3px solid var(--card); box-shadow:0 3px 10px -2px rgba(0,0,0,.4); cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:22px; height:22px; border-radius:50%; background:var(--ink); border:3px solid var(--card); cursor:pointer}
+  .result{margin-top:28px; background:var(--green-soft); border:1px solid color-mix(in srgb,var(--green) 32%,transparent);
+    border-radius:16px; padding:22px 24px; display:flex; justify-content:space-between; gap:18px; align-items:center; flex-wrap:wrap}
+  .result .lab{font-size:14.5px; color:var(--ink2); font-weight:600}
+  .result .amt{font-family:"JetBrains Mono",monospace; font-weight:700; font-size:clamp(30px,5vw,44px); color:var(--green); line-height:1}
+  .result .yr{font-size:13.5px; color:var(--muted); margin-top:4px}
+  .calc .fine{margin-top:14px; font-size:13px; color:var(--muted); text-align:center}
+
+  /* WHY */
+  .why{display:grid; grid-template-columns:repeat(2,1fr); gap:16px}
+  @media(max-width:680px){.why{grid-template-columns:1fr}}
+  .wcard{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:22px; display:flex; gap:14px}
+  .wcard .ic{font-size:24px; flex:0 0 auto}
+  .wcard h3{font-size:16.5px; font-weight:700} .wcard p{color:var(--ink2); font-size:14px; margin-top:5px}
+
+  /* CTA */
+  .final{background:var(--ink); color:var(--bg); border-radius:26px; padding:60px 28px; text-align:center}
+  .final h2{font-size:clamp(28px,4.4vw,44px); font-weight:800}
+  .final p{color:color-mix(in srgb,var(--bg) 72%,var(--ink)); margin:14px auto 0; max-width:440px; font-size:16.5px}
+  .final .btn-dark{background:var(--bg); color:var(--ink); margin-top:26px}
+
+  footer{padding:38px 0 60px; color:var(--muted); font-size:13.5px; text-align:center}
+</style>
+
+<nav><div class="nav-in">
+  <a class="brand" href="index.html"><span class="mk">🎙️</span> Tân Seven <span>Voice</span></a>
+  <div class="langsw" id="langsw">
+    <button class="langsw-btn" id="langswBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Chọn ngôn ngữ / Select language">
+      <span class="langsw-globe">🌐</span><span class="langsw-cur" id="langswCur">Tiếng Việt</span><span class="langsw-chev">▾</span>
+    </button>
+    <div class="langsw-menu" id="langswMenu" role="menu">
+      <button class="langsw-item" type="button" role="menuitem" data-lang="vi"><span class="langsw-flag">🇻🇳</span><span class="langsw-name">Tiếng Việt</span><span class="langsw-check">✓</span></button>
+      <button class="langsw-item" type="button" role="menuitem" data-lang="en"><span class="langsw-flag">🇺🇸</span><span class="langsw-name">English</span><span class="langsw-check">✓</span></button>
+      <button class="langsw-item" type="button" role="menuitem" data-lang="hi"><span class="langsw-flag">🇮🇳</span><span class="langsw-name">हिन्दी</span><span class="langsw-check">✓</span></button>
+      <button class="langsw-item" type="button" role="menuitem" data-lang="ko"><span class="langsw-flag">🇰🇷</span><span class="langsw-name">한국어</span><span class="langsw-check">✓</span></button>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;flex:0 0 auto"><a href="index.html" class="btn btn-out" style="padding:9px 15px;font-size:14px" data-i18n="nav.home">← Trang chủ</a><a href="#dangky" class="btn btn-dark" style="padding:9px 16px;font-size:14px" data-i18n="nav.signup">Đăng ký ngay</a></div>
+</div></nav>
+
+<header><div class="wrap">
+  <span class="eyebrow" data-i18n="hero.eyebrow">💰 Chương trình Affiliate</span>
+  <div class="hero-grid">
+    <div>
+      <h1 data-i18n="hero.h1">Giới thiệu bạn bè,<br><span class="u">nhận 12% mỗi đơn</span></h1>
+      <p class="lead" data-i18n="hero.lead">Chia sẻ Tân Seven Voice tới cộng đồng làm YouTube. Khách dùng qua link của bạn trả phí hàng tháng — <b style="color:var(--ink)">bạn nhận 12% đều đặn mỗi tháng</b>, khách còn dùng là bạn còn có tiền. Thu nhập thụ động, không vốn, không rủi ro.</p>
+      <div class="hero-cta">
+        <a href="#dangky" class="btn btn-dark" data-i18n="hero.cta1">Lấy link giới thiệu →</a>
+        <a href="#tinh" class="btn btn-out" data-i18n="hero.cta2">Tính thử thu nhập</a>
+      </div>
+    </div>
+    <div class="badge12">
+      <div class="big">12%</div>
+      <div class="lbl" data-i18n="badge.lbl">hoa hồng mỗi tháng, đều đặn</div>
+      <div class="hr"></div>
+      <div class="rows">
+        <div><span class="ck">✓</span> <span data-i18n="badge.r1">12% mỗi tháng khách còn dùng</span></div>
+        <div><span class="ck">✓</span> <span data-i18n="badge.r2">Thu nhập thụ động, tự động</span></div>
+        <div><span class="ck">✓</span> <span data-i18n="badge.r3">Link riêng, theo dõi minh bạch</span></div>
+      </div>
+    </div>
+  </div>
+</div></header>
+
+<section><div class="wrap">
+  <div class="sec-head">
+    <h2 data-i18n="steps.h2">Kiếm tiền chỉ với 3 bước</h2>
+    <p data-i18n="steps.sub">Đơn giản như chia sẻ một video — nhưng lần này bạn được trả tiền.</p>
+  </div>
+  <div class="steps">
+    <div class="step"><div class="ic">🔗</div><div class="no" data-i18n="step1.no">BƯỚC 01</div><h3 data-i18n="step1.h3">Lấy link riêng</h3><p data-i18n="step1.p">Đăng ký miễn phí, nhận ngay đường link giới thiệu gắn tên bạn.</p></div>
+    <div class="step"><div class="ic">📣</div><div class="no" data-i18n="step2.no">BƯỚC 02</div><h3 data-i18n="step2.h3">Chia sẻ khắp nơi</h3><p data-i18n="step2.p">Dán link vào video YouTube, nhóm Zalo, Facebook, TikTok, bạn bè làm nội dung…</p></div>
+    <div class="step"><div class="ic">🤑</div><div class="no" data-i18n="step3.no">BƯỚC 03</div><h3 data-i18n="step3.h3">Nhận 12% mỗi tháng</h3><p data-i18n="step3.p">Khách còn trả phí tháng nào, bạn nhận 12% tháng đó. Càng nhiều khách, thu nhập thụ động càng lớn.</p></div>
+  </div>
+</div></section>
+
+<section class="calc-sec" id="tinh"><div class="wrap">
+  <div class="sec-head">
+    <h2 data-i18n="calc.h2">Thu nhập của bạn có thể là bao nhiêu?</h2>
+    <p data-i18n="calc.sub">Kéo thanh trượt xem bạn kiếm được bao nhiêu mỗi tháng.</p>
+  </div>
+  <div class="calc">
+    <div class="toprow">
+      <div>
+        <label style="margin:0" data-i18n="calc.planlabel">Khách chọn gói</label>
+        <div class="plans" id="plans" style="margin-top:8px">
+          <button data-p="99000" data-i18n="calc.plan.basic">Cơ bản · 99k/th</button>
+          <button data-p="299000" class="on" data-i18n="calc.plan.pro">Pro · 299k/th</button>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <label style="margin:0" data-i18n="calc.perlabel">Hoa hồng / khách / tháng</label>
+        <div class="mono" id="perc" style="font-size:26px;font-weight:700;color:var(--gold);margin-top:6px">35.880đ</div>
+      </div>
+    </div>
+
+    <label for="rng" data-i18n="calc.rnglabel">Số khách đang dùng qua link của bạn</label>
+    <div class="cust"><span class="n mono" id="cn">20</span><span class="t" data-i18n="calc.custunit">khách đang dùng</span></div>
+    <input type="range" id="rng" min="1" max="200" value="20">
+
+    <div class="result">
+      <div>
+        <div class="lab" data-i18n="calc.reslabel">💵 Bạn nhận mỗi tháng</div>
+        <div class="yr" id="yr">≈ 8.611.200đ / năm</div>
+      </div>
+      <div class="amt" id="amt">717.600đ</div>
+    </div>
+    <p class="fine" data-i18n="calc.fine">* Hoa hồng 12% mỗi tháng — khách còn dùng là bạn còn nhận, đều đặn. Thu nhập thực tế tuỳ số khách bạn giữ được.</p>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="sec-head"><h2 data-i18n="why.h2">Vì sao nên làm Affiliate Tân Seven?</h2></div>
+  <div class="why">
+    <div class="wcard"><span class="ic">🚀</span><div><h3 data-i18n="why1.h3">Hoa hồng cao top thị trường</h3><p data-i18n="why1.p">12% — cao hơn nhiều chương trình khác chỉ 5-10%.</p></div></div>
+    <div class="wcard"><span class="ic">🎯</span><div><h3 data-i18n="why2.h3">Sản phẩm dễ bán</h3><p data-i18n="why2.p">Dân YouTube ai cũng cần giọng đọc. Giới thiệu là có người mua.</p></div></div>
+    <div class="wcard"><span class="ic">📊</span><div><h3 data-i18n="why3.h3">Minh bạch, dễ theo dõi</h3><p data-i18n="why3.p">Bảng điều khiển riêng: xem lượt click, đơn hàng, tiền hoa hồng.</p></div></div>
+    <div class="wcard"><span class="ic">⚡</span><div><h3 data-i18n="why4.h3">Thanh toán nhanh</h3><p data-i18n="why4.p">Đủ ngưỡng là rút về tài khoản ngân hàng, không lằng nhằng.</p></div></div>
+  </div>
+</div></section>
+
+<section id="dangky"><div class="wrap">
+  <div class="final">
+    <h2 data-i18n="final.h2">Sẵn sàng kiếm tiền cùng Tân Seven?</h2>
+    <p data-i18n="final.p">Đăng ký làm Affiliate miễn phí — nhận link riêng trong 1 phút và bắt đầu kiếm 12% ngay hôm nay.</p>
+    <a href="#" class="btn btn-dark" data-i18n="final.btn">Đăng ký làm Affiliate →</a>
+  </div>
+</div></section>
+
+<footer><div class="wrap" data-i18n="footer">© 2026 Tân Seven Voice · Chương trình Affiliate · Hoa hồng 12% mỗi đơn</div></footer>
+
+<script>
+/* ===== earnings calculator ===== */
+(function(){
+  var rng=document.getElementById('rng'), cn=document.getElementById('cn'),
+      amt=document.getElementById('amt'), yr=document.getElementById('yr'),
+      perc=document.getElementById('perc'), plans=document.getElementById('plans');
+  var price=299000, RATE=0.12;
+  var LOCALE={vi:'vi-VN',en:'en-US',hi:'en-IN',ko:'ko-KR'};
+  var YRSFX={vi:' / năm',en:' / year',hi:' / वर्ष',ko:' / 년'};
+  function lang(){ return document.documentElement.lang || 'vi'; }
+  function fmt(n){ return Math.round(n).toLocaleString(LOCALE[lang()]||'vi-VN')+'đ'; }
+  function upd(){
+    var n=+rng.value; cn.textContent=n;
+    var per=price*RATE, month=per*n;
+    perc.textContent=fmt(per);
+    amt.textContent=fmt(month);
+    yr.textContent='≈ '+fmt(month*12)+(YRSFX[lang()]||' / năm');
+  }
+  window.__updCalc = upd;
+  rng.addEventListener('input',upd);
+  plans.querySelectorAll('button').forEach(function(b){
+    b.addEventListener('click',function(){
+      plans.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});
+      b.classList.add('on'); price=+b.dataset.p; upd();
+    });
+  });
+  upd();
+})();
+
+/* ===== i18n language switcher ===== */
+const I18N = {
+  vi:{
+    'nav.home':'← Trang chủ','nav.signup':'Đăng ký ngay',
+    'hero.eyebrow':'💰 Chương trình Affiliate',
+    'hero.h1':'Giới thiệu bạn bè,<br><span class="u">nhận 12% mỗi đơn</span>',
+    'hero.lead':'Chia sẻ Tân Seven Voice tới cộng đồng làm YouTube. Khách dùng qua link của bạn trả phí hàng tháng — <b style="color:var(--ink)">bạn nhận 12% đều đặn mỗi tháng</b>, khách còn dùng là bạn còn có tiền. Thu nhập thụ động, không vốn, không rủi ro.',
+    'hero.cta1':'Lấy link giới thiệu →','hero.cta2':'Tính thử thu nhập',
+    'badge.lbl':'hoa hồng mỗi tháng, đều đặn',
+    'badge.r1':'12% mỗi tháng khách còn dùng','badge.r2':'Thu nhập thụ động, tự động','badge.r3':'Link riêng, theo dõi minh bạch',
+    'steps.h2':'Kiếm tiền chỉ với 3 bước','steps.sub':'Đơn giản như chia sẻ một video — nhưng lần này bạn được trả tiền.',
+    'step1.no':'BƯỚC 01','step1.h3':'Lấy link riêng','step1.p':'Đăng ký miễn phí, nhận ngay đường link giới thiệu gắn tên bạn.',
+    'step2.no':'BƯỚC 02','step2.h3':'Chia sẻ khắp nơi','step2.p':'Dán link vào video YouTube, nhóm Zalo, Facebook, TikTok, bạn bè làm nội dung…',
+    'step3.no':'BƯỚC 03','step3.h3':'Nhận 12% mỗi tháng','step3.p':'Khách còn trả phí tháng nào, bạn nhận 12% tháng đó. Càng nhiều khách, thu nhập thụ động càng lớn.',
+    'calc.h2':'Thu nhập của bạn có thể là bao nhiêu?','calc.sub':'Kéo thanh trượt xem bạn kiếm được bao nhiêu mỗi tháng.',
+    'calc.planlabel':'Khách chọn gói','calc.plan.basic':'Cơ bản · 99k/th','calc.plan.pro':'Pro · 299k/th',
+    'calc.perlabel':'Hoa hồng / khách / tháng','calc.rnglabel':'Số khách đang dùng qua link của bạn','calc.custunit':'khách đang dùng',
+    'calc.reslabel':'💵 Bạn nhận mỗi tháng',
+    'calc.fine':'* Hoa hồng 12% mỗi tháng — khách còn dùng là bạn còn nhận, đều đặn. Thu nhập thực tế tuỳ số khách bạn giữ được.',
+    'why.h2':'Vì sao nên làm Affiliate Tân Seven?',
+    'why1.h3':'Hoa hồng cao top thị trường','why1.p':'12% — cao hơn nhiều chương trình khác chỉ 5-10%.',
+    'why2.h3':'Sản phẩm dễ bán','why2.p':'Dân YouTube ai cũng cần giọng đọc. Giới thiệu là có người mua.',
+    'why3.h3':'Minh bạch, dễ theo dõi','why3.p':'Bảng điều khiển riêng: xem lượt click, đơn hàng, tiền hoa hồng.',
+    'why4.h3':'Thanh toán nhanh','why4.p':'Đủ ngưỡng là rút về tài khoản ngân hàng, không lằng nhằng.',
+    'final.h2':'Sẵn sàng kiếm tiền cùng Tân Seven?','final.p':'Đăng ký làm Affiliate miễn phí — nhận link riêng trong 1 phút và bắt đầu kiếm 12% ngay hôm nay.','final.btn':'Đăng ký làm Affiliate →',
+    'footer':'© 2026 Tân Seven Voice · Chương trình Affiliate · Hoa hồng 12% mỗi đơn'
+  },
+  en:{
+    'nav.home':'← Home','nav.signup':'Sign up now',
+    'hero.eyebrow':'💰 Affiliate Program',
+    'hero.h1':'Refer friends,<br><span class="u">earn 12% per sale</span>',
+    'hero.lead':'Share Tân Seven Voice with the YouTube community. Customers who subscribe through your link pay monthly — <b style="color:var(--ink)">you earn 12% every single month</b>, for as long as they keep using it. Passive income, no capital, no risk.',
+    'hero.cta1':'Get your referral link →','hero.cta2':'Estimate your income',
+    'badge.lbl':'commission every month, recurring',
+    'badge.r1':'12% every month they stay','badge.r2':'Passive, automatic income','badge.r3':'Your own link, transparent tracking',
+    'steps.h2':'Earn in just 3 steps','steps.sub':'As easy as sharing a video — except this time you get paid.',
+    'step1.no':'STEP 01','step1.h3':'Get your link','step1.p':'Sign up free and instantly get a referral link tied to your name.',
+    'step2.no':'STEP 02','step2.h3':'Share everywhere','step2.p':'Drop the link in your YouTube videos, Zalo/Facebook groups, TikTok, or with fellow creators…',
+    'step3.no':'STEP 03','step3.h3':'Earn 12% monthly','step3.p':'For every month a customer pays, you get 12%. The more customers, the bigger your passive income.',
+    'calc.h2':'How much could you earn?','calc.sub':'Drag the slider to see your monthly earnings.',
+    'calc.planlabel':'Customer’s plan','calc.plan.basic':'Basic · 99k/mo','calc.plan.pro':'Pro · 299k/mo',
+    'calc.perlabel':'Commission / customer / month','calc.rnglabel':'Customers active through your link','calc.custunit':'active customers',
+    'calc.reslabel':'💵 You earn each month',
+    'calc.fine':'* 12% commission every month — you keep earning as long as customers stay. Actual income depends on how many customers you retain.',
+    'why.h2':'Why join Tân Seven Affiliate?',
+    'why1.h3':'Top-tier commission','why1.p':'12% — higher than most programs that offer just 5-10%.',
+    'why2.h3':'Easy to sell','why2.p':'Every YouTuber needs voiceovers. Recommend it and sales follow.',
+    'why3.h3':'Transparent tracking','why3.p':'Your own dashboard: track clicks, orders, and commission.',
+    'why4.h3':'Fast payouts','why4.p':'Hit the threshold and withdraw to your bank — no hassle.',
+    'final.h2':'Ready to earn with Tân Seven?','final.p':'Join the Affiliate program free — get your link in 1 minute and start earning 12% today.','final.btn':'Join as an Affiliate →',
+    'footer':'© 2026 Tân Seven Voice · Affiliate Program · 12% commission per sale'
+  },
+  hi:{
+    'nav.home':'← होम','nav.signup':'अभी जुड़ें',
+    'hero.eyebrow':'💰 एफिलिएट प्रोग्राम',
+    'hero.h1':'दोस्तों को रेफर करें,<br><span class="u">हर बिक्री पर 12% कमाएँ</span>',
+    'hero.lead':'Tân Seven Voice को YouTube कम्युनिटी के साथ शेयर करें। आपके लिंक से सब्सक्राइब करने वाले ग्राहक हर महीने भुगतान करते हैं — <b style="color:var(--ink)">आप हर महीने 12% कमाते हैं</b>, जब तक वे इस्तेमाल करते रहें। पैसिव इनकम, न पूँजी, न जोखिम।',
+    'hero.cta1':'अपना रेफरल लिंक पाएँ →','hero.cta2':'अपनी कमाई देखें',
+    'badge.lbl':'हर महीने कमीशन, नियमित',
+    'badge.r1':'हर महीने 12%, जब तक ग्राहक जुड़ा रहे','badge.r2':'पैसिव, ऑटोमैटिक इनकम','badge.r3':'अपना लिंक, पारदर्शी ट्रैकिंग',
+    'steps.h2':'सिर्फ़ 3 स्टेप में कमाएँ','steps.sub':'एक वीडियो शेयर करने जितना आसान — बस इस बार आपको पैसे मिलते हैं।',
+    'step1.no':'स्टेप 01','step1.h3':'अपना लिंक लें','step1.p':'मुफ़्त जुड़ें और तुरंत अपने नाम का रेफरल लिंक पाएँ।',
+    'step2.no':'स्टेप 02','step2.h3':'हर जगह शेयर करें','step2.p':'लिंक को अपने YouTube वीडियो, Zalo/Facebook ग्रुप, TikTok या साथी क्रिएटर्स के साथ शेयर करें…',
+    'step3.no':'स्टेप 03','step3.h3':'हर महीने 12% कमाएँ','step3.p':'ग्राहक जिस महीने भुगतान करे, उस महीने आपको 12% मिलता है। जितने ज़्यादा ग्राहक, उतनी बड़ी पैसिव इनकम।',
+    'calc.h2':'आप कितना कमा सकते हैं?','calc.sub':'स्लाइडर खींचकर अपनी मासिक कमाई देखें।',
+    'calc.planlabel':'ग्राहक का प्लान','calc.plan.basic':'बेसिक · 99k/माह','calc.plan.pro':'प्रो · 299k/माह',
+    'calc.perlabel':'कमीशन / ग्राहक / माह','calc.rnglabel':'आपके लिंक से जुड़े सक्रिय ग्राहक','calc.custunit':'सक्रिय ग्राहक',
+    'calc.reslabel':'💵 आपकी मासिक कमाई',
+    'calc.fine':'* हर महीने 12% कमीशन — जब तक ग्राहक जुड़े रहें, आप कमाते रहें। असल कमाई इस पर निर्भर करती है कि आप कितने ग्राहक बनाए रखते हैं।',
+    'why.h2':'Tân Seven एफिलिएट क्यों चुनें?',
+    'why1.h3':'मार्केट में टॉप कमीशन','why1.p':'12% — ज़्यादातर प्रोग्राम्स के 5-10% से कहीं ज़्यादा।',
+    'why2.h3':'बेचने में आसान','why2.p':'हर YouTuber को वॉइसओवर चाहिए। सुझाइए और बिक्री होगी।',
+    'why3.h3':'पारदर्शी ट्रैकिंग','why3.p':'अपना डैशबोर्ड: क्लिक, ऑर्डर और कमीशन देखें।',
+    'why4.h3':'तेज़ भुगतान','why4.p':'थ्रेशोल्ड पूरा होते ही बैंक अकाउंट में निकालें — कोई झंझट नहीं।',
+    'final.h2':'Tân Seven के साथ कमाने को तैयार?','final.p':'मुफ़्त एफिलिएट प्रोग्राम जॉइन करें — 1 मिनट में लिंक पाएँ और आज ही 12% कमाना शुरू करें।','final.btn':'एफिलिएट बनें →',
+    'footer':'© 2026 Tân Seven Voice · एफिलिएट प्रोग्राम · हर बिक्री पर 12% कमीशन'
+  },
+  ko:{
+    'nav.home':'← 홈','nav.signup':'지금 가입',
+    'hero.eyebrow':'💰 제휴 프로그램',
+    'hero.h1':'친구를 추천하고<br><span class="u">판매마다 12% 받으세요</span>',
+    'hero.lead':'Tân Seven Voice를 유튜브 커뮤니티에 공유하세요. 회원님 링크로 구독한 고객이 매달 결제하면 — <b style="color:var(--ink)">회원님은 매달 12%를 받습니다</b>. 고객이 계속 쓰는 한 수익이 계속 들어옵니다. 자본도 위험도 없는 패시브 인컴.',
+    'hero.cta1':'추천 링크 받기 →','hero.cta2':'수익 계산해보기',
+    'badge.lbl':'매달 받는 정기 커미션',
+    'badge.r1':'고객이 유지하는 한 매달 12%','badge.r2':'자동으로 쌓이는 패시브 수익','badge.r3':'전용 링크, 투명한 추적',
+    'steps.h2':'단 3단계로 수익 창출','steps.sub':'영상 하나 공유하는 것만큼 쉬워요 — 이번엔 돈까지 받습니다.',
+    'step1.no':'1단계','step1.h3':'전용 링크 받기','step1.p':'무료로 가입하면 내 이름이 담긴 추천 링크가 바로 나옵니다.',
+    'step2.no':'2단계','step2.h3':'어디서나 공유','step2.p':'유튜브 영상, 잘로·페이스북 그룹, 틱톡, 동료 크리에이터에게 링크를 공유하세요…',
+    'step3.no':'3단계','step3.h3':'매달 12% 수익','step3.p':'고객이 결제하는 달마다 12%를 받습니다. 고객이 많을수록 패시브 수익도 커집니다.',
+    'calc.h2':'얼마나 벌 수 있을까요?','calc.sub':'슬라이더를 움직여 월 수익을 확인하세요.',
+    'calc.planlabel':'고객이 고른 요금제','calc.plan.basic':'베이직 · 99k/월','calc.plan.pro':'프로 · 299k/월',
+    'calc.perlabel':'커미션 / 고객 / 월','calc.rnglabel':'내 링크로 이용 중인 고객 수','calc.custunit':'명 이용 중',
+    'calc.reslabel':'💵 매달 받는 금액',
+    'calc.fine':'* 매달 12% 커미션 — 고객이 유지되는 한 계속 받습니다. 실제 수익은 유지 고객 수에 따라 달라집니다.',
+    'why.h2':'왜 Tân Seven 제휴일까요?',
+    'why1.h3':'업계 최고 수준 커미션','why1.p':'12% — 5~10%에 그치는 다른 프로그램보다 높습니다.',
+    'why2.h3':'팔기 쉬운 제품','why2.p':'모든 유튜버에게 보이스오버가 필요합니다. 추천하면 바로 팔립니다.',
+    'why3.h3':'투명한 추적','why3.p':'전용 대시보드에서 클릭·주문·커미션을 확인하세요.',
+    'why4.h3':'빠른 정산','why4.p':'기준 금액을 채우면 은행 계좌로 바로 출금, 번거로움 없이.',
+    'final.h2':'Tân Seven과 함께 벌 준비 됐나요?','final.p':'무료 제휴 프로그램에 가입하세요 — 1분 만에 링크를 받고 오늘부터 12% 수익을 시작하세요.','final.btn':'제휴사로 가입 →',
+    'footer':'© 2026 Tân Seven Voice · 제휴 프로그램 · 판매당 12% 커미션'
+  }
+};
+const LANG_NAMES = { vi:'Tiếng Việt', en:'English', hi:'हिन्दी', ko:'한국어' };
+
+function setLang(code){
+  if(!I18N[code]) code = 'vi';
+  document.documentElement.lang = code;
+  var dict = I18N[code], base = I18N.vi;
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var k = el.getAttribute('data-i18n');
+    var val = (dict && dict[k] != null) ? dict[k] : base[k];
+    if(val != null) el.innerHTML = val;
+  });
+  var cur = document.getElementById('langswCur');
+  if(cur) cur.textContent = LANG_NAMES[code] || code;
+  document.querySelectorAll('.langsw-item').forEach(function(it){
+    it.classList.toggle('on', it.getAttribute('data-lang') === code);
+  });
+  if(window.__updCalc) window.__updCalc();
+  try{ localStorage.setItem('ts_lang', code); }catch(e){}
+}
+
+(function(){
+  var langsw = document.getElementById('langsw');
+  var langswBtn = document.getElementById('langswBtn');
+  function close(){ if(langsw) langsw.classList.remove('open'); if(langswBtn) langswBtn.setAttribute('aria-expanded','false'); }
+  if(langswBtn){
+    langswBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var open = langsw.classList.toggle('open');
+      langswBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+  document.querySelectorAll('.langsw-item').forEach(function(it){
+    it.addEventListener('click', function(e){
+      e.stopPropagation();
+      setLang(it.getAttribute('data-lang'));
+      close();
+    });
+  });
+  document.addEventListener('click', function(e){ if(langsw && !langsw.contains(e.target)) close(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') close(); });
+  var saved = 'vi';
+  try{ saved = localStorage.getItem('ts_lang') || 'vi'; }catch(e){}
+  setLang(saved);
+})();
+</script>

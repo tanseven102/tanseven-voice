@@ -1,0 +1,263 @@
+<meta charset="utf-8">
+<title>Tài khoản · Tân Seven Voice</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#fbfaf8;--bg2:#f3f1ec;--card:#fff;--ink:#0b0b0c;--ink2:#33322f;--muted:#78766f;
+    --line:#e9e6df;--line2:#dbd7ce;--field:#f6f4ef;--gold:#c98a1e;--gold-soft:#fbf1dd;
+    --green:#1f9d55;--green-soft:#e7f5ec;--red:#e0483d;--shadow:0 26px 60px -34px rgba(30,22,10,.45)}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Be Vietnam Pro",system-ui,Segoe UI,Roboto,sans-serif;
+    background:linear-gradient(160deg,var(--bg),var(--bg2));color:var(--ink);line-height:1.6;min-height:100vh}
+  a{color:inherit}
+  .mono{font-family:"JetBrains Mono",monospace}
+  nav{border-bottom:1px solid var(--line);background:rgba(251,250,248,.85);backdrop-filter:blur(10px);
+    position:sticky;top:0;z-index:20}
+  .nav-in{max-width:960px;margin:0 auto;padding:0 20px;height:62px;display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;text-decoration:none}
+  .brand .mk{width:32px;height:32px;border-radius:9px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-size:16px}
+  .brand span{color:var(--muted);font-weight:600}
+  .wrap{max-width:960px;margin:0 auto;padding:26px 20px}
+
+  /* AUTH */
+  .auth{max-width:430px;margin:34px auto;background:var(--card);border:1px solid var(--line);
+    border-radius:22px;padding:30px 26px;box-shadow:var(--shadow)}
+  .tabs{display:flex;background:var(--field);border:1px solid var(--line2);border-radius:12px;padding:4px;margin-bottom:22px}
+  .tabs button{flex:1;border:0;background:transparent;color:var(--muted);font-family:inherit;font-weight:700;
+    font-size:15px;padding:10px;border-radius:9px;cursor:pointer}
+  .tabs button.on{background:var(--card);color:var(--ink);box-shadow:0 2px 8px -4px rgba(0,0,0,.3)}
+  h1{font-size:22px;font-weight:800;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:14.5px;margin:0 0 18px}
+  label{display:block;font-weight:700;font-size:13px;margin:13px 0 5px}
+  input{width:100%;padding:12px 13px;border:1px solid var(--line2);border-radius:11px;font-size:15px;
+    font-family:inherit;background:var(--field);outline:none}
+  input:focus{border-color:var(--ink);background:#fff}
+  .btn{width:100%;margin-top:18px;padding:14px;border:0;border-radius:12px;background:var(--ink);color:#fff;
+    font-weight:800;font-size:16px;cursor:pointer;font-family:inherit}
+  .btn:hover{background:var(--green)}
+  .btn:disabled{opacity:.6;cursor:default}
+  .msg{margin-top:14px;padding:11px 14px;border-radius:11px;font-size:14px;display:none}
+  .msg.err{display:block;background:#fdecea;color:var(--red);border:1px solid #f5c6c2}
+  .msg.ok{display:block;background:var(--green-soft);color:var(--green);border:1px solid #b8e6c8}
+
+  /* DASHBOARD */
+  .dash{display:none}
+  .hello{font-size:26px;font-weight:800;margin:6px 0 2px}
+  .hello .sub{font-size:15px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:22px}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:var(--shadow)}
+  .box .k{font-size:13px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+  .credit{font-family:"JetBrains Mono",monospace;font-size:40px;font-weight:800;color:var(--green);line-height:1.1;margin-top:6px}
+  .credit small{font-size:15px;color:var(--muted);font-weight:600}
+  .box .desc{color:var(--ink2);font-size:14px;margin-top:6px}
+  .box .act{display:inline-block;margin-top:14px;padding:10px 16px;border-radius:10px;background:var(--gold-soft);
+    color:var(--gold);font-weight:700;font-size:14px;text-decoration:none;border:1px solid #f0dcae}
+  .soon{opacity:.55}
+  .soon .tag{font-size:11px;background:var(--bg2);color:var(--muted);padding:2px 8px;border-radius:99px;font-weight:700}
+  textarea{width:100%;min-height:120px;padding:13px;border:1px solid var(--line2);border-radius:12px;
+    font-family:inherit;font-size:15px;background:var(--field);outline:none;resize:vertical;margin-top:12px;line-height:1.5}
+  textarea:focus{border-color:var(--ink);background:#fff}
+  select{padding:10px 12px;border:1px solid var(--line2);border-radius:10px;font-family:inherit;font-size:14.5px;background:var(--field);cursor:pointer}
+  #ttsResult audio{width:100%;margin-top:2px}
+  .logout{background:none;border:1px solid var(--line2);color:var(--ink2);padding:8px 14px;border-radius:10px;
+    font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit}
+  .config-warn{max-width:600px;margin:30px auto;background:#fff8e6;border:1px solid #f0dcae;border-radius:16px;
+    padding:20px 22px;font-size:14.5px;color:var(--ink2);display:none}
+  .config-warn b{color:var(--gold)}
+</style>
+
+<nav><div class="nav-in">
+  <a class="brand" href="index.html"><span class="mk">🎙️</span> Tân Seven <span>Voice</span></a>
+  <button class="logout" id="logoutBtn" style="display:none" onclick="doLogout()">Đăng xuất</button>
+</div></nav>
+
+<div class="wrap">
+
+  <!-- ====== CHƯA ĐĂNG NHẬP: form đăng nhập / đăng ký ====== -->
+  <div class="auth" id="authBox">
+    <div class="tabs">
+      <button id="tabLogin" class="on" onclick="switchTab('login')">Đăng nhập</button>
+      <button id="tabReg" onclick="switchTab('reg')">Đăng ký</button>
+    </div>
+
+    <div id="loginForm">
+      <h1>Đăng nhập</h1>
+      <p class="sub">Vào tài khoản để dùng giọng đọc AI.</p>
+      <label>Email</label>
+      <input id="lgEmail" type="email" placeholder="ban@email.com">
+      <label>Mật khẩu</label>
+      <input id="lgPass" type="password" placeholder="••••••••">
+      <button class="btn" id="lgBtn" onclick="doLogin()">Đăng nhập</button>
+    </div>
+
+    <div id="regForm" style="display:none">
+      <h1>Tạo tài khoản</h1>
+      <p class="sub">Đăng ký miễn phí — tặng ngay <b>10.000 ký tự</b> dùng thử.</p>
+      <label>Họ và tên</label>
+      <input id="rgName" placeholder="Nguyễn Văn A">
+      <label>Email</label>
+      <input id="rgEmail" type="email" placeholder="ban@email.com">
+      <label>Mật khẩu (tối thiểu 6 ký tự)</label>
+      <input id="rgPass" type="password" placeholder="••••••••">
+      <button class="btn" id="rgBtn" onclick="doRegister()">Đăng ký miễn phí →</button>
+    </div>
+
+    <div class="msg" id="authMsg"></div>
+  </div>
+
+  <!-- ====== ĐÃ ĐĂNG NHẬP: dashboard ====== -->
+  <div class="dash" id="dashBox">
+    <div class="hello">Chào <span id="userName">bạn</span>! 👋</div>
+    <div class="sub" id="userEmail" style="color:var(--muted)"></div>
+    <div class="grid">
+      <div class="box">
+        <div class="k">💎 Ký tự còn lại</div>
+        <div class="credit" id="creditNum">—<small> ký tự</small></div>
+        <div class="desc">Mỗi ký tự = 1 lần đọc. Hết thì nạp thêm.</div>
+        <a class="act" href="#" onclick="alert('Phase 4: nạp credit — sắp có');return false">+ Nạp thêm</a>
+      </div>
+      <div class="box soon">
+        <div class="k">💰 Affiliate <span class="tag">Phase 3</span></div>
+        <div class="desc">Lấy link giới thiệu, theo dõi hoa hồng 12% real-time.</div>
+      </div>
+    </div>
+
+    <div class="box" style="margin-top:16px">
+      <div class="k">🎙️ Tạo giọng</div>
+      <textarea id="ttsText" placeholder="Dán kịch bản cần đọc vào đây... (tối đa 5000 ký tự)" maxlength="5000"></textarea>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:10px">
+        <select id="ttsVoice">
+          <option value="Minh Đức">🇻🇳 Minh Đức · Nam</option>
+          <option value="Lan Anh">🇻🇳 Lan Anh · Nữ</option>
+        </select>
+        <span id="ttsCount" style="color:var(--muted);font-size:13px">0 ký tự</span>
+        <button class="btn" id="ttsBtn" style="margin:0;width:auto;padding:12px 26px" onclick="doTTS()">🎙️ Tạo giọng</button>
+      </div>
+      <div class="msg" id="ttsMsg"></div>
+      <div id="ttsResult" style="display:none;margin-top:14px">
+        <audio id="ttsAudio" controls></audio>
+        <a id="ttsDownload" class="act" download="giong-tanseven.mp3" style="margin-top:10px">⬇️ Tải file MP3</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cảnh báo chưa cấu hình Supabase -->
+  <div class="config-warn" id="configWarn">
+    ⚙️ <b>Chưa nối Supabase.</b> Trang này đã sẵn sàng — chỉ cần điền <b>SUPABASE_URL</b> và <b>SUPABASE_ANON_KEY</b>
+    (lấy từ project Supabase) vào đầu file là chạy được đăng ký/đăng nhập thật.
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ====== CẤU HÌNH — điền sau khi tạo project Supabase ======
+  const SUPABASE_URL = "https://idnfafxgrbabypfokgve.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_Subrht5w8KLv8WC95UbriQ_XlO8QNYW";
+  const FREE_CREDITS = 10000; // tặng khi đăng ký
+  // ==========================================================
+
+  let sb = null;
+  const configured = !SUPABASE_URL.startsWith("DAN_") && !SUPABASE_ANON_KEY.startsWith("DAN_");
+
+  function el(id){ return document.getElementById(id); }
+  function showMsg(t, ok){ const m=el('authMsg'); m.className='msg '+(ok?'ok':'err'); m.textContent=t; }
+  function switchTab(w){
+    const login = w==='login';
+    el('tabLogin').classList.toggle('on', login);
+    el('tabReg').classList.toggle('on', !login);
+    el('loginForm').style.display = login?'block':'none';
+    el('regForm').style.display = login?'none':'block';
+    el('authMsg').className='msg';
+  }
+
+  if (!configured) {
+    el('configWarn').style.display = 'block';
+  } else {
+    sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    sb.auth.onAuthStateChange((_e, session) => renderState(session));
+    sb.auth.getSession().then(({data}) => renderState(data.session));
+  }
+
+  async function renderState(session){
+    if (session && session.user) {
+      el('authBox').style.display='none';
+      el('dashBox').style.display='block';
+      el('logoutBtn').style.display='inline-block';
+      el('userEmail').textContent = session.user.email;
+      // Lấy hồ sơ (tên + credit)
+      const { data: prof } = await sb.from('profiles').select('name, credits').eq('id', session.user.id).single();
+      el('userName').textContent = (prof && prof.name) ? prof.name : session.user.email.split('@')[0];
+      el('creditNum').innerHTML = (prof ? Number(prof.credits).toLocaleString('vi-VN') : '0') + '<small> ký tự</small>';
+    } else {
+      el('authBox').style.display='block';
+      el('dashBox').style.display='none';
+      el('logoutBtn').style.display='none';
+    }
+  }
+
+  async function doRegister(){
+    if(!sb) return;
+    const name=el('rgName').value.trim(), email=el('rgEmail').value.trim(), pass=el('rgPass').value;
+    if(!name||!email||pass.length<6){ showMsg('Điền đủ tên, email, mật khẩu ≥6 ký tự.'); return; }
+    el('rgBtn').disabled=true; el('rgBtn').textContent='Đang tạo...';
+    const { data, error } = await sb.auth.signUp({ email, password: pass, options:{ data:{ name } } });
+    el('rgBtn').disabled=false; el('rgBtn').textContent='Đăng ký miễn phí →';
+    if(error){ showMsg(error.message); return; }
+    showMsg('🎉 Tạo tài khoản thành công! Kiểm tra email xác nhận (nếu có) rồi đăng nhập.', true);
+    switchTab('login');
+  }
+
+  async function doLogin(){
+    if(!sb) return;
+    const email=el('lgEmail').value.trim(), pass=el('lgPass').value;
+    if(!email||!pass){ showMsg('Nhập email và mật khẩu.'); return; }
+    el('lgBtn').disabled=true; el('lgBtn').textContent='Đang vào...';
+    const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+    el('lgBtn').disabled=false; el('lgBtn').textContent='Đăng nhập';
+    if(error){ showMsg('Sai email hoặc mật khẩu.'); return; }
+  }
+
+  async function doLogout(){ if(sb){ await sb.auth.signOut(); } }
+
+  // đếm ký tự
+  var _tt = document.getElementById('ttsText');
+  if(_tt) _tt.addEventListener('input', function(){
+    document.getElementById('ttsCount').textContent = this.value.length + ' ký tự';
+  });
+
+  // tạo giọng
+  async function doTTS(){
+    if(!sb) return;
+    var text = document.getElementById('ttsText').value.trim();
+    var voice = document.getElementById('ttsVoice').value;
+    var msg = document.getElementById('ttsMsg');
+    var res = document.getElementById('ttsResult');
+    if(!text){ msg.className='msg err'; msg.textContent='Nhập nội dung cần đọc.'; return; }
+    var btn = document.getElementById('ttsBtn');
+    btn.disabled=true; btn.textContent='Đang tạo... (~20s)';
+    msg.className='msg'; res.style.display='none';
+    try{
+      var s = await sb.auth.getSession();
+      var token = s.data.session.access_token;
+      var r = await fetch(SUPABASE_URL + '/functions/v1/smart-api', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer '+token, 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text, voice: voice })
+      });
+      var d = await r.json();
+      if(!r.ok || !d.audio_base64){
+        msg.className='msg err'; msg.textContent = 'Lỗi: ' + (d.error || ('HTTP '+r.status));
+      } else {
+        var src = 'data:audio/mpeg;base64,' + d.audio_base64;
+        document.getElementById('ttsAudio').src = src;
+        document.getElementById('ttsDownload').href = src;
+        res.style.display='block';
+        msg.className='msg ok';
+        msg.textContent = '🎉 Xong! Trừ ' + d.cost + ' ký tự. Còn lại: ' + Number(d.credits).toLocaleString('vi-VN') + ' ký tự';
+        document.getElementById('creditNum').innerHTML = Number(d.credits).toLocaleString('vi-VN') + '<small> ký tự</small>';
+      }
+    }catch(e){ msg.className='msg err'; msg.textContent='Lỗi: '+String(e); }
+    btn.disabled=false; btn.textContent='🎙️ Tạo giọng';
+  }
+</script>
