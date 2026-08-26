@@ -204,6 +204,19 @@
   .batch-tx{flex:1;font-size:13px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .batch-ac{flex:0 0 auto;display:flex;align-items:center;gap:6px}
   .batch-ac audio{height:32px}
+  /* nút chọn giọng + popup chọn giọng */
+  .voice-select-btn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;
+    border:1.5px solid var(--line2);background:var(--card);border-radius:14px;padding:12px 15px;font-family:inherit;transition:.14s}
+  .voice-select-btn:hover{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold-soft)}
+  .vsb-ava{width:44px;height:44px;border-radius:12px;flex:0 0 auto;display:grid;place-items:center;font-weight:800;font-size:16px;color:#fff;background:linear-gradient(135deg,#5b78ea,#3b5bdb)}
+  .vsb-info{flex:1;display:flex;flex-direction:column;min-width:0}
+  .vsb-name{font-weight:800;font-size:16px;color:var(--ink)}
+  .vsb-sub{color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .vsb-chev{flex:0 0 auto;color:var(--gold);font-weight:700;font-size:13.5px}
+  .voice-modal{background:var(--card);border:1px solid var(--line);border-radius:22px;max-width:820px;width:100%;
+    padding:24px 22px 20px;box-shadow:var(--shadow);position:relative;margin:auto}
+  .voice-modal .vp-grid{border:0;background:transparent;padding:2px}
+  .vc-fav{border:0;background:transparent;cursor:pointer;font-size:18px;padding:0 2px;line-height:1;flex:0 0 auto;align-self:flex-start}
 </style>
 
 <nav><div class="nav-in">
@@ -272,24 +285,13 @@
       <div class="box">
         <div class="k">🎙️ Văn bản thành giọng nói</div>
         <textarea id="ttsText" placeholder="Dán kịch bản cần đọc vào đây... (tối đa 200.000 ký tự)" maxlength="200000"></textarea>
-        <!-- CHỌN GIỌNG NÓI: 2 nguồn — Tân Seven VIP hoặc Clone -->
+        <!-- CHỌN GIỌNG NÓI: bấm để mở popup -->
         <div class="vs-lbl">🎙️ Chọn giọng nói</div>
-        <div class="vsrc-tabs">
-          <button type="button" id="vsVip" class="vsrc on" onclick="setVoiceSrc('vip')">🌟 Giọng Tân Seven <span class="vsrc-vip">VIP</span></button>
-          <button type="button" id="vsClone" class="vsrc" onclick="setVoiceSrc('clone')">🧬 Giọng Clone của bạn</button>
-        </div>
-
-        <div id="vipPane" class="voice-pick">
-          <div class="vp-head">🎭 Chọn giọng đọc <span id="vpCount" class="mono"></span></div>
-          <div class="vp-chips" id="vpChips"></div>
-          <div class="vp-grid" id="vpGrid"></div>
-        </div>
-
-        <div id="clonePane" style="display:none">
-          <div class="vp-head">🧬 Giọng clone của bạn <span id="myVoiceCount" class="mono"></span></div>
-          <div class="vp-grid" id="myVoicesGrid" style="max-height:340px"></div>
-          <button type="button" class="add-voice" onclick="showView('clone')">➕ Tạo / quản lý giọng clone</button>
-        </div>
+        <button type="button" class="voice-select-btn" onclick="openVoiceModal()">
+          <span class="vsb-ava" id="vsbAva">M</span>
+          <span class="vsb-info"><span class="vsb-name" id="vsbName">Minh Đức</span><span class="vsb-sub" id="vsbSub">Giọng Tân Seven VIP · Nam · Bắc</span></span>
+          <span class="vsb-chev">Đổi giọng →</span>
+        </button>
 
         <!-- ==== TUỲ CHỈNH TẠO AUDIO (chung cho mọi giọng) ==== -->
         <div id="genOpts" class="gen-opts" style="display:none">
@@ -458,6 +460,16 @@
   </div>
 </div>
 
+<div id="voiceOverlay" class="nap-overlay" onclick="if(event.target===this)closeVoiceModal()">
+  <div class="voice-modal">
+    <button class="nap-x" onclick="closeVoiceModal()">✕</button>
+    <h2 class="nap-h">🎙️ Chọn giọng nói</h2>
+    <input id="voiceSearch" placeholder="🔍 Tìm giọng theo tên..." oninput="renderVoiceModal()" style="margin-bottom:12px">
+    <div class="vp-chips" id="voiceFilters" style="margin-bottom:12px"></div>
+    <div class="vp-grid" id="voiceModalGrid" style="max-height:54vh"></div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -496,7 +508,7 @@
   function showView(v){
     var views = { audio:'audioView', clone:'cloneView', batch:'batchView', affiliate:'affiliateView', account:'accountView' };
     var navs  = { audio:'navAudio',  clone:'navClone',  batch:'navBatch',  affiliate:'navAffiliate',  account:'navAccount'  };
-    if(v==='audio') setVoiceSrc(voiceSrc);
+    if(v==='audio') updateVoiceBtn();
     if(v==='clone'||v==='batch') loadMyVoices();
     for(var k in views){
       if(el(views[k])) el(views[k]).style.display = (k===v) ? 'block' : 'none';
@@ -578,8 +590,8 @@
   async function doTTS(){
     if(!sb) return;
     var text = document.getElementById('ttsText').value.trim();
-    var voice = selVoice;
-    var lang = selLang;
+    var voice = selectedVoice.name;
+    var lang = selectedVoice.lang;
     var speed = parseFloat(document.getElementById('ttsSpeed').value) || 1.0;
     var msg = document.getElementById('ttsMsg');
     var res = document.getElementById('ttsResult');
@@ -742,8 +754,13 @@
   function gradFor(v){ var s=0,i; for(i=0;i<v.name.length;i++) s+=v.name.charCodeAt(i); return GRADS[s%GRADS.length]; }
   function initsOf(n){ var p=n.trim().split(/\s+/); return (p[p.length-1][0]||"").toUpperCase(); }
 
-  var vpFilter="all", selVoice="Minh Đức", selLang="vi";
-  function vpIn(v){ if(vpFilter==="all")return true; if(vpFilter==="vi")return v.lang==="vi"; if(vpFilter==="en")return v.lang==="en"; return v.lang!=="vi"&&v.lang!=="en"; }
+  // Giọng đang chọn (gộp VIP + Clone) + Yêu thích
+  var selectedVoice={type:'vip',name:'Minh Đức',lang:'vi'};
+  var vmFilter='all';
+  function loadFavs(){ try{ return new Set(JSON.parse(localStorage.getItem('ts_favs')||'[]')); }catch(e){ return new Set(); } }
+  var favVoices=loadFavs();
+  function saveFavs(){ try{ localStorage.setItem('ts_favs', JSON.stringify(Array.from(favVoices))); }catch(e){} }
+  function toggleFav(k){ if(favVoices.has(k)) favVoices.delete(k); else favVoices.add(k); saveFavs(); renderVoiceModal(); }
   var GENRE_DESC={
     "📰 Tin tức":["rõ ràng, dứt khoát, chuyên nghiệp","bản tin, thời sự, phóng sự, video cập nhật"],
     "📖 Kể chuyện":["truyền cảm, cuốn hút","kể chuyện, truyện dài, podcast, review"],
@@ -785,27 +802,72 @@
     _prev.onerror=function(){ btn.innerHTML='⚠️ chưa có'; setTimeout(function(){ btn.innerHTML=old; },1500); };
     _prev.play().catch(function(){ btn.innerHTML=old; });
   }
-  function renderVoices(){
-    var chips=[["all","🌐 Tất cả"],["vi","🇻🇳 Việt"],["en","🇬🇧🇺🇸 Anh"],["other","🌍 Khác"]];
-    if(el('vpChips')) el('vpChips').innerHTML = chips.map(function(c){ return '<button type="button" class="vp-chip'+(vpFilter===c[0]?' on':'')+'" onclick="setVpFilter(\''+c[0]+'\')">'+c[1]+'</button>'; }).join('');
-    var list = ALL_VOICES.filter(vpIn);
-    if(el('vpCount')) el('vpCount').textContent = list.length+' giọng';
-    if(!el('vpGrid')) return;
-    el('vpGrid').innerHTML = list.map(function(v){
-      var pi=pillInfo(v), gender=v.info.indexOf('Nữ')>-1?'Nữ':'Nam', q=jsq(v.name);
-      return '<div class="vcard'+(selVoice===v.name?' on':'')+'">'+
-        '<div class="vc-head"><span class="vc-ava" style="background:'+gradFor(v)+'">'+initsOf(v.name)+'</span>'+
-        '<div><div class="vc-name">'+v.name+' <span class="vc-vip">VIP</span></div>'+
-        '<div class="vc-pills"><span class="vp '+pi.cls+'">'+pi.label+'</span><span class="vp g">'+gender+'</span><span class="vp g">'+v.genre+'</span></div></div></div>'+
-        '<p class="vc-desc">'+descOf(v)+'</p>'+
-        '<div class="vc-foot"><button type="button" class="vc-play" onclick="playPreview(this,\''+v.lang+'\',\''+q+'\')">▶ Nghe thử</button>'+
-        '<button type="button" class="vc-pick" onclick="selectVoice(\''+q+'\',\''+v.lang+'\')">'+(selVoice===v.name?'Đang chọn ✓':'Chọn')+'</button></div>'+
-      '</div>';
-    }).join('');
+  function gradForName(n){ return gradFor({name:n}); }
+  function allVoiceItems(){
+    var items=ALL_VOICES.map(function(v){ return {type:'vip',id:v.name,name:v.name,lang:v.lang,genre:v.genre,info:v.info,key:'vip:'+v.name}; });
+    (myVoices||[]).forEach(function(v){ items.push({type:'clone',id:v.id,name:v.name,lang:'vi',key:'clone:'+v.id}); });
+    return items;
   }
-  function setVpFilter(f){ vpFilter=f; renderVoices(); }
-  function selectVoice(n,lg){ selVoice=n; selLang=lg; renderVoices(); }
-  renderVoices();
+  function openVoiceModal(){ el('voiceOverlay').style.display='flex'; renderVoiceModal(); }
+  function closeVoiceModal(){ el('voiceOverlay').style.display='none'; }
+  function setVmFilter(f){ vmFilter=f; renderVoiceModal(); }
+  function isSel(v){ return selectedVoice.type===v.type && (v.type==='vip'?selectedVoice.name===v.name:selectedVoice.id===v.id); }
+  function voiceModalCard(v){
+    var on=isSel(v), fav=favVoices.has(v.key);
+    var heart='<button type="button" class="vc-fav" onclick="event.stopPropagation();toggleFav(\''+v.key+'\')" title="Yêu thích">'+(fav?'❤️':'🤍')+'</button>';
+    if(v.type==='clone'){
+      return '<div class="vcard'+(on?' on':'')+'">'+
+        '<div class="vc-head"><span class="vc-ava" style="background:linear-gradient(135deg,#9775fa,#7048e8)">🧬</span>'+
+        '<div style="flex:1"><div class="vc-name">'+esc(v.name)+' <span class="vc-vip" style="background:linear-gradient(135deg,#9775fa,#7048e8)">CLONE</span></div>'+
+        '<div class="vc-pills"><span class="vp other">Giọng của bạn</span></div></div>'+heart+'</div>'+
+        '<p class="vc-desc">Giọng bạn tự nhân bản — đọc mọi văn bản bằng chính giọng này.</p>'+
+        '<div class="vc-foot"><button type="button" class="vc-pick" onclick="chooseVoice(\'clone\',\''+v.id+'\')">'+(on?'Đang chọn ✓':'Dùng')+'</button></div>'+
+      '</div>';
+    }
+    var pi=pillInfo(v), gender=v.info.indexOf('Nữ')>-1?'Nữ':'Nam', q=jsq(v.name);
+    return '<div class="vcard'+(on?' on':'')+'">'+
+      '<div class="vc-head"><span class="vc-ava" style="background:'+gradFor(v)+'">'+initsOf(v.name)+'</span>'+
+      '<div style="flex:1"><div class="vc-name">'+v.name+' <span class="vc-vip">VIP</span></div>'+
+      '<div class="vc-pills"><span class="vp '+pi.cls+'">'+pi.label+'</span><span class="vp g">'+gender+'</span><span class="vp g">'+v.genre+'</span></div></div>'+heart+'</div>'+
+      '<p class="vc-desc">'+descOf(v)+'</p>'+
+      '<div class="vc-foot"><button type="button" class="vc-play" onclick="playPreview(this,\''+v.lang+'\',\''+q+'\')">▶ Nghe thử</button>'+
+      '<button type="button" class="vc-pick" onclick="chooseVoice(\'vip\',\''+q+'\',\''+v.lang+'\')">'+(on?'Đang chọn ✓':'Dùng')+'</button></div>'+
+    '</div>';
+  }
+  function renderVoiceModal(){
+    var q=(el('voiceSearch')?el('voiceSearch').value:'').toLowerCase().trim();
+    var chips=[['fav','❤️ Yêu thích'],['all','🌐 Tất cả'],['vi','🇻🇳 Việt'],['en','🇬🇧🇺🇸 Anh'],['other','🌍 Khác'],['clone','🧬 Giọng của tôi']];
+    if(el('voiceFilters')) el('voiceFilters').innerHTML=chips.map(function(c){ return '<button type="button" class="vp-chip'+(vmFilter===c[0]?' on':'')+'" onclick="setVmFilter(\''+c[0]+'\')">'+c[1]+'</button>'; }).join('');
+    var items=allVoiceItems().filter(function(v){
+      if(vmFilter==='fav' && !favVoices.has(v.key)) return false;
+      if(vmFilter==='clone' && v.type!=='clone') return false;
+      if(vmFilter==='vi' && !(v.type==='vip'&&v.lang==='vi')) return false;
+      if(vmFilter==='en' && !(v.type==='vip'&&v.lang==='en')) return false;
+      if(vmFilter==='other' && !(v.type==='vip'&&v.lang!=='vi'&&v.lang!=='en')) return false;
+      if(q && v.name.toLowerCase().indexOf(q)<0) return false;
+      return true;
+    });
+    var g=el('voiceModalGrid'); if(!g) return;
+    if(!items.length){ g.innerHTML='<div class="mv-empty" style="grid-column:1/-1">'+(vmFilter==='fav'?'Chưa có giọng yêu thích. Bấm 🤍 trên giọng để thêm.':(vmFilter==='clone'?'Chưa có giọng clone. Vào tab “Nhân bản giọng nói” để tạo.':'Không tìm thấy giọng.'))+'</div>'; return; }
+    g.innerHTML=items.map(voiceModalCard).join('');
+  }
+  function chooseVoice(type,idn,lang){
+    if(type==='vip'){ selectedVoice={type:'vip',name:idn,lang:lang}; }
+    else { var v=(myVoices||[]).filter(function(x){return x.id===idn;})[0]; selectedVoice={type:'clone',id:idn,name:v?v.name:'Giọng clone',lang:'vi'}; }
+    updateVoiceBtn();
+    if(el('genOpts')) el('genOpts').style.display=(type==='clone')?'grid':'none';
+    closeVoiceModal();
+  }
+  function updateVoiceBtn(){
+    var sv=selectedVoice;
+    if(el('vsbName')) el('vsbName').textContent=sv.name;
+    if(el('vsbAva')){ el('vsbAva').textContent=sv.type==='clone'?'🧬':initsOf(sv.name); el('vsbAva').style.background=sv.type==='clone'?'linear-gradient(135deg,#9775fa,#7048e8)':gradForName(sv.name); }
+    if(el('vsbSub')){
+      if(sv.type==='clone') el('vsbSub').textContent='🧬 Giọng Clone của bạn';
+      else { var vv=ALL_VOICES.filter(function(x){return x.name===sv.name;})[0]; el('vsbSub').textContent='🌟 Giọng Tân Seven VIP'+(vv?' · '+vv.info:''); }
+    }
+  }
+  updateVoiceBtn();
 
   // ====== NHÂN BẢN GIỌNG (viXTTS clone) ======
   var CLONE_STYLES = [
@@ -820,8 +882,8 @@
     ["tr","🇹🇷 Thổ Nhĩ Kỳ"],["nl","🇳🇱 Hà Lan"],["cs","🇨🇿 Tiếng Séc"],["ar","🇸🇦 Ả Rập"],
     ["hu","🇭🇺 Hungary"],["hi","🇮🇳 Hindi"]
   ];
-  var voiceSrc="vip", cloneRefB64=null, cloneBusy=false;
-  var myVoices=[], selCloneId=null, selCloneName="";
+  var cloneRefB64=null, cloneBusy=false;
+  var myVoices=[];
 
   function fillCloneUI(){
     var st=el('cloneStyle'); if(st) st.innerHTML=CLONE_STYLES.map(function(s){ return '<option value="'+s[0]+'">'+s[0]+'</option>'; }).join('');
@@ -831,16 +893,6 @@
     var m={}; CLONE_STYLES.forEach(function(s){ m[s[0]]=s[1]; });
     var sp=m[el('cloneStyle').value]||1.0;
     el('ttsSpeed').value=sp; el('ttsSpeedVal').textContent=sp.toFixed(2)+'x';
-  }
-  // Đổi nguồn giọng: VIP (giọng có sẵn) hoặc Clone (giọng bạn tự tạo)
-  function setVoiceSrc(m){
-    voiceSrc=m;
-    if(el('vsVip')) el('vsVip').classList.toggle('on',m==='vip');
-    if(el('vsClone')) el('vsClone').classList.toggle('on',m==='clone');
-    if(el('vipPane')) el('vipPane').style.display=m==='vip'?'block':'none';
-    if(el('clonePane')) el('clonePane').style.display=m==='clone'?'block':'none';
-    if(el('genOpts')) el('genOpts').style.display=m==='clone'?'grid':'none';
-    if(m==='clone') loadMyVoices();
   }
   function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -852,7 +904,7 @@
     renderMyVoices();
   }
   function mvCard(v,pick){
-    var on=pick && selCloneId===v.id;
+    var on=pick && selectedVoice.type==='clone' && selectedVoice.id===v.id;
     var click=pick?(' onclick="selectMyVoice(\''+v.id+'\')"'):'';
     return '<div class="mvcard'+(on?' on':'')+'"'+click+'>'+
       '<span class="mv-ava">🧬</span>'+
@@ -870,16 +922,16 @@
     if(l) l.innerHTML=myVoices.length?myVoices.map(function(v){return mvCard(v,false);}).join('')
       :'<div class="mv-empty">Chưa có giọng nói nào.<br>Tải lên tệp âm thanh để tạo giọng đầu tiên.</div>';
     if(el('batchVoice')) fillBatchVoices();
+    if(el('voiceOverlay')&&el('voiceOverlay').style.display==='flex') renderVoiceModal();
   }
   function selectMyVoice(id){
-    selCloneId=id; var v=myVoices.filter(function(x){return x.id===id;})[0]; selCloneName=v?v.name:'';
-    renderMyVoices();
+    chooseVoice('clone',id); showView('audio');
   }
   async function deleteMyVoice(id){
     if(!sb) return;
     if(!confirm('Xoá giọng clone này khỏi thư viện?')) return;
     try{ await sb.from('user_voices').delete().eq('id',id); }catch(e){}
-    if(selCloneId===id){ selCloneId=null; selCloneName=''; }
+    if(selectedVoice.type==='clone'&&selectedVoice.id===id){ selectedVoice={type:'vip',name:'Minh Đức',lang:'vi'}; updateVoiceBtn(); if(el('genOpts'))el('genOpts').style.display='none'; }
     loadMyVoices();
   }
 
@@ -949,19 +1001,19 @@
   }
 
   // ---- Tạo audio: điều hướng VIP / Clone ----
-  function doGenerate(){ if(voiceSrc==='clone') return doCloneGen(); return doTTS(); }
+  function doGenerate(){ if(selectedVoice.type==='clone') return doCloneGen(); return doTTS(); }
   async function doCloneGen(){
     if(!sb){ alert('Vui lòng đăng nhập.'); return; }
     if(cloneBusy) return;
     var text=el('ttsText').value.trim();
     var msg=el('ttsMsg'), res=el('ttsResult'), btn=el('ttsBtn');
     if(!text){ msg.className='msg err'; msg.textContent='Nhập nội dung cần đọc.'; return; }
-    if(!selCloneId){ msg.className='msg err'; msg.textContent='Hãy chọn 1 giọng clone (hoặc bấm ➕ tạo giọng mới).'; return; }
+    if(selectedVoice.type!=='clone'){ msg.className='msg err'; msg.textContent='Hãy chọn 1 giọng clone (bấm “Chọn giọng nói” → mục 🧬 Giọng của tôi).'; return; }
     cloneBusy=true; btn.disabled=true; btn.textContent='🧬 Đang tạo...';
     msg.className='msg'; res.style.display='none';
     try{
       var s=await sb.auth.getSession(); var token=s.data.session.access_token;
-      var payload={ text:text, voice_id:selCloneId, language:el('cloneLang').value,
+      var payload={ text:text, voice_id:selectedVoice.id, language:el('cloneLang').value,
         style:el('cloneStyle').value, speed:parseFloat(el('ttsSpeed').value)||1.0, format:'mp3' };
       var r=await fetch(SUPABASE_URL+'/functions/v1/clone-voice',{
         method:'POST',
@@ -980,7 +1032,7 @@
         if(el('ttsSrt')) el('ttsSrt').style.display='none';
         res.style.display='block';
         msg.className='msg ok';
-        msg.textContent='🎉 Xong! Giọng “'+selCloneName+'”. Trừ '+d.cost+' ký tự. Còn lại: '+Number(d.credits).toLocaleString('vi-VN')+' ký tự';
+        msg.textContent='🎉 Xong! Giọng “'+selectedVoice.name+'”. Trừ '+d.cost+' ký tự. Còn lại: '+Number(d.credits).toLocaleString('vi-VN')+' ký tự';
         var cv=Number(d.credits).toLocaleString('vi-VN');
         el('creditNum').innerHTML=cv+'<small> ký tự</small>'; if(el('creditMini')) el('creditMini').textContent=cv;
       }
