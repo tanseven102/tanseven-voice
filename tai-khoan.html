@@ -65,6 +65,38 @@
   .config-warn{max-width:600px;margin:30px auto;background:#fff8e6;border:1px solid #f0dcae;border-radius:16px;
     padding:20px 22px;font-size:14.5px;color:var(--ink2);display:none}
   .config-warn b{color:var(--gold)}
+
+  /* NẠP TIỀN modal */
+  .nap-overlay{display:none;position:fixed;inset:0;background:rgba(15,12,6,.55);backdrop-filter:blur(3px);
+    z-index:100;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto}
+  .nap-box{background:var(--card);border:1px solid var(--line);border-radius:22px;max-width:420px;width:100%;
+    padding:26px 24px;box-shadow:var(--shadow);position:relative;margin:auto}
+  .nap-x{position:absolute;top:14px;right:14px;border:0;background:var(--field);width:32px;height:32px;
+    border-radius:9px;font-size:15px;cursor:pointer;color:var(--ink2)}
+  .nap-h{font-size:20px;font-weight:800;margin:0 0 4px}
+  .nap-sub{color:var(--muted);font-size:14px;margin:0 0 18px}
+  .nap-packs{display:grid;gap:12px}
+  .nap-pack{position:relative;text-align:left;border:1.5px solid var(--line2);background:var(--field);
+    border-radius:15px;padding:16px 18px;cursor:pointer;font-family:inherit;transition:.15s}
+  .nap-pack:hover{border-color:var(--ink);background:#fff}
+  .nap-pack.hot{border-color:var(--gold);background:var(--gold-soft)}
+  .np-nm{font-weight:800;font-size:16px}
+  .np-amt{font-family:"JetBrains Mono",monospace;font-size:22px;font-weight:800;color:var(--green);margin-top:2px}
+  .nap-pack.hot .np-amt{color:var(--gold)}
+  .np-cr{color:var(--ink2);font-size:13.5px;margin-top:2px}
+  .np-badge{position:absolute;top:12px;right:12px;background:var(--gold);color:#fff;font-size:11px;font-weight:800;
+    padding:3px 9px;border-radius:99px}
+  .nap-qr{text-align:center;margin:6px 0 14px}
+  .nap-qr img{width:210px;height:210px;border:1px solid var(--line);border-radius:12px;background:#fff}
+  .nap-info{border:1px solid var(--line);border-radius:13px;overflow:hidden;font-size:14px}
+  .nap-info>div{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line)}
+  .nap-info>div:last-child{border-bottom:0}
+  .nap-info span{color:var(--muted)} .nap-info b{text-align:right;word-break:break-all}
+  .nap-info .hl{background:var(--gold-soft)} .nap-info .hl b{color:var(--gold);font-family:"JetBrains Mono",monospace}
+  .nap-note{font-size:13px;color:var(--ink2);background:#fff8e6;border:1px solid #f0dcae;border-radius:11px;padding:11px 13px;margin:14px 0 0}
+  .nap-wait{margin-top:14px;text-align:center;font-weight:700;color:var(--gold);font-size:14.5px}
+  .nap-done{margin-top:14px;text-align:center;font-weight:800;color:var(--green);background:var(--green-soft);
+    border:1px solid #b8e6c8;border-radius:12px;padding:14px}
 </style>
 
 <nav><div class="nav-in">
@@ -115,7 +147,7 @@
         <div class="k">💎 Ký tự còn lại</div>
         <div class="credit" id="creditNum">—<small> ký tự</small></div>
         <div class="desc">Mỗi ký tự = 1 lần đọc. Hết thì nạp thêm.</div>
-        <a class="act" href="#" onclick="alert('Phase 4: nạp credit — sắp có');return false">+ Nạp thêm</a>
+        <a class="act" href="#" onclick="openNap();return false">+ Nạp thêm</a>
       </div>
       <div class="box">
         <div class="k">🤝 Affiliate — hoa hồng 12%</div>
@@ -163,12 +195,54 @@
   </div>
 </div>
 
+<div id="napOverlay" class="nap-overlay" onclick="if(event.target===this)closeNap()">
+  <div class="nap-box">
+    <button class="nap-x" onclick="closeNap()">✕</button>
+    <div id="napStep1">
+      <h2 class="nap-h">💳 Nạp thêm ký tự</h2>
+      <p class="nap-sub">Mua 1 lần — ký tự dùng <b>vĩnh viễn</b>, không hết hạn.</p>
+      <div class="nap-packs">
+        <button class="nap-pack" onclick="chooseNap('basic')">
+          <div class="np-nm">💚 Cơ bản</div>
+          <div class="np-amt">99.000đ</div>
+          <div class="np-cr">1.100.000 ký tự · ~18 giờ audio</div>
+        </button>
+        <button class="nap-pack hot" onclick="chooseNap('pro')">
+          <div class="np-badge">LỢI NHẤT</div>
+          <div class="np-nm">💛 Pro</div>
+          <div class="np-amt">299.000đ</div>
+          <div class="np-cr">3.800.000 ký tự · ~63 giờ audio</div>
+        </button>
+      </div>
+    </div>
+    <div id="napStep2" style="display:none">
+      <h2 class="nap-h">📲 Quét mã để chuyển khoản</h2>
+      <div class="nap-qr"><img id="napQR" alt="QR chuyển khoản"></div>
+      <div class="nap-info">
+        <div><span>Ngân hàng</span><b id="napBank"></b></div>
+        <div><span>Số tài khoản</span><b id="napAcc"></b></div>
+        <div><span>Chủ tài khoản</span><b id="napOwner"></b></div>
+        <div><span>Số tiền</span><b id="napAmount"></b></div>
+        <div class="hl"><span>Nội dung CK</span><b id="napCode"></b></div>
+      </div>
+      <p class="nap-note">⚠️ Chuyển <b>đúng số tiền</b> và <b>đúng nội dung</b> ở trên. Hệ thống tự cộng ký tự sau 1–2 phút.</p>
+      <div id="napWait" class="nap-wait">⏳ Đang chờ chuyển khoản...</div>
+      <div id="napDone" class="nap-done" style="display:none">🎉 Đã nhận tiền! Ký tự đã được cộng vào tài khoản.</div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   // ====== CẤU HÌNH — điền sau khi tạo project Supabase ======
   const SUPABASE_URL = "https://idnfafxgrbabypfokgve.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_Subrht5w8KLv8WC95UbriQ_XlO8QNYW";
   const FREE_CREDITS = 10000; // tặng khi đăng ký
+
+  // ====== NGÂN HÀNG NHẬN TIỀN (Phase 4 — ĐIỀN THÔNG TIN CỦA BẠN) ======
+  const BANK_CODE  = "MB";            // mã NH: MB, VCB, ACB, TCB, BIDV, VPB, Sacombank...
+  const BANK_ACC   = "50223344556688";  // số tài khoản nhận tiền (MB — SePay theo dõi)
+  const BANK_OWNER = "LE VAN TAN";    // tên chủ tài khoản (hiện cho khách xem)
   // ==========================================================
 
   // Bắt mã giới thiệu từ URL (?ref=CODE) → lưu lại để dùng khi đăng ký
@@ -307,5 +381,53 @@
     if(navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(i.value).then(done, function(){ try{document.execCommand('copy');}catch(e){} done(); });
     } else { try{document.execCommand('copy');}catch(e){} done(); }
+  }
+
+  // ====== NẠP TIỀN (Phase 4) ======
+  var napPoll = null, napCode = null;
+  function openNap(){
+    if(!sb){ alert('Vui lòng đăng nhập.'); return; }
+    el('napStep1').style.display='block';
+    el('napStep2').style.display='none';
+    el('napOverlay').style.display='flex';
+  }
+  function closeNap(){
+    el('napOverlay').style.display='none';
+    if(napPoll){ clearInterval(napPoll); napPoll=null; }
+  }
+  async function chooseNap(pack){
+    if(!sb) return;
+    try{
+      var { data, error } = await sb.rpc('create_order', { p_pack: pack });
+      if(error || !data || !data[0]){ alert('Lỗi tạo đơn: ' + (error?error.message:'?')); return; }
+      var o = data[0];
+      napCode = o.code;
+      el('napBank').textContent  = BANK_CODE;
+      el('napAcc').textContent   = BANK_ACC;
+      el('napOwner').textContent = BANK_OWNER;
+      el('napAmount').textContent = Number(o.amount_vnd).toLocaleString('vi-VN') + 'đ';
+      el('napCode').textContent  = o.code;
+      el('napQR').src = 'https://qr.sepay.vn/img?acc=' + encodeURIComponent(BANK_ACC) +
+        '&bank=' + encodeURIComponent(BANK_CODE) + '&amount=' + o.amount_vnd + '&des=' + encodeURIComponent(o.code);
+      el('napStep1').style.display='none';
+      el('napStep2').style.display='block';
+      el('napWait').style.display='block';
+      el('napDone').style.display='none';
+      if(napPoll) clearInterval(napPoll);
+      napPoll = setInterval(checkNap, 4000);
+    }catch(e){ alert('Lỗi: '+String(e)); }
+  }
+  async function checkNap(){
+    if(!sb || !napCode) return;
+    try{
+      var { data } = await sb.from('orders').select('status').eq('code', napCode).single();
+      if(data && data.status === 'paid'){
+        clearInterval(napPoll); napPoll=null;
+        el('napWait').style.display='none';
+        el('napDone').style.display='block';
+        var s = await sb.auth.getSession();
+        if(s.data.session) renderState(s.data.session);
+      }
+    }catch(e){}
   }
 </script>
