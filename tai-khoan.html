@@ -198,6 +198,12 @@
   .tip{color:var(--ink2);font-size:13px;padding-left:18px;position:relative;margin-top:3px}
   .tip:before{content:"•";position:absolute;left:4px;color:var(--gold);font-weight:800}
   .mv-list{margin-top:14px;display:flex;flex-direction:column;gap:10px;min-height:110px}
+  /* tạo hàng loạt */
+  .batch-row{display:flex;align-items:center;gap:10px;background:var(--field);border:1px solid var(--line2);border-radius:10px;padding:8px 12px}
+  .batch-st{flex:0 0 auto;font-size:15px;width:20px;text-align:center}
+  .batch-tx{flex:1;font-size:13px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .batch-ac{flex:0 0 auto;display:flex;align-items:center;gap:6px}
+  .batch-ac audio{height:32px}
 </style>
 
 <nav><div class="nav-in">
@@ -255,6 +261,7 @@
     <div class="dash-nav">
       <button id="navAudio" class="on" onclick="showView('audio')">🎙️ Văn bản thành giọng nói</button>
       <button id="navClone" onclick="showView('clone')">🧬 Nhân bản giọng nói</button>
+      <button id="navBatch" onclick="showView('batch')">📚 Tạo hàng loạt</button>
       <button id="navAffiliate" onclick="showView('affiliate')">🤝 Affiliate</button>
       <button id="navAccount" onclick="showView('account')">👤 Tài khoản</button>
       <span class="dash-credit">💎 <b id="creditMini">—</b> ký tự</span>
@@ -340,6 +347,27 @@
           <div class="k">🎧 Giọng của tôi <span id="myVoiceCount2" class="mono" style="color:var(--muted);font-weight:600"></span></div>
           <div id="myVoicesList" class="mv-list"></div>
         </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: TẠO HÀNG LOẠT ===== -->
+    <div id="batchView" style="display:none">
+      <div class="box">
+        <div class="k">📚 Tạo hàng loạt</div>
+        <p class="desc" style="margin-top:6px">Mỗi <b>dòng</b> = 1 file audio riêng. Nhập nhiều dòng để tạo hàng loạt, rồi tải về từng file hoặc cả gói <b>.zip</b>.</p>
+        <textarea id="batchText" placeholder="Dòng 1: Xin chào các bạn, đây là video hôm nay...&#10;Dòng 2: Đừng quên like và đăng ký kênh nhé...&#10;Dòng 3: Hẹn gặp lại các bạn ở video sau!" style="min-height:150px"></textarea>
+        <div class="gen-opts" style="display:grid;margin-top:14px">
+          <div><label style="margin:0 0 5px">🎙️ Giọng đọc</label><select id="batchVoice"></select></div>
+          <div><label style="margin:0 0 5px">🎭 Cảm xúc <span style="font-weight:400;color:var(--muted);font-size:11px">(giọng clone)</span></label><select id="batchStyle"></select></div>
+        </div>
+        <label style="margin-top:14px">⚡ Tốc độ: <b id="batchSpeedVal" style="color:var(--gold)">1.00x</b></label>
+        <input type="range" id="batchSpeed" min="0.7" max="1.5" step="0.01" value="1" oninput="el('batchSpeedVal').textContent=(+this.value).toFixed(2)+'x'">
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px">
+          <button class="btn" id="batchBtn" style="margin:0;width:auto;padding:12px 26px" onclick="doBatch()">🚀 Tạo hàng loạt</button>
+          <a class="act" id="batchDl" style="margin:0;display:none;cursor:pointer" onclick="downloadAllZip();return false">⬇️ Tải tất cả (.zip)</a>
+        </div>
+        <div class="msg" id="batchMsg"></div>
+        <div id="batchResults" style="margin-top:14px;display:flex;flex-direction:column;gap:8px"></div>
       </div>
     </div>
 
@@ -430,6 +458,7 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   // ====== CẤU HÌNH — điền sau khi tạo project Supabase ======
@@ -465,10 +494,10 @@
     el('authMsg').className='msg';
   }
   function showView(v){
-    var views = { audio:'audioView', clone:'cloneView', affiliate:'affiliateView', account:'accountView' };
-    var navs  = { audio:'navAudio',  clone:'navClone',  affiliate:'navAffiliate',  account:'navAccount'  };
+    var views = { audio:'audioView', clone:'cloneView', batch:'batchView', affiliate:'affiliateView', account:'accountView' };
+    var navs  = { audio:'navAudio',  clone:'navClone',  batch:'navBatch',  affiliate:'navAffiliate',  account:'navAccount'  };
     if(v==='audio') setVoiceSrc(voiceSrc);
-    if(v==='clone') loadMyVoices();
+    if(v==='clone'||v==='batch') loadMyVoices();
     for(var k in views){
       if(el(views[k])) el(views[k]).style.display = (k===v) ? 'block' : 'none';
       if(el(navs[k]))  el(navs[k]).classList.toggle('on', k===v);
@@ -840,6 +869,7 @@
     var l=el('myVoicesList');
     if(l) l.innerHTML=myVoices.length?myVoices.map(function(v){return mvCard(v,false);}).join('')
       :'<div class="mv-empty">Chưa có giọng nói nào.<br>Tải lên tệp âm thanh để tạo giọng đầu tiên.</div>';
+    if(el('batchVoice')) fillBatchVoices();
   }
   function selectMyVoice(id){
     selCloneId=id; var v=myVoices.filter(function(x){return x.id===id;})[0]; selCloneName=v?v.name:'';
@@ -963,7 +993,83 @@
     }catch(e){ msg.className='msg err'; msg.textContent='Lỗi: '+String(e); }
     cloneBusy=false; btn.disabled=false; btn.textContent='🎙️ Tạo audio';
   }
-  fillCloneUI();
+
+  // ====== TẠO HÀNG LOẠT ======
+  function fillBatchStyle(){
+    var s=el('batchStyle'); if(s) s.innerHTML=CLONE_STYLES.map(function(x){return '<option value="'+x[0]+'">'+x[0]+'</option>';}).join('');
+  }
+  function fillBatchVoices(){
+    var s=el('batchVoice'); if(!s) return;
+    var cur=s.value;
+    var h='<optgroup label="🌟 Giọng Tân Seven VIP">';
+    ALL_VOICES.forEach(function(v){ h+='<option value="vip::'+v.name+'::'+v.lang+'">'+v.name+' — '+v.info+'</option>'; });
+    h+='</optgroup>';
+    if(myVoices.length){
+      h+='<optgroup label="🧬 Giọng Clone của tôi">';
+      myVoices.forEach(function(v){ h+='<option value="clone::'+v.id+'">🧬 '+esc(v.name)+'</option>'; });
+      h+='</optgroup>';
+    }
+    s.innerHTML=h; if(cur) try{ s.value=cur; }catch(e){}
+  }
+  var batchResults=[], batchBusy=false;
+  function renderBatch(){
+    var g=el('batchResults'); if(!g) return;
+    g.innerHTML=batchResults.map(function(it){
+      var st=it.status==='ok'?'✅':(it.status==='run'?'⏳':(it.status==='warm'?'🕐':'❌'));
+      var ac=it.audio?('<audio controls src="data:audio/mpeg;base64,'+it.audio+'"></audio><a class="act" style="margin:0;padding:6px 9px" download="audio-'+it.idx+'.mp3" href="data:audio/mpeg;base64,'+it.audio+'">⬇️</a>')
+        :('<span class="mv-sub">'+esc(it.err||'đang chờ...')+'</span>');
+      return '<div class="batch-row"><span class="batch-st">'+st+'</span><span class="batch-tx">'+it.idx+'. '+esc(it.text.slice(0,70))+'</span><span class="batch-ac">'+ac+'</span></div>';
+    }).join('');
+  }
+  async function doBatch(){
+    if(!sb){ alert('Vui lòng đăng nhập.'); return; }
+    if(batchBusy) return;
+    var lines=el('batchText').value.split('\n').map(function(x){return x.trim();}).filter(Boolean);
+    var msg=el('batchMsg');
+    if(!lines.length){ msg.className='msg err'; msg.textContent='Nhập ít nhất 1 dòng.'; return; }
+    if(!el('batchVoice').value){ msg.className='msg err'; msg.textContent='Chọn giọng đọc.'; return; }
+    var sel=el('batchVoice').value.split('::');
+    var speed=parseFloat(el('batchSpeed').value)||1.0;
+    var style=el('batchStyle')?el('batchStyle').value:'🤖 Tự động (cân bằng)';
+    batchBusy=true; batchResults=[]; var btn=el('batchBtn'); btn.disabled=true;
+    msg.className='msg'; el('batchDl').style.display='none';
+    for(var i=0;i<lines.length;i++){
+      btn.textContent='Đang tạo '+(i+1)+'/'+lines.length+'...';
+      var item={idx:i+1,text:lines[i],status:'run',audio:null,err:''};
+      batchResults.push(item); renderBatch();
+      try{
+        var ss=await sb.auth.getSession(); var token=ss.data.session.access_token;
+        var fn, payload;
+        if(sel[0]==='clone'){ fn='clone-voice'; payload={text:lines[i],voice_id:sel[1],style:style,speed:speed,format:'mp3'}; }
+        else { fn='smart-api'; payload={text:lines[i],voice:sel[1],lang:sel[2],speed:speed}; }
+        var r=await fetch(SUPABASE_URL+'/functions/v1/'+fn,{method:'POST',
+          headers:{'Authorization':'Bearer '+token,'apikey':SUPABASE_ANON_KEY,'Content-Type':'application/json'},
+          body:JSON.stringify(payload)});
+        var d=await r.json();
+        if(d.audio_base64){ item.status='ok'; item.audio=d.audio_base64;
+          var cv=Number(d.credits).toLocaleString('vi-VN'); el('creditNum').innerHTML=cv+'<small> ký tự</small>'; if(el('creditMini'))el('creditMini').textContent=cv; }
+        else if(r.status===202||d.warming){ item.status='warm'; item.err='máy chủ đang khởi động, chạy lại sau'; }
+        else { item.status='err'; item.err=d.error||('HTTP '+r.status); }
+      }catch(e){ item.status='err'; item.err=String(e); }
+      renderBatch();
+    }
+    btn.disabled=false; btn.textContent='🚀 Tạo hàng loạt'; batchBusy=false;
+    var okc=batchResults.filter(function(x){return x.status==='ok';}).length;
+    msg.className=okc?'msg ok':'msg err'; msg.textContent='✅ Xong '+okc+'/'+lines.length+' file.';
+    if(okc>0) el('batchDl').style.display='inline-block';
+  }
+  async function downloadAllZip(){
+    var ok=batchResults.filter(function(x){return x.audio;});
+    if(!ok.length){ alert('Chưa có file nào.'); return; }
+    if(typeof JSZip==='undefined'){ alert('Thư viện nén chưa sẵn sàng, thử lại sau.'); return; }
+    var zip=new JSZip();
+    ok.forEach(function(it){ zip.file('audio-'+it.idx+'.mp3', it.audio, {base64:true}); });
+    var blob=await zip.generateAsync({type:'blob'});
+    var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='tanseven-hangloat.zip';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); },1500);
+  }
+  fillCloneUI(); fillBatchStyle(); fillBatchVoices();
 
   // ====== MẬT KHẨU ======
   async function changePass(){
