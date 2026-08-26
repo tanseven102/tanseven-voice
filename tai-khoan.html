@@ -43,6 +43,12 @@
 
   /* DASHBOARD */
   .dash{display:none}
+  .dash-nav{display:flex;gap:8px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+  .dash-nav>button{border:1px solid var(--line2);background:var(--card);color:var(--ink2);font-family:inherit;
+    font-weight:700;font-size:14.5px;padding:10px 18px;border-radius:11px;cursor:pointer}
+  .dash-nav>button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .dash-credit{margin-left:auto;background:var(--green-soft);color:var(--green);font-weight:800;
+    padding:8px 14px;border-radius:10px;font-size:13.5px;border:1px solid #b8e6c8}
   .hello{font-size:26px;font-weight:800;margin:6px 0 2px}
   .hello .sub{font-size:15px}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:22px}
@@ -152,66 +158,83 @@
 
   <!-- ====== ĐÃ ĐĂNG NHẬP: dashboard ====== -->
   <div class="dash" id="dashBox">
-    <div class="hello">Chào <span id="userName">bạn</span>! 👋</div>
-    <div class="sub" id="userEmail" style="color:var(--muted)"></div>
-    <div class="grid">
+    <div class="dash-nav">
+      <button id="navAudio" class="on" onclick="showView('audio')">🎙️ Tạo giọng</button>
+      <button id="navAffiliate" onclick="showView('affiliate')">🤝 Affiliate</button>
+      <button id="navAccount" onclick="showView('account')">👤 Tài khoản</button>
+      <span class="dash-credit">💎 <b id="creditMini">—</b> ký tự</span>
+    </div>
+
+    <!-- ===== TAB: TẠO GIỌNG ===== -->
+    <div id="audioView">
       <div class="box">
+        <div class="k">🎙️ Tạo giọng</div>
+        <textarea id="ttsText" placeholder="Dán kịch bản cần đọc vào đây... (tối đa 5000 ký tự)" maxlength="5000"></textarea>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+          <label style="margin:0;flex:1;min-width:150px">🌍 Ngôn ngữ
+            <select id="ttsLang" onchange="fillVoices()" style="width:100%;margin-top:4px"></select>
+          </label>
+          <label style="margin:0;flex:1;min-width:150px">🎭 Giọng đọc
+            <select id="ttsVoice" style="width:100%;margin-top:4px"></select>
+          </label>
+        </div>
+        <label style="margin-top:14px">⚡ Tốc độ đọc: <b id="ttsSpeedVal" style="color:var(--gold)">1.00x</b> <span style="font-weight:400;color:var(--muted);font-size:12px">(trái = chậm · phải = nhanh)</span></label>
+        <input type="range" id="ttsSpeed" min="0.7" max="1.5" step="0.05" value="1" oninput="el('ttsSpeedVal').textContent=(+this.value).toFixed(2)+'x'">
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px">
+          <span id="ttsCount" style="color:var(--muted);font-size:13px">0 ký tự</span>
+          <button class="btn" id="ttsBtn" style="margin:0;width:auto;padding:12px 26px" onclick="doTTS()">🎙️ Tạo giọng</button>
+        </div>
+        <div class="msg" id="ttsMsg"></div>
+        <div id="ttsResult" style="display:none;margin-top:14px">
+          <audio id="ttsAudio" controls></audio>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+            <a id="ttsDownload" class="act" download="giong-tanseven.mp3" style="margin:0">⬇️ Tải MP3</a>
+            <a id="ttsSrt" class="act" style="margin:0;display:none;cursor:pointer" onclick="downloadSRT();return false">📝 Tải phụ đề SRT</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: AFFILIATE ===== -->
+    <div id="affiliateView" style="display:none">
+      <div class="box">
+        <div class="k">🤝 Affiliate — hoa hồng 12%</div>
+        <div style="display:flex;gap:32px;margin-top:10px;flex-wrap:wrap">
+          <div><div class="credit" style="font-size:34px" id="affCount">0</div><div class="desc" style="margin:0">Người giới thiệu</div></div>
+          <div><div class="credit" style="font-size:34px;color:var(--gold)" id="affComm">0đ</div><div class="desc" style="margin:0">Hoa hồng đã kiếm</div></div>
+        </div>
+      </div>
+
+      <div class="box" id="affBox" style="margin-top:16px">
+        <div class="k">🔗 Link giới thiệu của bạn</div>
+        <div class="desc">Chia sẻ link này cho bạn bè, hội nhóm. Ai bấm vào rồi <b>đăng ký + mua ký tự</b>, bạn nhận ngay <b>12%</b> số tiền họ mua — khách vẫn trả giá như thường, bạn có thêm thu nhập.</div>
+        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+          <input id="affLink" readonly style="flex:1;min-width:220px;font-size:13px" value="Đăng nhập để lấy link...">
+          <button class="btn" id="affCopyBtn" style="margin:0;width:auto;padding:12px 22px" onclick="copyAff()">📋 Copy</button>
+        </div>
+        <div class="msg" id="affMsg"></div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: TÀI KHOẢN ===== -->
+    <div id="accountView" style="display:none">
+      <div class="hello">Chào <span id="userName">bạn</span>! 👋</div>
+      <div class="sub" id="userEmail" style="color:var(--muted)"></div>
+      <div class="box" style="margin-top:16px">
         <div class="k">💎 Ký tự còn lại</div>
         <div class="credit" id="creditNum">—<small> ký tự</small></div>
         <div class="desc">Mỗi ký tự = 1 lần đọc. Hết thì nạp thêm.</div>
         <a class="act" href="#" onclick="openNap();return false">+ Nạp thêm</a>
       </div>
-      <div class="box">
-        <div class="k">🤝 Affiliate — hoa hồng 12%</div>
-        <div style="display:flex;gap:26px;margin-top:8px">
-          <div><div class="credit" style="font-size:30px" id="affCount">0</div><div class="desc" style="margin:0">Người giới thiệu</div></div>
-          <div><div class="credit" style="font-size:30px;color:var(--gold)" id="affComm">0đ</div><div class="desc" style="margin:0">Hoa hồng</div></div>
+
+      <div class="box" style="margin-top:16px">
+        <div class="k">🔒 Đổi mật khẩu</div>
+        <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+          <input id="newPass" type="password" placeholder="Mật khẩu mới (≥ 6 ký tự)" style="flex:1;min-width:200px">
+          <button class="btn" style="margin:0;width:auto;padding:12px 24px" onclick="changePass()">Đổi mật khẩu</button>
         </div>
-        <a class="act" href="#affBox" onclick="var e=document.getElementById('affBox');if(e)e.scrollIntoView({behavior:'smooth'});return false">↓ Lấy link giới thiệu</a>
+        <div class="msg" id="passMsg"></div>
       </div>
-    </div>
-
-    <div class="box" style="margin-top:16px">
-      <div class="k">🎙️ Tạo giọng</div>
-      <textarea id="ttsText" placeholder="Dán kịch bản cần đọc vào đây... (tối đa 5000 ký tự)" maxlength="5000"></textarea>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
-        <label style="margin:0;flex:1;min-width:150px">🌍 Ngôn ngữ
-          <select id="ttsLang" onchange="fillVoices()" style="width:100%;margin-top:4px"></select>
-        </label>
-        <label style="margin:0;flex:1;min-width:150px">🎭 Giọng đọc
-          <select id="ttsVoice" style="width:100%;margin-top:4px"></select>
-        </label>
-      </div>
-      <label style="margin-top:14px">⚡ Tốc độ đọc: <b id="ttsSpeedVal" style="color:var(--gold)">1.00x</b> <span style="font-weight:400;color:var(--muted);font-size:12px">(trái = chậm · phải = nhanh)</span></label>
-      <input type="range" id="ttsSpeed" min="0.7" max="1.5" step="0.05" value="1" oninput="el('ttsSpeedVal').textContent=(+this.value).toFixed(2)+'x'">
-      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px">
-        <span id="ttsCount" style="color:var(--muted);font-size:13px">0 ký tự</span>
-        <button class="btn" id="ttsBtn" style="margin:0;width:auto;padding:12px 26px" onclick="doTTS()">🎙️ Tạo giọng</button>
-      </div>
-      <div class="msg" id="ttsMsg"></div>
-      <div id="ttsResult" style="display:none;margin-top:14px">
-        <audio id="ttsAudio" controls></audio>
-        <a id="ttsDownload" class="act" download="giong-tanseven.mp3" style="margin-top:10px">⬇️ Tải file MP3</a>
-      </div>
-    </div>
-
-    <div class="box" id="affBox" style="margin-top:16px">
-      <div class="k">🤝 Link giới thiệu của bạn — kiếm 12% hoa hồng</div>
-      <div class="desc">Chia sẻ link này cho bạn bè, hội nhóm. Ai bấm vào rồi <b>đăng ký + mua ký tự</b>, bạn nhận ngay <b>12%</b> số tiền họ mua — khách vẫn trả giá như thường, bạn có thêm thu nhập.</div>
-      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
-        <input id="affLink" readonly style="flex:1;min-width:220px;font-size:13px" value="Đăng nhập để lấy link...">
-        <button class="btn" id="affCopyBtn" style="margin:0;width:auto;padding:12px 22px" onclick="copyAff()">📋 Copy</button>
-      </div>
-      <div class="msg" id="affMsg"></div>
-    </div>
-
-    <div class="box" style="margin-top:16px">
-      <div class="k">🔒 Đổi mật khẩu</div>
-      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-        <input id="newPass" type="password" placeholder="Mật khẩu mới (≥ 6 ký tự)" style="flex:1;min-width:200px">
-        <button class="btn" style="margin:0;width:auto;padding:12px 24px" onclick="changePass()">Đổi mật khẩu</button>
-      </div>
-      <div class="msg" id="passMsg"></div>
     </div>
   </div>
 
@@ -293,6 +316,14 @@
     el('regForm').style.display = login?'none':'block';
     el('authMsg').className='msg';
   }
+  function showView(v){
+    var views = { audio:'audioView', affiliate:'affiliateView', account:'accountView' };
+    var navs  = { audio:'navAudio',  affiliate:'navAffiliate',  account:'navAccount'  };
+    for(var k in views){
+      if(el(views[k])) el(views[k]).style.display = (k===v) ? 'block' : 'none';
+      if(el(navs[k]))  el(navs[k]).classList.toggle('on', k===v);
+    }
+  }
 
   var IS_RECOVERY = location.hash.indexOf('type=recovery') > -1;
   function showReset(){
@@ -323,7 +354,9 @@
       // Lấy hồ sơ (tên + credit)
       const { data: prof } = await sb.from('profiles').select('name, credits').eq('id', session.user.id).single();
       el('userName').textContent = (prof && prof.name) ? prof.name : session.user.email.split('@')[0];
-      el('creditNum').innerHTML = (prof ? Number(prof.credits).toLocaleString('vi-VN') : '0') + '<small> ký tự</small>';
+      var creditVal = prof ? Number(prof.credits).toLocaleString('vi-VN') : '0';
+      el('creditNum').innerHTML = creditVal + '<small> ký tự</small>';
+      if(el('creditMini')) el('creditMini').textContent = creditVal;
       loadAffiliate();
     } else {
       el('authBox').style.display='block';
@@ -390,10 +423,15 @@
         var src = 'data:audio/mpeg;base64,' + d.audio_base64;
         document.getElementById('ttsAudio').src = src;
         document.getElementById('ttsDownload').href = src;
+        window._ttsSegs = d.segments || [];
+        var srtBtn = document.getElementById('ttsSrt');
+        if(srtBtn) srtBtn.style.display = (window._ttsSegs.length ? 'inline-block' : 'none');
         res.style.display='block';
         msg.className='msg ok';
         msg.textContent = '🎉 Xong! Trừ ' + d.cost + ' ký tự. Còn lại: ' + Number(d.credits).toLocaleString('vi-VN') + ' ký tự';
-        document.getElementById('creditNum').innerHTML = Number(d.credits).toLocaleString('vi-VN') + '<small> ký tự</small>';
+        var cv = Number(d.credits).toLocaleString('vi-VN');
+        document.getElementById('creditNum').innerHTML = cv + '<small> ký tự</small>';
+        if(el('creditMini')) el('creditMini').textContent = cv;
       }
     }catch(e){ msg.className='msg err'; msg.textContent='Lỗi: '+String(e); }
     btn.disabled=false; btn.textContent='🎙️ Tạo giọng';
@@ -523,5 +561,26 @@
     if(error){ m.className='msg err'; m.textContent='Lỗi: '+error.message; }
     else { m.className='msg ok'; m.textContent='✅ Đổi mật khẩu thành công! Đang vào tài khoản...';
       setTimeout(function(){ location.href = location.origin + location.pathname; }, 1500); }
+  }
+
+  // ====== PHỤ ĐỀ SRT ======
+  function _srtTime(t){
+    t = Math.max(0, t||0);
+    var h = Math.floor(t/3600), m = Math.floor((t%3600)/60), s = Math.floor(t%60), ms = Math.round((t-Math.floor(t))*1000);
+    function p(n,l){ n=String(n); while(n.length<l) n='0'+n; return n; }
+    return p(h,2)+':'+p(m,2)+':'+p(s,2)+','+p(ms,3);
+  }
+  function downloadSRT(){
+    var segs = window._ttsSegs || [];
+    if(!segs.length){ alert('Chưa có dữ liệu phụ đề.'); return; }
+    var srt = segs.map(function(s,i){
+      return (i+1)+'\n'+_srtTime(s.start)+' --> '+_srtTime(s.end)+'\n'+String(s.text||'').trim()+'\n';
+    }).join('\n');
+    var blob = new Blob([srt], {type:'text/plain;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'phu-de-tanseven.srt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
   }
 </script>
