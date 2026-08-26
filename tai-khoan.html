@@ -306,7 +306,6 @@
     el('configWarn').style.display = 'block';
   } else {
     sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    fillLangs();
     sb.auth.onAuthStateChange((event, session) => {
       if(event === 'PASSWORD_RECOVERY'){ showReset(); return; }
       if(IS_RECOVERY) return;   // đang trong luồng đặt lại mật khẩu → đợi sự kiện recovery
@@ -496,6 +495,7 @@
     var vs = TTS_VOICES[el('ttsLang').value] || [];
     s.innerHTML = vs.map(function(v){ return '<option value="'+v[0]+'">'+v[1]+'</option>'; }).join('');
   }
+  fillLangs();  // đổ danh sách 7 tiếng + giọng (chạy sau khi đã định nghĩa dữ liệu ở trên)
 
   // ====== MẬT KHẨU ======
   async function changePass(){
