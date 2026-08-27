@@ -244,6 +244,7 @@
   .gp-txt{font-size:12.5px;color:var(--ink2);margin-top:6px;font-weight:600}
   .tgl{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;margin-top:12px;cursor:pointer}
   .tgl input{width:auto;margin:0;cursor:pointer}
+  .pron-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--line2);border-radius:10px;background:var(--field);margin-bottom:8px;font-size:14px}
 </style>
 
 <nav><div class="nav-in">
@@ -455,6 +456,17 @@
           <button class="btn" style="margin:0;width:auto;padding:12px 24px" onclick="changePass()">Đổi mật khẩu</button>
         </div>
         <div class="msg" id="passMsg"></div>
+      </div>
+
+      <div class="box" style="margin-top:16px">
+        <div class="k">📖 Từ điển phát âm riêng</div>
+        <div class="desc">Dạy AI đọc đúng những từ khó (tên riêng, thương hiệu, từ nước ngoài). Áp dụng cho mọi giọng, lưu trên máy bạn.</div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <input id="pronWord" placeholder="Từ (VD: Nguyễn)" style="flex:1;min-width:110px">
+          <input id="pronRead" placeholder="Đọc là (VD: Ngwiễn)" style="flex:1;min-width:110px">
+          <button class="btn" style="margin:0;width:auto;padding:12px 20px" onclick="pronAdd()">+ Thêm</button>
+        </div>
+        <div id="pronList" style="margin-top:12px"></div>
       </div>
     </div>
   </div>
@@ -1282,7 +1294,16 @@
     return t.replace(/\s+/g," ").trim();
   }
   // Chuẩn bị text theo ngôn ngữ: tiếng Việt → normVi; ngoại → để máy chủ tự xử lý (num2words).
-  function prep(text, lang){ return (lang==='vi'||!lang) ? normVi(text) : String(text||''); }
+  // ===== TỪ ĐIỂN PHÁT ÂM RIÊNG (user tự thêm, lưu localStorage) =====
+  var pronDict=[];
+  function pronLoad(){ try{ pronDict=JSON.parse(localStorage.getItem('ts_pron')||'[]'); }catch(e){ pronDict=[]; } if(!Array.isArray(pronDict))pronDict=[]; pronRender(); }
+  function pronSave(){ try{ localStorage.setItem('ts_pron', JSON.stringify(pronDict)); }catch(e){} }
+  function pronAdd(){ var w=(el('pronWord').value||'').trim(), r=(el('pronRead').value||'').trim(); if(!w||!r) return; pronDict.unshift({w:w,r:r}); if(pronDict.length>200)pronDict=pronDict.slice(0,200); pronSave(); el('pronWord').value=''; el('pronRead').value=''; pronRender(); }
+  function pronDel(i){ pronDict.splice(i,1); pronSave(); pronRender(); }
+  function pronRender(){ var g=el('pronList'); if(!g) return; if(!pronDict.length){ g.innerHTML='<div style="color:var(--muted);font-size:13px">Chưa có từ nào. Thêm từ khó để AI đọc đúng.</div>'; return; } g.innerHTML=pronDict.map(function(p,i){ return '<div class="pron-row"><span class="mono">'+esc(p.w)+'</span> <span style="color:var(--muted)">→</span> <b>'+esc(p.r)+'</b><button class="mini-x" style="margin-left:auto" onclick="pronDel('+i+')">✕</button></div>'; }).join(''); }
+  function applyUserPron(t){ pronDict.forEach(function(p){ try{ t=t.replace(new RegExp("\\b"+p.w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+"\\b","gi"), p.r); }catch(e){} }); return t; }
+  pronLoad();
+  function prep(text, lang){ var t=applyUserPron(String(text||'')); return (lang==='vi'||!lang) ? normVi(t) : t; }
   histLoad();
 
   // ====== MẬT KHẨU ======
