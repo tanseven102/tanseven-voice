@@ -245,6 +245,10 @@
   .tgl{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;margin-top:12px;cursor:pointer}
   .tgl input{width:auto;margin:0;cursor:pointer}
   .pron-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--line2);border-radius:10px;background:var(--field);margin-bottom:8px;font-size:14px}
+  .tts-tools{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
+  .tool-btn{border:1px solid var(--line2);background:var(--field);color:var(--ink);cursor:pointer;font-family:inherit;font-weight:700;font-size:13px;padding:7px 13px;border-radius:9px}
+  .tool-btn:hover{border-color:var(--gold);color:var(--gold)}
+  .tool-hint{font-size:12px;color:var(--muted);flex:1;min-width:180px}
 </style>
 
 <nav><div class="nav-in">
@@ -314,6 +318,7 @@
       <div class="box">
         <div class="k">🎙️ Văn bản thành giọng nói</div>
         <textarea id="ttsText" placeholder="Dán kịch bản cần đọc vào đây... (tối đa 200.000 ký tự)" maxlength="200000"></textarea>
+        <div class="tts-tools"><button type="button" class="tool-btn" onclick="insertPause('ttsText')">⏸ Chèn nghỉ</button><span class="tool-hint">Chèn dấu <b>⏸</b> vào chỗ muốn ngắt nghỉ — nhiều dấu = nghỉ lâu hơn. (Dấu phẩy/chấm cũng tạo nhịp nghỉ tự nhiên.)</span></div>
         <!-- CHỌN GIỌNG NÓI: bấm để mở popup -->
         <div class="vs-lbl">🎙️ Chọn giọng nói</div>
         <button type="button" class="voice-select-btn" onclick="openVoiceModal()">
@@ -1303,7 +1308,9 @@
   function pronRender(){ var g=el('pronList'); if(!g) return; if(!pronDict.length){ g.innerHTML='<div style="color:var(--muted);font-size:13px">Chưa có từ nào. Thêm từ khó để AI đọc đúng.</div>'; return; } g.innerHTML=pronDict.map(function(p,i){ return '<div class="pron-row"><span class="mono">'+esc(p.w)+'</span> <span style="color:var(--muted)">→</span> <b>'+esc(p.r)+'</b><button class="mini-x" style="margin-left:auto" onclick="pronDel('+i+')">✕</button></div>'; }).join(''); }
   function applyUserPron(t){ pronDict.forEach(function(p){ try{ t=t.replace(new RegExp("\\b"+p.w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+"\\b","gi"), p.r); }catch(e){} }); return t; }
   pronLoad();
-  function prep(text, lang){ var t=applyUserPron(String(text||'')); return (lang==='vi'||!lang) ? normVi(t) : t; }
+  function prep(text, lang){ var t=applyUserPron(String(text||'').replace(/⏸/g,'. ')); return (lang==='vi'||!lang) ? normVi(t) : t; }
+  // Chèn dấu nghỉ ⏸ vào vị trí con trỏ
+  function insertPause(id){ var t=el(id); if(!t) return; var s=t.selectionStart, e=t.selectionEnd; if(s==null){ s=e=t.value.length; } t.value=t.value.slice(0,s)+' ⏸ '+t.value.slice(e); t.focus(); try{ t.selectionStart=t.selectionEnd=s+3; }catch(_){}; t.dispatchEvent(new Event('input')); }
   histLoad();
 
   // ====== MẬT KHẨU ======
