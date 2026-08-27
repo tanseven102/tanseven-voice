@@ -220,6 +220,28 @@
   .voice-filter-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
   .voice-filter-row select{flex:1;min-width:180px}
   #favToggle.on{background:#fdecea;color:var(--red);border-color:#f5c6c2}
+  /* ===== 2 CỘT: TẠO AUDIO | LỊCH SỬ + THANH % ===== */
+  .audio-layout{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start}
+  @media(max-width:820px){ .audio-layout{grid-template-columns:1fr} }
+  .hist-list{margin-top:10px;display:flex;flex-direction:column;gap:10px;max-height:72vh;overflow-y:auto}
+  .hist-item{border:1px solid var(--line2);border-radius:12px;padding:11px 12px;background:var(--field)}
+  .hist-top{display:flex;align-items:center;gap:8px}
+  .hist-ts{font-size:11.5px;color:var(--muted);font-family:"JetBrains Mono",monospace}
+  .hist-badge{font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:99px}
+  .hist-badge.ok{background:var(--green-soft);color:var(--green)}
+  .hist-badge.run{background:#fff8e6;color:var(--gold)}
+  .hist-del{margin-left:auto;border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:14px}
+  .hist-del:hover{color:var(--red)}
+  .hist-text{font-size:13px;color:var(--ink2);margin:6px 0;line-height:1.4;max-height:54px;overflow:hidden}
+  .hist-item audio{width:100%;height:34px;margin-top:4px}
+  .hist-acts{display:flex;gap:8px;align-items:center;margin-top:6px}
+  .hist-play{border:1px solid var(--line2);background:var(--card);color:var(--ink);cursor:pointer;font-family:inherit;font-weight:700;font-size:12px;padding:6px 12px;border-radius:9px}
+  .hist-play:hover{border-color:var(--gold);color:var(--gold)}
+  .hist-meta{font-size:11.5px;color:var(--muted);margin-top:6px}
+  .gen-prog{margin-top:12px}
+  .gp-bar{height:10px;background:var(--field);border:1px solid var(--line2);border-radius:99px;overflow:hidden}
+  .gp-fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),#e8890c);transition:width .25s ease}
+  .gp-txt{font-size:12.5px;color:var(--ink2);margin-top:6px;font-weight:600}
 </style>
 
 <nav><div class="nav-in">
@@ -285,6 +307,7 @@
 
     <!-- ===== TAB: TẠO GIỌNG ===== -->
     <div id="audioView">
+      <div class="audio-layout">
       <div class="box">
         <div class="k">🎙️ Văn bản thành giọng nói</div>
         <textarea id="ttsText" placeholder="Dán kịch bản cần đọc vào đây... (tối đa 200.000 ký tự)" maxlength="200000"></textarea>
@@ -308,6 +331,10 @@
           <button class="btn" id="ttsBtn" style="margin:0;width:auto;padding:12px 26px" onclick="doGenerate()">🎙️ Tạo audio</button>
         </div>
         <div class="msg" id="ttsMsg"></div>
+        <div id="genProg" class="gen-prog" style="display:none">
+          <div class="gp-bar"><div id="genProgFill" class="gp-fill"></div></div>
+          <div class="gp-txt"><b id="genProgTxt">0%</b> · đang tạo audio…</div>
+        </div>
         <div id="ttsResult" style="display:none;margin-top:14px">
           <audio id="ttsAudio" controls></audio>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
@@ -315,6 +342,12 @@
             <a id="ttsSrt" class="act" style="margin:0;display:none;cursor:pointer" onclick="downloadSRT();return false">📝 Tải phụ đề SRT</a>
           </div>
         </div>
+      </div>
+      <div class="box hist-box">
+        <div class="k">🕘 Lịch sử <span id="histCount" class="mono" style="color:var(--muted);font-weight:600;font-size:12px"></span></div>
+        <div style="color:var(--muted);font-size:12px;margin:3px 0 4px">Tự động xoá sau 24 giờ để đỡ đầy bộ nhớ.</div>
+        <div id="histList" class="hist-list"></div>
+      </div>
       </div>
     </div>
 
@@ -603,8 +636,8 @@
     var res = document.getElementById('ttsResult');
     if(!text){ msg.className='msg err'; msg.textContent='Nhập nội dung cần đọc.'; return; }
     var btn = document.getElementById('ttsBtn');
-    btn.disabled=true; btn.textContent='Đang tạo... (~20s)';
-    msg.className='msg'; res.style.display='none';
+    btn.disabled=true; btn.textContent='Đang tạo...';
+    msg.className='msg'; res.style.display='none'; progStart(estSec(text));
     try{
       var s = await sb.auth.getSession();
       var token = s.data.session.access_token;
@@ -615,10 +648,11 @@
       });
       var d = await r.json();
       if(r.status===202 || d.warming){
-        msg.className='msg warn'; msg.textContent='⏳ Máy chủ đang xử lý (văn bản dài có thể lâu hơn). Bấm “Tạo audio” lại sau chút nhé.';
+        progFail(); msg.className='msg warn'; msg.textContent='⏳ Máy chủ đang xử lý (văn bản dài có thể lâu hơn). Bấm “Tạo audio” lại sau chút nhé.';
       } else if(!r.ok || !d.audio_base64){
-        msg.className='msg err'; msg.textContent = 'Lỗi: ' + (d.error || ('HTTP '+r.status));
+        progFail(); msg.className='msg err'; msg.textContent = 'Lỗi: ' + (d.error || ('HTTP '+r.status));
       } else {
+        progDone();
         var src = 'data:audio/mpeg;base64,' + d.audio_base64;
         document.getElementById('ttsAudio').src = src;
         document.getElementById('ttsDownload').href = src;
@@ -631,9 +665,10 @@
         var cv = Number(d.credits).toLocaleString('vi-VN');
         document.getElementById('creditNum').innerHTML = cv + '<small> ký tự</small>';
         if(el('creditMini')) el('creditMini').textContent = cv;
+        histAdd(text, voice, d.cost, d.audio_seconds, d.audio_base64);
       }
-    }catch(e){ msg.className='msg err'; msg.textContent='Lỗi: '+String(e); }
-    btn.disabled=false; btn.textContent='🎙️ Tạo giọng';
+    }catch(e){ progFail(); msg.className='msg err'; msg.textContent='Lỗi: '+String(e); }
+    btn.disabled=false; btn.textContent='🎙️ Tạo audio';
   }
 
   // ====== AFFILIATE ======
@@ -1017,7 +1052,7 @@
     if(!text){ msg.className='msg err'; msg.textContent='Nhập nội dung cần đọc.'; return; }
     if(selectedVoice.type!=='clone'){ msg.className='msg err'; msg.textContent='Hãy chọn 1 giọng clone (bấm “Chọn giọng nói” → mục 🧬 Giọng của tôi).'; return; }
     cloneBusy=true; btn.disabled=true; btn.textContent='🧬 Đang tạo...';
-    msg.className='msg'; res.style.display='none';
+    msg.className='msg'; res.style.display='none'; progStart(estSec(text));
     try{
       var s=await sb.auth.getSession(); var token=s.data.session.access_token;
       var payload={ text:text, voice_id:selectedVoice.id, language:el('cloneLang').value,
@@ -1029,11 +1064,12 @@
       });
       var d=await r.json();
       if(r.status===202 || d.warming){
-        msg.className='msg warn';
+        progFail(); msg.className='msg warn';
         msg.textContent='⏳ Máy chủ AI đang khởi động (~1 phút). Bấm “Tạo audio” lại sau chút nhé.';
       } else if(!r.ok || !d.audio_base64){
-        msg.className='msg err'; msg.textContent='Lỗi: '+(d.error||('HTTP '+r.status));
+        progFail(); msg.className='msg err'; msg.textContent='Lỗi: '+(d.error||('HTTP '+r.status));
       } else {
+        progDone();
         var src='data:audio/mpeg;base64,'+d.audio_base64;
         el('ttsAudio').src=src; el('ttsDownload').href=src;
         if(el('ttsSrt')) el('ttsSrt').style.display='none';
@@ -1042,8 +1078,9 @@
         msg.textContent='🎉 Xong! Giọng “'+selectedVoice.name+'”. Trừ '+d.cost+' ký tự. Còn lại: '+Number(d.credits).toLocaleString('vi-VN')+' ký tự';
         var cv=Number(d.credits).toLocaleString('vi-VN');
         el('creditNum').innerHTML=cv+'<small> ký tự</small>'; if(el('creditMini')) el('creditMini').textContent=cv;
+        histAdd(text, '🧬 '+selectedVoice.name, d.cost, d.seconds, d.audio_base64);
       }
-    }catch(e){ msg.className='msg err'; msg.textContent='Lỗi: '+String(e); }
+    }catch(e){ progFail(); msg.className='msg err'; msg.textContent='Lỗi: '+String(e); }
     cloneBusy=false; btn.disabled=false; btn.textContent='🎙️ Tạo audio';
   }
 
@@ -1123,6 +1160,67 @@
     setTimeout(function(){ URL.revokeObjectURL(a.href); },1500);
   }
   fillCloneUI(); fillBatchStyle(); fillBatchVoices();
+
+  // ====== THANH PHẦN TRĂM (mô phỏng tiến độ) ======
+  var _prog=null;
+  function progStart(estSec){
+    var g=el('genProg'), f=el('genProgFill'), t=el('genProgTxt'); if(!g) return;
+    g.style.display='block'; var p=0; f.style.width='0%'; t.textContent='0%';
+    var inc=90/Math.max(1,estSec*5);
+    _prog=setInterval(function(){ p=Math.min(90,p+inc); f.style.width=p.toFixed(0)+'%'; t.textContent=p.toFixed(0)+'%'; },200);
+  }
+  function progDone(){ if(_prog){clearInterval(_prog);_prog=null;} var f=el('genProgFill'),t=el('genProgTxt'); if(f)f.style.width='100%'; if(t)t.textContent='100% ✓'; setTimeout(function(){ var g=el('genProg'); if(g)g.style.display='none'; },1400); }
+  function progFail(){ if(_prog){clearInterval(_prog);_prog=null;} var g=el('genProg'); if(g)g.style.display='none'; }
+
+  // ====== LỊCH SỬ (meta ở localStorage, audio ở IndexedDB, tự xoá sau 24h) ======
+  var HIST_TTL=24*3600*1000, histData=[], _idb=null;
+  function nowTs(){ return (new Date()).getTime(); }
+  function pad2(n){ return (n<10?'0':'')+n; }
+  function fmtTs(t){ var d=new Date(t); return pad2(d.getHours())+':'+pad2(d.getMinutes())+' '+pad2(d.getDate())+'/'+pad2(d.getMonth()+1); }
+  function idbOpen(){ return new Promise(function(res,rej){ if(_idb)return res(_idb); try{ var r=indexedDB.open('tanseven',1); r.onupgradeneeded=function(e){ e.target.result.createObjectStore('audio'); }; r.onsuccess=function(e){ _idb=e.target.result; res(_idb); }; r.onerror=function(){ rej(r.error); }; }catch(e){ rej(e); } }); }
+  function idbPut(k,b){ return idbOpen().then(function(db){ return new Promise(function(res,rej){ var tx=db.transaction('audio','readwrite'); tx.objectStore('audio').put(b,k); tx.oncomplete=function(){res();}; tx.onerror=function(){rej(tx.error);}; }); }); }
+  function idbGet(k){ return idbOpen().then(function(db){ return new Promise(function(res,rej){ var tx=db.transaction('audio','readonly'), rq=tx.objectStore('audio').get(k); rq.onsuccess=function(){res(rq.result);}; rq.onerror=function(){rej(rq.error);}; }); }); }
+  function idbDel(k){ return idbOpen().then(function(db){ try{ db.transaction('audio','readwrite').objectStore('audio').delete(k); }catch(e){} }).catch(function(){}); }
+  function b64Blob(b64){ var bin=atob(b64), a=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i); return new Blob([a],{type:'audio/mpeg'}); }
+  function histLoad(){ try{ histData=JSON.parse(localStorage.getItem('ts_hist')||'[]'); }catch(e){ histData=[]; } if(!Array.isArray(histData)) histData=[]; histPrune(); }
+  function histSave(){ try{ localStorage.setItem('ts_hist', JSON.stringify(histData)); }catch(e){} }
+  function histPrune(){ var now=nowTs(), keep=[]; histData.forEach(function(h){ if(now-h.t<HIST_TTL) keep.push(h); else idbDel(h.id); }); if(keep.length!==histData.length){ histData=keep; histSave(); } histRender(); }
+  async function histAdd(text, voiceName, cost, seconds, audioB64){
+    var id='h'+nowTs()+Math.floor(Math.random()*1000);
+    try{ await idbPut(id, b64Blob(audioB64)); }catch(e){}
+    histData.unshift({id:id, t:nowTs(), text:text, voice:voiceName, cost:cost, seconds:seconds||0});
+    if(histData.length>60) histData=histData.slice(0,60);
+    histSave(); histRender();
+  }
+  function histRender(){
+    var g=el('histList'); if(!g) return;
+    if(el('histCount')) el('histCount').textContent=histData.length?('('+histData.length+')'):'';
+    if(!histData.length){ g.innerHTML='<div class="mv-empty">Chưa có lịch sử.<br>Tạo audio để lưu vào đây.</div>'; return; }
+    g.innerHTML=histData.map(function(h){
+      return '<div class="hist-item" id="hi_'+h.id+'">'+
+        '<div class="hist-top"><span class="hist-ts">'+fmtTs(h.t)+'</span><span class="hist-badge ok">Xong</span>'+
+        '<button class="hist-del" title="Xoá" onclick="histDel(\''+h.id+'\')">🗑</button></div>'+
+        '<div class="hist-text">'+esc((h.text||'').slice(0,120))+'</div>'+
+        '<div class="hist-acts"><button class="hist-play" onclick="histPlay(\''+h.id+'\',this)">▶ Nghe</button>'+
+        '<a class="act" style="margin:0;padding:6px 11px" onclick="histDownload(\''+h.id+'\');return false">⬇️ Tải</a></div>'+
+        '<div class="hist-meta">'+esc(h.voice||'')+' · '+h.cost+' ký tự'+(h.seconds?(' · '+h.seconds+'s'):'')+'</div>'+
+      '</div>';
+    }).join('');
+  }
+  async function histPlay(id,btn){
+    try{ var blob=await idbGet(id); if(!blob){ alert('Audio đã hết hạn (quá 24h).'); histDel(id); return; }
+      var box=el('hi_'+id), ex=box.querySelector('audio'); if(ex){ ex.play(); return; }
+      var a=document.createElement('audio'); a.controls=true; a.src=URL.createObjectURL(blob); a.autoplay=true; box.appendChild(a); if(btn)btn.style.display='none';
+    }catch(e){ alert('Không phát được.'); }
+  }
+  async function histDownload(id){
+    try{ var blob=await idbGet(id); if(!blob){ alert('Audio đã hết hạn (quá 24h).'); histDel(id); return; }
+      var url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download='tanseven-'+id+'.mp3'; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(function(){URL.revokeObjectURL(url);},1500);
+    }catch(e){ alert('Không tải được.'); }
+  }
+  function histDel(id){ histData=histData.filter(function(h){return h.id!==id;}); histSave(); idbDel(id); histRender(); }
+  function estSec(t){ return Math.max(6, Math.min(90, Math.round((t||'').length/25))); }
+  histLoad();
 
   // ====== MẬT KHẨU ======
   async function changePass(){
