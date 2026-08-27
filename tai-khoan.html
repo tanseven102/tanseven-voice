@@ -242,6 +242,8 @@
   .gp-bar{height:10px;background:var(--field);border:1px solid var(--line2);border-radius:99px;overflow:hidden}
   .gp-fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),#e8890c);transition:width .25s ease}
   .gp-txt{font-size:12.5px;color:var(--ink2);margin-top:6px;font-weight:600}
+  .tgl{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;margin-top:12px;cursor:pointer}
+  .tgl input{width:auto;margin:0;cursor:pointer}
 </style>
 
 <nav><div class="nav-in">
@@ -323,6 +325,11 @@
         <div id="genOpts" class="gen-opts" style="display:none">
           <div><label style="margin:0 0 5px">🎭 Cảm xúc</label><select id="cloneStyle" onchange="onCloneStyle()"></select></div>
           <div><label style="margin:0 0 5px">🌍 Ngôn ngữ</label><select id="cloneLang"></select></div>
+        </div>
+        <div id="cloneAdv" style="display:none">
+          <label style="margin-top:14px">🎭 Độ biểu cảm: <b id="cloneExprVal" style="color:var(--gold)">Vừa</b> <span style="font-weight:400;color:var(--muted);font-size:12px">(trái = ổn định, rõ · phải = giàu cảm xúc)</span></label>
+          <input type="range" id="cloneExpr" min="0" max="1" step="0.05" value="0.4" oninput="onExpr()">
+          <label class="tgl"><input type="checkbox" id="cloneDenoise" checked onchange="void 0"> 🧹 Tự lọc tạp âm mẫu giọng <span style="color:var(--muted);font-weight:400">(giúp clone rõ & giống hơn)</span></label>
         </div>
         <label style="margin-top:16px">⚡ Tốc độ đọc: <b id="ttsSpeedVal" style="color:var(--gold)">1.00x</b> <span style="font-weight:400;color:var(--muted);font-size:12px">(trái = chậm · phải = nhanh)</span></label>
         <input type="range" id="ttsSpeed" min="0.7" max="1.5" step="0.01" value="1" oninput="el('ttsSpeedVal').textContent=(+this.value).toFixed(2)+'x'">
@@ -898,6 +905,7 @@
     else { var v=(myVoices||[]).filter(function(x){return x.id===idn;})[0]; selectedVoice={type:'clone',id:idn,name:v?v.name:'Giọng clone',lang:'vi'}; }
     updateVoiceBtn();
     if(el('genOpts')) el('genOpts').style.display=(type==='clone')?'grid':'none';
+    if(el('cloneAdv')) el('cloneAdv').style.display=(type==='clone')?'block':'none';
     closeVoiceModal();
   }
   function updateVoiceBtn(){
@@ -931,6 +939,7 @@
     var st=el('cloneStyle'); if(st) st.innerHTML=CLONE_STYLES.map(function(s){ return '<option value="'+s[0]+'">'+s[0]+'</option>'; }).join('');
     var lg=el('cloneLang'); if(lg) lg.innerHTML=CLONE_LANGS.map(function(l){ return '<option value="'+l[0]+'">'+l[1]+'</option>'; }).join('');
   }
+  function onExpr(){ var v=parseFloat(el('cloneExpr').value); el('cloneExprVal').textContent = v<0.3?'Ổn định':(v<0.6?'Vừa':(v<0.8?'Biểu cảm':'Rất biểu cảm')); }
   function onCloneStyle(){
     var m={}; CLONE_STYLES.forEach(function(s){ m[s[0]]=s[1]; });
     var sp=m[el('cloneStyle').value]||1.0;
@@ -973,7 +982,7 @@
     if(!sb) return;
     if(!confirm('Xoá giọng clone này khỏi thư viện?')) return;
     try{ await sb.from('user_voices').delete().eq('id',id); }catch(e){}
-    if(selectedVoice.type==='clone'&&selectedVoice.id===id){ selectedVoice={type:'vip',name:'Minh Đức',lang:'vi'}; updateVoiceBtn(); if(el('genOpts'))el('genOpts').style.display='none'; }
+    if(selectedVoice.type==='clone'&&selectedVoice.id===id){ selectedVoice={type:'vip',name:'Minh Đức',lang:'vi'}; updateVoiceBtn(); if(el('genOpts'))el('genOpts').style.display='none'; if(el('cloneAdv'))el('cloneAdv').style.display='none'; }
     loadMyVoices();
   }
 
@@ -1063,7 +1072,8 @@
     try{
       var s=await sb.auth.getSession(); var token=s.data.session.access_token;
       var payload={ text:prep(text, el('cloneLang').value), voice_id:selectedVoice.id, language:el('cloneLang').value,
-        style:el('cloneStyle').value, speed:parseFloat(el('ttsSpeed').value)||1.0, format:'mp3' };
+        style:el('cloneStyle').value, speed:parseFloat(el('ttsSpeed').value)||1.0, format:'mp3',
+        expressiveness:parseFloat(el('cloneExpr').value), denoise:(el('cloneDenoise')?el('cloneDenoise').checked:true) };
       var r=await fetch(SUPABASE_URL+'/functions/v1/clone-voice',{
         method:'POST',
         headers:{'Authorization':'Bearer '+token,'apikey':SUPABASE_ANON_KEY,'Content-Type':'application/json'},
