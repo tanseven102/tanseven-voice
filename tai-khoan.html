@@ -986,8 +986,15 @@
     var m=el('cvMsg'); if(!f) return;
     if(f.size>12*1024*1024){ m.className='msg err'; m.textContent='File quá lớn (>12MB).'; return; }
     m.className='msg'; el('cloneFileName').textContent='(đang xử lý…)'; el('cloneFileInfo').style.display='block';
-    f.arrayBuffer().then(decodeToWav).then(function(wav){ setRefFromWav(wav, (f.name||'ghi-am').replace(/\.[^.]+$/,'')+'.wav'); })
-      .catch(function(e){ el('cloneFileInfo').style.display='none'; m.className='msg err'; m.textContent='Không đọc được file này. Hãy thử file .mp3 hoặc .wav khác.'; });
+    f.arrayBuffer().then(function(buf){
+      var AC=window.AudioContext||window.webkitAudioContext; var ac=new AC();
+      return ac.decodeAudioData(buf).then(function(ab){ try{ac.close();}catch(e){}
+        var dur=ab.duration;
+        if(dur>30.9){ el('cloneFileInfo').style.display='none'; m.className='msg err'; m.textContent='Mẫu giọng dài '+Math.round(dur)+' giây — chỉ cho phép DƯỚI 30 giây. Hãy cắt ngắn lại (10–30s giọng sạch là tốt nhất).'; return; }
+        if(dur<3){ el('cloneFileInfo').style.display='none'; m.className='msg err'; m.textContent='Mẫu giọng ngắn quá ('+dur.toFixed(1)+'s). Nên 10–30 giây để clone chuẩn.'; return; }
+        setRefFromWav(encodeWAV(ab), (f.name||'ghi-am').replace(/\.[^.]+$/,'')+'.wav');
+      });
+    }).catch(function(e){ el('cloneFileInfo').style.display='none'; m.className='msg err'; m.textContent='Không đọc được file này. Hãy thử file .mp3 hoặc .wav khác.'; });
   }
   function onCloneFile(inp){ var f=inp.files&&inp.files[0]; if(f) useAudioFile(f); }
   function onDropFile(e){ e.preventDefault(); if(el('upZone'))el('upZone').classList.remove('drag');
@@ -1055,7 +1062,7 @@
     msg.className='msg'; res.style.display='none'; progStart(estSec(text));
     try{
       var s=await sb.auth.getSession(); var token=s.data.session.access_token;
-      var payload={ text:fixCaps(text), voice_id:selectedVoice.id, language:el('cloneLang').value,
+      var payload={ text:normVi(text), voice_id:selectedVoice.id, language:el('cloneLang').value,
         style:el('cloneStyle').value, speed:parseFloat(el('ttsSpeed').value)||1.0, format:'mp3' };
       var r=await fetch(SUPABASE_URL+'/functions/v1/clone-voice',{
         method:'POST',
@@ -1130,7 +1137,7 @@
       try{
         var ss=await sb.auth.getSession(); var token=ss.data.session.access_token;
         var fn, payload;
-        if(sel[0]==='clone'){ fn='clone-voice'; payload={text:fixCaps(lines[i]),voice_id:sel[1],style:style,speed:speed,format:'mp3'}; }
+        if(sel[0]==='clone'){ fn='clone-voice'; payload={text:normVi(lines[i]),voice_id:sel[1],style:style,speed:speed,format:'mp3'}; }
         else { fn='smart-api'; payload={text:fixCaps(lines[i]),voice:sel[1],lang:sel[2],speed:speed}; }
         var r=await fetch(SUPABASE_URL+'/functions/v1/'+fn,{method:'POST',
           headers:{'Authorization':'Bearer '+token,'apikey':SUPABASE_ANON_KEY,'Content-Type':'application/json'},
@@ -1223,6 +1230,39 @@
   // Chữ IN HOA có nguyên âm (TIN, TỨC, HÀ NỘI...) = nhấn mạnh → đọc như từ thường (khỏi bị đánh vần).
   // Toàn phụ âm (VTV, HTML) = viết tắt thật → giữ hoa để đánh vần.
   function fixCaps(t){ return String(t||'').replace(/[A-ZĐÂĂÊÔƠƯ]{2,}/g, function(w){ return /[AEIOUYĂÂÊÔƠƯ]/.test(w) ? w.toLowerCase() : w; }); }
+  // ===== ĐỌC SỐ TIẾNG VIỆT (chuyển từ động cơ) =====
+  var _ONES=["không","một","hai","ba","bốn","năm","sáu","bảy","tám","chín"];
+  var _PRON={"Seven":"Sê Vờn","MiniMax":"Mi Ni Mách","YouTube":"Diu Túp","Youtube":"Diu Túp","Facebook":"Phây Búc","Zalo":"Za Lô","TikTok":"Tích Tóc","Google":"Gu Gồ"};
+  var _SYM=[['%',' phần trăm'],['$',' đô la'],['&',' và '],['@',' a còng '],['=',' bằng '],['°',' độ '],['+',' cộng ']];
+  function _read3(n,leading){
+    var tr=Math.floor(n/100), ch=Math.floor((n%100)/10), dv=n%10, out=[];
+    if(tr>0) out.push(_ONES[tr]+" trăm"); else if(!leading&&(ch>0||dv>0)) out.push("không trăm");
+    if(ch>1){ out.push(_ONES[ch]+" mươi"); if(dv===1)out.push("mốt"); else if(dv===5)out.push("lăm"); else if(dv>0)out.push(_ONES[dv]); }
+    else if(ch===1){ out.push("mười"); if(dv===5)out.push("lăm"); else if(dv>0)out.push(_ONES[dv]); }
+    else if(dv>0){ if(tr>0||!leading)out.push("lẻ"); out.push(_ONES[dv]); }
+    return out.join(" ");
+  }
+  function numToVi(numStr){
+    var num=parseInt(numStr,10); if(isNaN(num)) return numStr; if(num===0) return "không";
+    var neg=num<0; num=Math.abs(num); var groups=[]; while(num>0){ groups.push(num%1000); num=Math.floor(num/1000); }
+    var units=["","nghìn","triệu","tỷ","nghìn tỷ","triệu tỷ"], parts=[], n=groups.length, i;
+    for(i=n-1;i>=0;i--){ if(groups[i]===0&&i>0) continue; var seg=_read3(groups[i], i===n-1); if(seg) parts.push(seg+(units[i]?(" "+units[i]):"")); }
+    var r=parts.join(" ").replace(/\s+/g," ").trim(); return neg?("âm "+r):r;
+  }
+  function _numRepl(s){
+    if(s.indexOf(",")>-1){ var p=s.replace(/\./g,"").split(","), intp=p[0], dec=p[1]||"", dw=""; for(var i=0;i<dec.length;i++){ var d=dec.charAt(i); if(d>='0'&&d<='9') dw+=(dw?" ":"")+_ONES[+d]; } return numToVi(intp||"0")+" phẩy "+dw; }
+    return numToVi(s.replace(/\./g,""));
+  }
+  // Chuẩn hoá đầy đủ: từ điển phát âm + tiền tệ + ký hiệu + hoa + SỐ. Idempotent với máy chủ.
+  function normVi(t){
+    t=String(t||"");
+    for(var k in _PRON){ try{ t=t.replace(new RegExp("\\b"+k+"\\b","gi"), _PRON[k]); }catch(e){} }
+    t=t.replace(/(\d[\d.,]*)\s*[đ₫]/g, function(m,g){ return g+" đồng"; });
+    _SYM.forEach(function(s){ t=t.split(s[0]).join(s[1]); });
+    t=fixCaps(t);
+    t=t.replace(/\d[\d.,]*\d|\d/g, function(m){ return _numRepl(m); });
+    return t.replace(/\s+/g," ").trim();
+  }
   histLoad();
 
   // ====== MẬT KHẨU ======
