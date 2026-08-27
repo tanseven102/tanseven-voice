@@ -217,6 +217,9 @@
     padding:24px 22px 20px;box-shadow:var(--shadow);position:relative;margin:auto}
   .voice-modal .vp-grid{border:0;background:transparent;padding:2px}
   .vc-fav{border:0;background:transparent;cursor:pointer;font-size:18px;padding:0 2px;line-height:1;flex:0 0 auto;align-self:flex-start}
+  .voice-filter-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+  .voice-filter-row select{flex:1;min-width:180px}
+  #favToggle.on{background:#fdecea;color:var(--red);border-color:#f5c6c2}
 </style>
 
 <nav><div class="nav-in">
@@ -465,7 +468,10 @@
     <button class="nap-x" onclick="closeVoiceModal()">✕</button>
     <h2 class="nap-h">🎙️ Chọn giọng nói</h2>
     <input id="voiceSearch" placeholder="🔍 Tìm giọng theo tên..." oninput="renderVoiceModal()" style="margin-bottom:12px">
-    <div class="vp-chips" id="voiceFilters" style="margin-bottom:12px"></div>
+    <div class="voice-filter-row">
+      <select id="voiceLang" onchange="renderVoiceModal()"></select>
+      <button type="button" id="favToggle" class="vp-chip" onclick="toggleFavFilter()">❤️ Yêu thích</button>
+    </div>
     <div class="vp-grid" id="voiceModalGrid" style="max-height:54vh"></div>
   </div>
 </div>
@@ -744,7 +750,8 @@
     p:{"Beatriz":["🎧 Đa dụng","Nữ"],"Tiago":["🎧 Đa dụng","Nam"]},
     h:{"Aisha":["🎧 Đa dụng","Nữ"],"Arjun":["🎧 Đa dụng","Nam"]},
     f:{"Chloé":["🎧 Đa dụng","Nữ"]},
-    i:{"Giulia":["🎧 Đa dụng","Nữ"],"Marco":["🎧 Đa dụng","Nam"]}
+    i:{"Giulia":["🎧 Đa dụng","Nữ"],"Marco":["🎧 Đa dụng","Nam"]},
+    zh:{"Mei":["🎧 Đa dụng","Trung · Nữ"],"Lan":["📖 Kể chuyện","Trung · Nữ"],"Wei":["🎧 Đa dụng","Trung · Nam"],"Jun":["📰 Tin tức","Trung · Nam"]}
   };
   var ALL_VOICES = [];
   Object.keys(VI_CAT).forEach(function(n){ ALL_VOICES.push({name:n,lang:"vi",genre:VI_CAT[n][0],info:VI_CAT[n][1]}); });
@@ -756,7 +763,10 @@
 
   // Giọng đang chọn (gộp VIP + Clone) + Yêu thích
   var selectedVoice={type:'vip',name:'Minh Đức',lang:'vi'};
-  var vmFilter='all';
+  var vmLang='all', vmFav=false;
+  var VOICE_LANGS=[['all','🌐 Tất cả ngôn ngữ'],['vi','🇻🇳 Tiếng Việt'],['en','🇺🇸🇬🇧 Tiếng Anh'],['zh','🇨🇳 Tiếng Trung'],['e','🇪🇸 Tây Ban Nha'],['p','🇵🇹 Bồ Đào Nha'],['h','🇮🇳 Hindi'],['f','🇫🇷 Tiếng Pháp'],['i','🇮🇹 Tiếng Ý'],['clone','🧬 Giọng của tôi']];
+  function fillVoiceLangs(){ var s=el('voiceLang'); if(s&&!s.options.length) s.innerHTML=VOICE_LANGS.map(function(l){return '<option value="'+l[0]+'">'+l[1]+'</option>';}).join(''); }
+  function toggleFavFilter(){ vmFav=!vmFav; if(el('favToggle')) el('favToggle').classList.toggle('on',vmFav); renderVoiceModal(); }
   function loadFavs(){ try{ return new Set(JSON.parse(localStorage.getItem('ts_favs')||'[]')); }catch(e){ return new Set(); } }
   var favVoices=loadFavs();
   function saveFavs(){ try{ localStorage.setItem('ts_favs', JSON.stringify(Array.from(favVoices))); }catch(e){} }
@@ -780,7 +790,7 @@
   function pillInfo(v){
     if(v.lang==='vi'){ return v.info.indexOf('Bắc')>-1?{cls:'bac',label:'Miền Bắc'}:(v.info.indexOf('Trung')>-1?{cls:'trung',label:'Miền Trung'}:{cls:'nam',label:'Miền Nam'}); }
     if(v.lang==='en'){ return v.info.indexOf('Anh')>-1?{cls:'en',label:'🇬🇧 Anh–Anh'}:{cls:'en',label:'🇺🇸 Anh–Mỹ'}; }
-    var m={e:'🇪🇸 Tây Ban Nha',p:'🇵🇹 Bồ Đào Nha',f:'🇫🇷 Pháp',i:'🇮🇹 Ý',h:'🇮🇳 Hindi'};
+    var m={e:'🇪🇸 Tây Ban Nha',p:'🇵🇹 Bồ Đào Nha',f:'🇫🇷 Pháp',i:'🇮🇹 Ý',h:'🇮🇳 Hindi',ja:'🇯🇵 Nhật',zh:'🇨🇳 Trung'};
     return {cls:'other',label:m[v.lang]||v.lang};
   }
   function descOf(v){
@@ -788,7 +798,7 @@
     var gender=v.info.indexOf('Nữ')>-1?'nữ':'nam', who;
     if(v.lang==='vi'){ var reg=v.info.indexOf('Bắc')>-1?'miền Bắc':(v.info.indexOf('Trung')>-1?'miền Trung':'miền Nam'); who='Giọng '+gender+' '+reg; }
     else if(v.lang==='en'){ who='Giọng '+gender+' '+(v.info.indexOf('Anh')>-1?'Anh–Anh':'Anh–Mỹ'); }
-    else { var mm={e:'Tây Ban Nha',p:'Bồ Đào Nha',f:'Pháp',i:'Ý',h:'Hindi'}; who='Giọng '+gender+' '+(mm[v.lang]||''); }
+    else { var mm={e:'Tây Ban Nha',p:'Bồ Đào Nha',f:'Pháp',i:'Ý',h:'Hindi',ja:'Nhật',zh:'Trung'}; who='Giọng '+gender+' '+(mm[v.lang]||''); }
     return who+', '+g[0]+'. Hợp '+g[1]+'.';
   }
   function safeFile(n){ return String(n).replace(/[^0-9A-Za-z]/g,'_'); }
@@ -808,9 +818,8 @@
     (myVoices||[]).forEach(function(v){ items.push({type:'clone',id:v.id,name:v.name,lang:'vi',key:'clone:'+v.id}); });
     return items;
   }
-  function openVoiceModal(){ el('voiceOverlay').style.display='flex'; renderVoiceModal(); }
+  function openVoiceModal(){ el('voiceOverlay').style.display='flex'; if(el('favToggle')) el('favToggle').classList.toggle('on',vmFav); renderVoiceModal(); }
   function closeVoiceModal(){ el('voiceOverlay').style.display='none'; }
-  function setVmFilter(f){ vmFilter=f; renderVoiceModal(); }
   function isSel(v){ return selectedVoice.type===v.type && (v.type==='vip'?selectedVoice.name===v.name:selectedVoice.id===v.id); }
   function voiceModalCard(v){
     var on=isSel(v), fav=favVoices.has(v.key);
@@ -835,20 +844,18 @@
     '</div>';
   }
   function renderVoiceModal(){
+    fillVoiceLangs();
     var q=(el('voiceSearch')?el('voiceSearch').value:'').toLowerCase().trim();
-    var chips=[['fav','❤️ Yêu thích'],['all','🌐 Tất cả'],['vi','🇻🇳 Việt'],['en','🇬🇧🇺🇸 Anh'],['other','🌍 Khác'],['clone','🧬 Giọng của tôi']];
-    if(el('voiceFilters')) el('voiceFilters').innerHTML=chips.map(function(c){ return '<button type="button" class="vp-chip'+(vmFilter===c[0]?' on':'')+'" onclick="setVmFilter(\''+c[0]+'\')">'+c[1]+'</button>'; }).join('');
+    var lang=el('voiceLang')?el('voiceLang').value:'all';
     var items=allVoiceItems().filter(function(v){
-      if(vmFilter==='fav' && !favVoices.has(v.key)) return false;
-      if(vmFilter==='clone' && v.type!=='clone') return false;
-      if(vmFilter==='vi' && !(v.type==='vip'&&v.lang==='vi')) return false;
-      if(vmFilter==='en' && !(v.type==='vip'&&v.lang==='en')) return false;
-      if(vmFilter==='other' && !(v.type==='vip'&&v.lang!=='vi'&&v.lang!=='en')) return false;
+      if(vmFav && !favVoices.has(v.key)) return false;
+      if(lang==='clone'){ if(v.type!=='clone') return false; }
+      else if(lang!=='all'){ if(!(v.type==='vip'&&v.lang===lang)) return false; }
       if(q && v.name.toLowerCase().indexOf(q)<0) return false;
       return true;
     });
     var g=el('voiceModalGrid'); if(!g) return;
-    if(!items.length){ g.innerHTML='<div class="mv-empty" style="grid-column:1/-1">'+(vmFilter==='fav'?'Chưa có giọng yêu thích. Bấm 🤍 trên giọng để thêm.':(vmFilter==='clone'?'Chưa có giọng clone. Vào tab “Nhân bản giọng nói” để tạo.':'Không tìm thấy giọng.'))+'</div>'; return; }
+    if(!items.length){ g.innerHTML='<div class="mv-empty" style="grid-column:1/-1">'+(vmFav?'Chưa có giọng yêu thích ở mục này. Bấm 🤍 trên giọng để thêm.':(lang==='clone'?'Chưa có giọng clone. Vào tab “Nhân bản giọng nói” để tạo giọng của bạn.':'Không có giọng cho mục này.'))+'</div>'; return; }
     g.innerHTML=items.map(voiceModalCard).join('');
   }
   function chooseVoice(type,idn,lang){
