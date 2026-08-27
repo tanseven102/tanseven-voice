@@ -644,7 +644,7 @@
       var r = await fetch(SUPABASE_URL + '/functions/v1/smart-api', {
         method: 'POST',
         headers: { 'Authorization': 'Bearer '+token, 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: fixCaps(text), voice: voice, lang: lang, speed: speed })
+        body: JSON.stringify({ text: prep(text, lang), voice: voice, lang: lang, speed: speed })
       });
       var d = await r.json();
       if(r.status===202 || d.warming){
@@ -1062,7 +1062,7 @@
     msg.className='msg'; res.style.display='none'; progStart(estSec(text));
     try{
       var s=await sb.auth.getSession(); var token=s.data.session.access_token;
-      var payload={ text:normVi(text), voice_id:selectedVoice.id, language:el('cloneLang').value,
+      var payload={ text:prep(text, el('cloneLang').value), voice_id:selectedVoice.id, language:el('cloneLang').value,
         style:el('cloneStyle').value, speed:parseFloat(el('ttsSpeed').value)||1.0, format:'mp3' };
       var r=await fetch(SUPABASE_URL+'/functions/v1/clone-voice',{
         method:'POST',
@@ -1137,8 +1137,8 @@
       try{
         var ss=await sb.auth.getSession(); var token=ss.data.session.access_token;
         var fn, payload;
-        if(sel[0]==='clone'){ fn='clone-voice'; payload={text:normVi(lines[i]),voice_id:sel[1],style:style,speed:speed,format:'mp3'}; }
-        else { fn='smart-api'; payload={text:fixCaps(lines[i]),voice:sel[1],lang:sel[2],speed:speed}; }
+        if(sel[0]==='clone'){ fn='clone-voice'; payload={text:prep(lines[i],'vi'),voice_id:sel[1],style:style,speed:speed,format:'mp3'}; }
+        else { fn='smart-api'; payload={text:prep(lines[i],sel[2]),voice:sel[1],lang:sel[2],speed:speed}; }
         var r=await fetch(SUPABASE_URL+'/functions/v1/'+fn,{method:'POST',
           headers:{'Authorization':'Bearer '+token,'apikey':SUPABASE_ANON_KEY,'Content-Type':'application/json'},
           body:JSON.stringify(payload)});
@@ -1253,16 +1253,26 @@
     if(s.indexOf(",")>-1){ var p=s.replace(/\./g,"").split(","), intp=p[0], dec=p[1]||"", dw=""; for(var i=0;i<dec.length;i++){ var d=dec.charAt(i); if(d>='0'&&d<='9') dw+=(dw?" ":"")+_ONES[+d]; } return numToVi(intp||"0")+" phẩy "+dw; }
     return numToVi(s.replace(/\./g,""));
   }
-  // Chuẩn hoá đầy đủ: từ điển phát âm + tiền tệ + ký hiệu + hoa + SỐ. Idempotent với máy chủ.
+  var _ABBR=[["TP.HCM","thành phố Hồ Chí Minh"],["TP.HN","thành phố Hà Nội"],["THPT","trung học phổ thông"],["THCS","trung học cơ sở"],["UBND","ủy ban nhân dân"],["ĐHQG","đại học quốc gia"],["km/h","ki lô mét trên giờ"]];
+  function _phone(m){ return m.split('').map(function(d){ return (d>='0'&&d<='9')?_ONES[+d]:d; }).join(' '); }
+  // Chuẩn hoá đầy đủ TIẾNG VIỆT: phát âm + viết tắt + SĐT + ngày + giờ + tiền + ký hiệu + hoa + SỐ.
   function normVi(t){
     t=String(t||"");
     for(var k in _PRON){ try{ t=t.replace(new RegExp("\\b"+k+"\\b","gi"), _PRON[k]); }catch(e){} }
-    t=t.replace(/(\d[\d.,]*)\s*[đ₫]/g, function(m,g){ return g+" đồng"; });
-    _SYM.forEach(function(s){ t=t.split(s[0]).join(s[1]); });
-    t=fixCaps(t);
-    t=t.replace(/\d[\d.,]*\d|\d/g, function(m){ return _numRepl(m); });
+    _ABBR.forEach(function(a){ t=t.split(a[0]).join(a[1]); });
+    t=t.replace(/\b0\d{8,10}\b/g, _phone);                                              // số điện thoại
+    t=t.replace(/\b(\d{1,2})\/(\d{1,2})\/(\d{4})\b/g, function(m,d,mo,y){ return "ngày "+d+" tháng "+mo+" năm "+y; }); // ngày
+    t=t.replace(/\b(\d{1,2}):(\d{2})\b/g, function(m,h,mi){ return mi==="00"?(h+" giờ"):(h+" giờ "+mi.replace(/^0/,'')+" phút"); }); // giờ hh:mm
+    t=t.replace(/\b(\d{1,2})h(\d{2})\b/g, function(m,h,mi){ return h+" giờ "+mi.replace(/^0/,'')+" phút"; });          // giờ hHmm
+    t=t.replace(/\b(\d{1,2})h\b/g, function(m,h){ return h+" giờ"; });                                                 // giờ hH
+    t=t.replace(/(\d[\d.,]*)\s*[đ₫]/g, function(m,g){ return g+" đồng"; });              // tiền
+    _SYM.forEach(function(s){ t=t.split(s[0]).join(s[1]); });                            // ký hiệu
+    t=fixCaps(t);                                                                        // hoa nhấn mạnh
+    t=t.replace(/\d[\d.,]*\d|\d/g, function(m){ return _numRepl(m); });                  // số còn lại
     return t.replace(/\s+/g," ").trim();
   }
+  // Chuẩn bị text theo ngôn ngữ: tiếng Việt → normVi; ngoại → để máy chủ tự xử lý (num2words).
+  function prep(text, lang){ return (lang==='vi'||!lang) ? normVi(text) : String(text||''); }
   histLoad();
 
   // ====== MẬT KHẨU ======
