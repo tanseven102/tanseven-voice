@@ -345,7 +345,7 @@
       </div>
       <div class="box hist-box">
         <div class="k">🕘 Lịch sử <span id="histCount" class="mono" style="color:var(--muted);font-weight:600;font-size:12px"></span></div>
-        <div style="color:var(--muted);font-size:12px;margin:3px 0 4px">Tự động xoá sau 24 giờ để đỡ đầy bộ nhớ.</div>
+        <div style="color:var(--muted);font-size:12px;margin:3px 0 4px">Tự động xoá sau 24 giờ.</div>
         <div id="histList" class="hist-list"></div>
       </div>
       </div>
@@ -644,7 +644,7 @@
       var r = await fetch(SUPABASE_URL + '/functions/v1/smart-api', {
         method: 'POST',
         headers: { 'Authorization': 'Bearer '+token, 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text, voice: voice, lang: lang, speed: speed })
+        body: JSON.stringify({ text: fixCaps(text), voice: voice, lang: lang, speed: speed })
       });
       var d = await r.json();
       if(r.status===202 || d.warming){
@@ -1055,7 +1055,7 @@
     msg.className='msg'; res.style.display='none'; progStart(estSec(text));
     try{
       var s=await sb.auth.getSession(); var token=s.data.session.access_token;
-      var payload={ text:text, voice_id:selectedVoice.id, language:el('cloneLang').value,
+      var payload={ text:fixCaps(text), voice_id:selectedVoice.id, language:el('cloneLang').value,
         style:el('cloneStyle').value, speed:parseFloat(el('ttsSpeed').value)||1.0, format:'mp3' };
       var r=await fetch(SUPABASE_URL+'/functions/v1/clone-voice',{
         method:'POST',
@@ -1125,13 +1125,13 @@
     msg.className='msg'; el('batchDl').style.display='none';
     for(var i=0;i<lines.length;i++){
       btn.textContent='Đang tạo '+(i+1)+'/'+lines.length+'...';
-      var item={idx:i+1,text:lines[i],status:'run',audio:null,err:''};
+      var item={idx:i+1,text:fixCaps(lines[i]),status:'run',audio:null,err:''};
       batchResults.push(item); renderBatch();
       try{
         var ss=await sb.auth.getSession(); var token=ss.data.session.access_token;
         var fn, payload;
-        if(sel[0]==='clone'){ fn='clone-voice'; payload={text:lines[i],voice_id:sel[1],style:style,speed:speed,format:'mp3'}; }
-        else { fn='smart-api'; payload={text:lines[i],voice:sel[1],lang:sel[2],speed:speed}; }
+        if(sel[0]==='clone'){ fn='clone-voice'; payload={text:fixCaps(lines[i]),voice_id:sel[1],style:style,speed:speed,format:'mp3'}; }
+        else { fn='smart-api'; payload={text:fixCaps(lines[i]),voice:sel[1],lang:sel[2],speed:speed}; }
         var r=await fetch(SUPABASE_URL+'/functions/v1/'+fn,{method:'POST',
           headers:{'Authorization':'Bearer '+token,'apikey':SUPABASE_ANON_KEY,'Content-Type':'application/json'},
           body:JSON.stringify(payload)});
@@ -1220,6 +1220,9 @@
   }
   function histDel(id){ histData=histData.filter(function(h){return h.id!==id;}); histSave(); idbDel(id); histRender(); }
   function estSec(t){ return Math.max(6, Math.min(90, Math.round((t||'').length/25))); }
+  // Chữ IN HOA có nguyên âm (TIN, TỨC, HÀ NỘI...) = nhấn mạnh → đọc như từ thường (khỏi bị đánh vần).
+  // Toàn phụ âm (VTV, HTML) = viết tắt thật → giữ hoa để đánh vần.
+  function fixCaps(t){ return String(t||'').replace(/[A-ZĐÂĂÊÔƠƯ]{2,}/g, function(w){ return /[AEIOUYĂÂÊÔƠƯ]/.test(w) ? w.toLowerCase() : w; }); }
   histLoad();
 
   // ====== MẬT KHẨU ======
