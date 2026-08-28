@@ -814,7 +814,8 @@
     h:{"Aisha":["🎧 Đa dụng","Nữ"],"Arjun":["🎧 Đa dụng","Nam"]},
     f:{"Chloé":["🎧 Đa dụng","Nữ"]},
     i:{"Giulia":["🎧 Đa dụng","Nữ"],"Marco":["🎧 Đa dụng","Nam"]},
-    zh:{"Mei":["🎧 Đa dụng","Trung · Nữ"],"Lan":["📖 Kể chuyện","Trung · Nữ"],"Wei":["🎧 Đa dụng","Trung · Nam"],"Jun":["📰 Tin tức","Trung · Nam"]}
+    zh:{"Mei":["🎧 Đa dụng","Trung · Nữ"],"Lan":["📖 Kể chuyện","Trung · Nữ"],"Wei":["🎧 Đa dụng","Trung · Nam"],"Jun":["📰 Tin tức","Trung · Nam"]},
+    ja:{"Yuki":["🎧 Đa dụng","Nhật · Nữ"],"Sakura":["📖 Kể chuyện","Nhật · Nữ"],"Riku":["🎧 Đa dụng","Nhật · Nam"]}
   };
   var ALL_VOICES = [];
   Object.keys(VI_CAT).forEach(function(n){ ALL_VOICES.push({name:n,lang:"vi",genre:VI_CAT[n][0],info:VI_CAT[n][1]}); });
@@ -827,7 +828,7 @@
   // Giọng đang chọn (gộp VIP + Clone) + Yêu thích
   var selectedVoice={type:'vip',name:'Minh Đức',lang:'vi'};
   var vmLang='all', vmFav=false;
-  var VOICE_LANGS=[['all','🌐 Tất cả ngôn ngữ'],['vi','🇻🇳 Tiếng Việt'],['en','🇺🇸🇬🇧 Tiếng Anh'],['zh','🇨🇳 Tiếng Trung'],['e','🇪🇸 Tây Ban Nha'],['p','🇵🇹 Bồ Đào Nha'],['h','🇮🇳 Hindi'],['f','🇫🇷 Tiếng Pháp'],['i','🇮🇹 Tiếng Ý'],['clone','🧬 Giọng của tôi']];
+  var VOICE_LANGS=[['all','🌐 Tất cả ngôn ngữ'],['vi','🇻🇳 Tiếng Việt'],['en','🇺🇸🇬🇧 Tiếng Anh'],['zh','🇨🇳 Tiếng Trung'],['ja','🇯🇵 Tiếng Nhật'],['e','🇪🇸 Tây Ban Nha'],['p','🇵🇹 Bồ Đào Nha'],['h','🇮🇳 Hindi'],['f','🇫🇷 Tiếng Pháp'],['i','🇮🇹 Tiếng Ý'],['clone','🧬 Giọng của tôi']];
   function fillVoiceLangs(){ var s=el('voiceLang'); if(s&&!s.options.length) s.innerHTML=VOICE_LANGS.map(function(l){return '<option value="'+l[0]+'">'+l[1]+'</option>';}).join(''); }
   function toggleFavFilter(){ vmFav=!vmFav; if(el('favToggle')) el('favToggle').classList.toggle('on',vmFav); renderVoiceModal(); }
   function loadFavs(){ try{ return new Set(JSON.parse(localStorage.getItem('ts_favs')||'[]')); }catch(e){ return new Set(); } }
