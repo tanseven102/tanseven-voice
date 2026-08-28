@@ -660,6 +660,10 @@
     var res = document.getElementById('ttsResult');
     if(!text){ msg.className='msg err'; msg.textContent='Nhập nội dung cần đọc.'; return; }
     var btn = document.getElementById('ttsBtn');
+    if(text.length > LONG_THRESHOLD){
+      return runLongGen({ fn:'smart-api', text:text, lang:lang, voiceLabel:voice, msg:msg, res:res, btn:btn, btnIdle:'🎙️ Tạo audio',
+        build:function(pt){ return { text:pt, voice:voice, lang:lang, speed:speed }; } });
+    }
     btn.disabled=true; btn.textContent='Đang tạo...';
     msg.className='msg'; res.style.display='none'; progStart(estSec(text));
     try{
@@ -1084,6 +1088,10 @@
     var msg=el('ttsMsg'), res=el('ttsResult'), btn=el('ttsBtn');
     if(!text){ msg.className='msg err'; msg.textContent='Nhập nội dung cần đọc.'; return; }
     if(selectedVoice.type!=='clone'){ msg.className='msg err'; msg.textContent='Hãy chọn 1 giọng clone (bấm “Chọn giọng nói” → mục 🧬 Giọng của tôi).'; return; }
+    if(text.length > LONG_THRESHOLD){
+      return runLongGen({ fn:'clone-voice', text:text, lang:el('cloneLang').value, voiceLabel:'🧬 '+selectedVoice.name, msg:msg, res:res, btn:btn, btnIdle:'🎙️ Tạo audio',
+        build:function(pt){ return { text:pt, voice_id:selectedVoice.id, language:el('cloneLang').value, style:el('cloneStyle').value, speed:parseFloat(el('ttsSpeed').value)||1.0, format:'mp3', expressiveness:parseFloat(el('cloneExpr').value), denoise:(el('cloneDenoise')?el('cloneDenoise').checked:true) }; } });
+    }
     cloneBusy=true; btn.disabled=true; btn.textContent='🧬 Đang tạo...';
     msg.className='msg'; res.style.display='none'; progStart(estSec(text));
     try{
@@ -1116,6 +1124,104 @@
       }
     }catch(e){ progFail(); msg.className='msg err'; msg.textContent='Lỗi: '+String(e); }
     cloneBusy=false; btn.disabled=false; btn.textContent='🎙️ Tạo audio';
+  }
+
+  // ====== VĂN BẢN SIÊU DÀI (xử lý nền: chia đoạn → ghép 1 file) ======
+  var LONG_THRESHOLD = 1500;            // dài hơn ngần này (ký tự) => chia đoạn
+  var LONG_CHUNK = 1000;                // mỗi đoạn tối đa ~ ký tự
+  function _sleep(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
+  function fmtDur(s){ s=Math.round(s||0); var m=Math.floor(s/60); return m+':'+pad2(s%60); }
+  function b64ToArrayBuffer(b64){ var bin=atob(b64), a=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i); return a.buffer; }
+  // Chia văn bản dài theo ranh giới CÂU (giữ nghĩa, không cắt giữa số/câu)
+  function splitLong(text, maxLen){
+    maxLen = maxLen || LONG_CHUNK;
+    text = String(text||'').replace(/\r/g,'');
+    var toks = text.match(/[^.!?…。\n]*[.!?…。\n]+|[^.!?…。\n]+$/g) || [text];
+    var parts=[], buf='';
+    for(var k=0;k<toks.length;k++){
+      var t = toks[k].replace(/\s+/g,' ').trim(); if(!t) continue;
+      if(buf && (buf.length + 1 + t.length) > maxLen){ parts.push(buf); buf=t; }
+      else buf = buf ? (buf+' '+t) : t;
+      while(buf.length > Math.round(maxLen*1.7)){
+        var cut = buf.lastIndexOf(' ', maxLen); if(cut < 40) cut = maxLen;
+        parts.push(buf.slice(0,cut).trim()); buf = buf.slice(cut).trim();
+      }
+    }
+    if(buf.trim()) parts.push(buf.trim());
+    return parts;
+  }
+  // Ghép audio: PCM 16-bit -> 1 file WAV chuẩn (không cần thư viện ngoài)
+  function f32ToI16(f32){ var o=new Int16Array(f32.length); for(var i=0;i<f32.length;i++){ var s=Math.max(-1,Math.min(1,f32[i])); o[i]= s<0 ? s*0x8000 : s*0x7FFF; } return o; }
+  function encodeWavI16(i16, sr){
+    var dataLen=i16.length*2, buf=new ArrayBuffer(44+dataLen), dv=new DataView(buf);
+    function ws(o,s){ for(var i=0;i<s.length;i++) dv.setUint8(o+i, s.charCodeAt(i)); }
+    ws(0,'RIFF'); dv.setUint32(4,36+dataLen,true); ws(8,'WAVE'); ws(12,'fmt ');
+    dv.setUint32(16,16,true); dv.setUint16(20,1,true); dv.setUint16(22,1,true);
+    dv.setUint32(24,sr,true); dv.setUint32(28,sr*2,true); dv.setUint16(32,2,true); dv.setUint16(34,16,true);
+    ws(36,'data'); dv.setUint32(40,dataLen,true);
+    var off=44; for(var i=0;i<i16.length;i++){ dv.setInt16(off, i16[i], true); off+=2; }
+    return new Blob([buf],{type:'audio/wav'});
+  }
+  // Thanh tiến độ THẬT cho chế độ dài
+  function longProgShow(){ var g=el('genProg'); if(g) g.style.display='block'; longProgSet(0,''); }
+  function longProgSet(frac,label){ var f=el('genProgFill'),t=el('genProgTxt'); var p=Math.round(frac*100); if(f)f.style.width=p+'%'; if(t)t.textContent=p+'%'+(label?(' · '+label):''); }
+  function longProgLabel(txt){ var t=el('genProgTxt'); if(t) t.textContent=txt; }
+  function longProgHide(){ var g=el('genProg'); if(g) setTimeout(function(){g.style.display='none';},1200); }
+  // Bộ máy chạy văn bản dài (dùng chung cho VIP + Clone)
+  async function runLongGen(opts){
+    var msg=opts.msg, res=opts.res, btn=opts.btn;
+    var chunks = splitLong(opts.text, LONG_CHUNK);
+    if(chunks.length > 40){ if(!confirm('Văn bản rất dài ('+chunks.length+' đoạn). Sẽ trừ nhiều ký tự và mất vài phút. Tiếp tục?')){ return; } }
+    if(opts.fn==='clone-voice'){ if(cloneBusy) return; cloneBusy=true; }
+    btn.disabled=true; res.style.display='none'; msg.className='msg';
+    msg.textContent='📜 Văn bản dài — chia '+chunks.length+' đoạn, xử lý lần lượt...';
+    longProgShow();
+    var ac=null, pcm=[], totalLen=0, sr=0, totalCost=0, lastCredits=null, ok=false, errMsg='';
+    try{
+      var token=(await sb.auth.getSession()).data.session.access_token;
+      ac = new (window.AudioContext||window.webkitAudioContext)();
+      for(var i=0;i<chunks.length;i++){
+        btn.textContent='Đang đọc đoạn '+(i+1)+'/'+chunks.length+'...';
+        longProgSet(i/chunks.length, 'đoạn '+(i+1)+'/'+chunks.length);
+        var payload = opts.build(prep(chunks[i], opts.lang));
+        var d=null, attempts=0;
+        while(attempts<5){
+          attempts++;
+          var r=await fetch(SUPABASE_URL+'/functions/v1/'+opts.fn,{method:'POST',
+            headers:{'Authorization':'Bearer '+token,'apikey':SUPABASE_ANON_KEY,'Content-Type':'application/json'},
+            body:JSON.stringify(payload)});
+          d=await r.json();
+          if(r.status===202 || (d&&d.warming)){ longProgLabel('⏳ Máy chủ đang khởi động, chờ chút... (đoạn '+(i+1)+')'); await _sleep(15000); d=null; continue; }
+          if(!r.ok || !d || !d.audio_base64){ throw new Error((d&&d.error) || ('HTTP '+r.status+' ở đoạn '+(i+1))); }
+          break;
+        }
+        if(!d || !d.audio_base64){ throw new Error('Máy chủ bận, thử lại sau (đoạn '+(i+1)+').'); }
+        totalCost += (d.cost||0); if(d.credits!=null) lastCredits=d.credits;
+        var abuf = await ac.decodeAudioData(b64ToArrayBuffer(d.audio_base64));
+        if(!sr) sr=abuf.sampleRate;
+        var i16 = f32ToI16(abuf.getChannelData(0));
+        pcm.push(i16); totalLen += i16.length;
+      }
+      longProgSet(1,'đang ghép file...');
+      var all=new Int16Array(totalLen), off=0;
+      for(var j=0;j<pcm.length;j++){ all.set(pcm[j], off); off+=pcm[j].length; }
+      var wav = encodeWavI16(all, sr||24000);
+      var secs = Math.round(totalLen/(sr||24000));
+      var url = URL.createObjectURL(wav);
+      el('ttsAudio').src=url; el('ttsDownload').href=url; el('ttsDownload').setAttribute('download','tanseven-daidong.wav');
+      if(el('ttsSrt')) el('ttsSrt').style.display='none';
+      res.style.display='block';
+      msg.className='msg ok';
+      msg.textContent='🎉 Xong '+chunks.length+' đoạn → 1 file ('+fmtDur(secs)+'). Trừ '+totalCost.toLocaleString('vi-VN')+' ký tự.'+(lastCredits!=null?(' Còn: '+Number(lastCredits).toLocaleString('vi-VN')+' ký tự'):'');
+      if(lastCredits!=null){ var cv=Number(lastCredits).toLocaleString('vi-VN'); el('creditNum').innerHTML=cv+'<small> ký tự</small>'; if(el('creditMini'))el('creditMini').textContent=cv; }
+      try{ await histAddBlob(opts.text, opts.voiceLabel, totalCost, secs, wav, 'wav'); }catch(e){}
+      ok=true;
+    }catch(e){ errMsg = String((e&&e.message)||e); }
+    finally{ if(ac&&ac.close){ try{ ac.close(); }catch(e){} } }
+    longProgHide();
+    if(!ok){ msg.className='msg err'; msg.textContent='Lỗi: '+errMsg; }
+    btn.disabled=false; btn.textContent=opts.btnIdle||'🎙️ Tạo audio';
+    if(opts.fn==='clone-voice') cloneBusy=false;
   }
 
   // ====== TẠO HÀNG LOẠT ======
@@ -1226,6 +1332,13 @@
     if(histData.length>60) histData=histData.slice(0,60);
     histSave(); histRender();
   }
+  async function histAddBlob(text, voiceName, cost, seconds, blob, ext){
+    var id='h'+nowTs()+Math.floor(Math.random()*1000);
+    try{ await idbPut(id, blob); }catch(e){}
+    histData.unshift({id:id, t:nowTs(), text:text, voice:voiceName, cost:cost, seconds:Math.round(seconds||0), ext:ext||'mp3'});
+    if(histData.length>60) histData=histData.slice(0,60);
+    histSave(); histRender();
+  }
   function histRender(){
     var g=el('histList'); if(!g) return;
     if(el('histCount')) el('histCount').textContent=histData.length?('('+histData.length+')'):'';
@@ -1249,7 +1362,8 @@
   }
   async function histDownload(id){
     try{ var blob=await idbGet(id); if(!blob){ alert('Audio đã hết hạn (quá 24h).'); histDel(id); return; }
-      var url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download='tanseven-'+id+'.mp3'; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(function(){URL.revokeObjectURL(url);},1500);
+      var _h=histData.filter(function(x){return x.id===id;})[0]; var _ext=(_h&&_h.ext)||'mp3';
+      var url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download='tanseven-'+id+'.'+_ext; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(function(){URL.revokeObjectURL(url);},1500);
     }catch(e){ alert('Không tải được.'); }
   }
   function histDel(id){ histData=histData.filter(function(h){return h.id!==id;}); histSave(); idbDel(id); histRender(); }
