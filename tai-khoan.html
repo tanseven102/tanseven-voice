@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<title>Tài khoản · Tân Seven Voice</title>
+<title>Tài khoản · Tan Seven Voice</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
@@ -252,7 +252,7 @@
 </style>
 
 <nav><div class="nav-in">
-  <a class="brand" href="index.html"><span class="mk">🎙️</span> Tân Seven <span>Voice</span></a>
+  <a class="brand" href="index.html"><span class="mk">🎙️</span> Tan Seven <span>Voice</span></a>
   <button class="logout" id="logoutBtn" style="display:none" onclick="doLogout()">Đăng xuất</button>
 </div></nav>
 
@@ -323,7 +323,7 @@
         <div class="vs-lbl">🎙️ Chọn giọng nói</div>
         <button type="button" class="voice-select-btn" onclick="openVoiceModal()">
           <span class="vsb-ava" id="vsbAva">M</span>
-          <span class="vsb-info"><span class="vsb-name" id="vsbName">Minh Đức</span><span class="vsb-sub" id="vsbSub">Giọng Tân Seven VIP · Nam · Bắc</span></span>
+          <span class="vsb-info"><span class="vsb-name" id="vsbName">Minh Đức</span><span class="vsb-sub" id="vsbSub">Giọng Tan Seven VIP · Nam · Bắc</span></span>
           <span class="vsb-chev">Đổi giọng →</span>
         </button>
 
@@ -936,7 +936,7 @@
     if(el('vsbAva')){ el('vsbAva').textContent=sv.type==='clone'?'🧬':initsOf(sv.name); el('vsbAva').style.background=sv.type==='clone'?'linear-gradient(135deg,#9775fa,#7048e8)':gradForName(sv.name); }
     if(el('vsbSub')){
       if(sv.type==='clone') el('vsbSub').textContent='🧬 Giọng Clone của bạn';
-      else { var vv=ALL_VOICES.filter(function(x){return x.name===sv.name;})[0]; el('vsbSub').textContent='🌟 Giọng Tân Seven VIP'+(vv?' · '+vv.info:''); }
+      else { var vv=ALL_VOICES.filter(function(x){return x.name===sv.name;})[0]; el('vsbSub').textContent='🌟 Giọng Tan Seven VIP'+(vv?' · '+vv.info:''); }
     }
   }
   updateVoiceBtn();
@@ -1234,7 +1234,7 @@
   function fillBatchVoices(){
     var s=el('batchVoice'); if(!s) return;
     var cur=s.value;
-    var h='<optgroup label="🌟 Giọng Tân Seven VIP">';
+    var h='<optgroup label="🌟 Giọng Tan Seven VIP">';
     ALL_VOICES.forEach(function(v){ h+='<option value="vip::'+v.name+'::'+v.lang+'">'+v.name+' — '+v.info+'</option>'; });
     h+='</optgroup>';
     if(myVoices.length){
