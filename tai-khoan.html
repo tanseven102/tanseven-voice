@@ -1176,7 +1176,7 @@
     btn.disabled=true; res.style.display='none'; msg.className='msg';
     msg.textContent='📜 Văn bản dài — chia '+chunks.length+' đoạn, xử lý lần lượt...';
     longProgShow();
-    var ac=null, pcm=[], totalLen=0, sr=0, totalCost=0, lastCredits=null, ok=false, errMsg='';
+    var ac=null, pcm=[], allSegs=[], totalLen=0, sr=0, totalCost=0, lastCredits=null, ok=false, errMsg='';
     try{
       var token=(await sb.auth.getSession()).data.session.access_token;
       ac = new (window.AudioContext||window.webkitAudioContext)();
@@ -1200,6 +1200,8 @@
         var abuf = await ac.decodeAudioData(b64ToArrayBuffer(d.audio_base64));
         if(!sr) sr=abuf.sampleRate;
         var i16 = f32ToI16(abuf.getChannelData(0));
+        var segOffset = totalLen/(sr||24000);   // giây: vị trí đoạn này trong file ghép
+        if(d.segments && d.segments.length){ for(var q=0;q<d.segments.length;q++){ var sg=d.segments[q]; allSegs.push({ start:(sg.start||0)+segOffset, end:(sg.end||0)+segOffset, text:sg.text||'' }); } }
         pcm.push(i16); totalLen += i16.length;
       }
       longProgSet(1,'đang ghép file...');
@@ -1209,7 +1211,7 @@
       var secs = Math.round(totalLen/(sr||24000));
       var url = URL.createObjectURL(wav);
       el('ttsAudio').src=url; el('ttsDownload').href=url; el('ttsDownload').setAttribute('download','tanseven-daidong.wav');
-      if(el('ttsSrt')) el('ttsSrt').style.display='none';
+      window._ttsSegs=allSegs; if(el('ttsSrt')) el('ttsSrt').style.display=(allSegs.length?'inline-block':'none');
       res.style.display='block';
       msg.className='msg ok';
       msg.textContent='🎉 Xong '+chunks.length+' đoạn → 1 file ('+fmtDur(secs)+'). Trừ '+totalCost.toLocaleString('vi-VN')+' ký tự.'+(lastCredits!=null?(' Còn: '+Number(lastCredits).toLocaleString('vi-VN')+' ký tự'):'');
