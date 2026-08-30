@@ -327,6 +327,27 @@
           <span class="vsb-chev">Đổi giọng →</span>
         </button>
 
+        <style>
+          .model-row{display:flex;gap:10px;margin-top:14px}
+          .model-btn{flex:1;background:rgba(255,255,255,.03);border:2px solid var(--border,#2a3550);border-radius:13px;padding:11px 13px;cursor:pointer;text-align:left;color:inherit;font-family:inherit;transition:.15s;display:flex;flex-direction:column;gap:3px}
+          .model-btn:hover{border-color:var(--gold,#c9a227)}
+          .model-btn.on{border-color:var(--gold,#c9a227);background:rgba(201,162,39,.12);box-shadow:0 0 0 1px var(--gold,#c9a227)}
+          .model-btn b{font-size:14px}.model-btn small{color:var(--muted,#8892a6);font-size:11px;font-weight:500}
+          .mdl-vip{display:inline-block;background:linear-gradient(90deg,#c9a227,#ffe08a);color:#1a2138;font-size:9px;font-weight:800;padding:1px 6px;border-radius:99px;margin-left:5px;animation:mdlGlow 1.4s ease-in-out infinite}
+          @keyframes mdlGlow{0%,100%{box-shadow:0 0 3px rgba(201,162,39,.6)}50%{box-shadow:0 0 12px rgba(201,162,39,1)}}
+          @media (prefers-reduced-motion:reduce){.mdl-vip{animation:none}}
+          .mdl-note{background:rgba(201,162,39,.10);border:1px solid var(--gold,#c9a227);border-radius:10px;padding:9px 12px;margin-top:11px;font-size:12.5px;line-height:1.5}
+        </style>
+        <div class="vs-lbl" style="margin-top:16px">🎛️ Chọn Model đọc</div>
+        <div class="model-row">
+          <button type="button" id="mdl30" class="model-btn on" onclick="setModel('3.0')"><b>⚡ Tan Seven 3.0</b><small>Nhanh · chuẩn</small></button>
+          <button type="button" id="mdl40" class="model-btn" onclick="setModel('4.0')"><b>✨ Tan Seven 4.0<span class="mdl-vip">VIP</span></b><small>Biểu cảm · hay hơn</small></button>
+        </div>
+        <div id="mdl40box" style="display:none">
+          <div class="mdl-note">⏳ <b>Đọc chậm rãi + nhiều nhịp nghỉ</b> → nghe <b>cảm xúc, tự nhiên</b> hơn (hợp kể chuyện, quảng cáo, phim). Bù lại tạo lâu hơn chút.</div>
+          <div><label style="margin:11px 0 5px;display:block">🎭 Cách đọc</label><select id="ttsStyle" onchange="onTtsStyle()"></select></div>
+        </div>
+
         <!-- ==== TUỲ CHỈNH TẠO AUDIO (chung cho mọi giọng) ==== -->
         <div id="genOpts" class="gen-opts" style="display:none">
           <div><label style="margin:0 0 5px">🎭 Cảm xúc</label><select id="cloneStyle" onchange="onCloneStyle()"></select></div>
@@ -928,6 +949,7 @@
     updateVoiceBtn();
     if(el('genOpts')) el('genOpts').style.display=(type==='clone')?'grid':'none';
     if(el('cloneAdv')) el('cloneAdv').style.display=(type==='clone')?'block':'none';
+    if(typeof refreshModelUI==='function') refreshModelUI();
     closeVoiceModal();
   }
   function updateVoiceBtn(){
@@ -967,6 +989,20 @@
     var sp=m[el('cloneStyle').value]||1.0;
     el('ttsSpeed').value=sp; el('ttsSpeedVal').textContent=sp.toFixed(2)+'x';
   }
+  // ====== MODEL 3.0 / 4.0 (đọc biểu cảm) ======
+  var ttsModel='3.0';
+  function setModel(m){
+    ttsModel=m;
+    if(el('mdl30')) el('mdl30').classList.toggle('on', m==='3.0');
+    if(el('mdl40')) el('mdl40').classList.toggle('on', m==='4.0');
+    var st=el('ttsStyle');
+    if(m==='4.0' && st && !st.options.length){ st.innerHTML=CLONE_STYLES.map(function(s){ return '<option value="'+s[0]+'">'+s[0]+'</option>'; }).join(''); }
+    refreshModelUI();
+  }
+  function refreshModelUI(){ var show=(ttsModel==='4.0' && selectedVoice.type!=='clone'); if(el('mdl40box')) el('mdl40box').style.display=show?'block':'none'; }
+  function onTtsStyle(){ var m={}; CLONE_STYLES.forEach(function(s){ m[s[0]]=s[1]; }); var sp=m[el('ttsStyle').value]||1.0; if(el('ttsSpeed')){ el('ttsSpeed').value=sp; el('ttsSpeedVal').textContent=sp.toFixed(2)+'x'; } }
+  // 4.0: thêm nhịp nghỉ sau mỗi câu -> đọc biểu cảm, tự nhiên hơn
+  function expressify(t){ return String(t||'').replace(/([.!?…。])\s+/g,'$1 ⏸ '); }
   function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   // ---- Thư viện "Giọng clone của tôi" ----
@@ -1441,7 +1477,7 @@
   function pronRender(){ var g=el('pronList'); if(!g) return; if(!pronDict.length){ g.innerHTML='<div style="color:var(--muted);font-size:13px">Chưa có từ nào. Thêm từ khó để AI đọc đúng.</div>'; return; } g.innerHTML=pronDict.map(function(p,i){ return '<div class="pron-row"><span class="mono">'+esc(p.w)+'</span> <span style="color:var(--muted)">→</span> <b>'+esc(p.r)+'</b><button class="mini-x" style="margin-left:auto" onclick="pronDel('+i+')">✕</button></div>'; }).join(''); }
   function applyUserPron(t){ pronDict.forEach(function(p){ try{ t=t.replace(new RegExp("\\b"+p.w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+"\\b","gi"), p.r); }catch(e){} }); return t; }
   pronLoad();
-  function prep(text, lang){ var t=applyUserPron(String(text||'').replace(/⏸/g,'. ')); return (lang==='vi'||!lang) ? normVi(t) : t; }
+  function prep(text, lang){ var raw=String(text||''); if(typeof ttsModel!=='undefined' && ttsModel==='4.0') raw=expressify(raw); var t=applyUserPron(raw.replace(/⏸/g,'. ')); return (lang==='vi'||!lang) ? normVi(t) : t; }
   // Chèn dấu nghỉ ⏸ vào vị trí con trỏ
   function insertPause(id){ var t=el(id); if(!t) return; var s=t.selectionStart, e=t.selectionEnd; if(s==null){ s=e=t.value.length; } t.value=t.value.slice(0,s)+' ⏸ '+t.value.slice(e); t.focus(); try{ t.selectionStart=t.selectionEnd=s+3; }catch(_){}; t.dispatchEvent(new Event('input')); }
   histLoad();
