@@ -1175,35 +1175,51 @@
     if(chunks.length > 40){ if(!confirm('Văn bản rất dài ('+chunks.length+' đoạn). Sẽ trừ nhiều ký tự và mất vài phút. Tiếp tục?')){ return; } }
     if(opts.fn==='clone-voice'){ if(cloneBusy) return; cloneBusy=true; }
     btn.disabled=true; res.style.display='none'; msg.className='msg';
-    msg.textContent='📜 Văn bản dài — chia '+chunks.length+' đoạn, xử lý lần lượt...';
+    msg.textContent='📜 Văn bản dài — chia '+chunks.length+' đoạn, xử lý SONG SONG cho nhanh...';
     longProgShow();
     var ac=null, pcm=[], allSegs=[], totalLen=0, sr=0, totalCost=0, lastCredits=null, ok=false, errMsg='';
     try{
       var token=(await sb.auth.getSession()).data.session.access_token;
       ac = new (window.AudioContext||window.webkitAudioContext)();
-      for(var i=0;i<chunks.length;i++){
-        btn.textContent='Đang đọc đoạn '+(i+1)+'/'+chunks.length+'...';
-        longProgSet(i/chunks.length, 'đoạn '+(i+1)+'/'+chunks.length);
-        var payload = opts.build(prep(chunks[i], opts.lang));
-        var d=null, attempts=0;
-        while(attempts<5){
-          attempts++;
-          var r=await fetch(SUPABASE_URL+'/functions/v1/'+opts.fn,{method:'POST',
-            headers:{'Authorization':'Bearer '+token,'apikey':SUPABASE_ANON_KEY,'Content-Type':'application/json'},
-            body:JSON.stringify(payload)});
-          d=await r.json();
-          if(r.status===202 || (d&&d.warming)){ longProgLabel('⏳ Máy chủ đang khởi động, chờ chút... (đoạn '+(i+1)+')'); await _sleep(15000); d=null; continue; }
-          if(!r.ok || !d || !d.audio_base64){ throw new Error((d&&d.error) || ('HTTP '+r.status+' ở đoạn '+(i+1))); }
-          break;
+      var parts=new Array(chunks.length), done=0, nextI=0, hardErr=null;
+      var CONC=Math.min(3, chunks.length);   // 3 doan cung luc (khop max_workers)
+      async function _fetchChunk(ci){
+        var payload = opts.build(prep(chunks[ci], opts.lang)), d=null, tries=0;
+        while(tries<6){
+          tries++;
+          try{
+            var r=await fetch(SUPABASE_URL+'/functions/v1/'+opts.fn,{method:'POST',
+              headers:{'Authorization':'Bearer '+token,'apikey':SUPABASE_ANON_KEY,'Content-Type':'application/json'},
+              body:JSON.stringify(payload)});
+            d=await r.json();
+            if(r.status===202 || (d&&d.warming)){ if(done===0) longProgLabel('⏳ Máy chủ đang khởi động (đoạn đầu hơi lâu)...'); await _sleep(12000); d=null; continue; }
+            if(!r.ok || !d || !d.audio_base64){ if(tries<6){ await _sleep(8000); d=null; continue; } throw new Error((d&&d.error)||('HTTP '+r.status)); }
+            break;
+          }catch(ne){ if(tries<6){ await _sleep(6000); d=null; continue; } throw ne; }
         }
-        if(!d || !d.audio_base64){ throw new Error('Máy chủ bận, thử lại sau (đoạn '+(i+1)+').'); }
-        totalCost += (d.cost||0); if(d.credits!=null) lastCredits=d.credits;
+        if(!d || !d.audio_base64) throw new Error('đoạn '+(ci+1)+' không tạo được');
         var abuf = await ac.decodeAudioData(b64ToArrayBuffer(d.audio_base64));
         if(!sr) sr=abuf.sampleRate;
-        var i16 = f32ToI16(abuf.getChannelData(0));
-        var segOffset = totalLen/(sr||24000);   // giây: vị trí đoạn này trong file ghép
-        if(d.segments && d.segments.length){ for(var q=0;q<d.segments.length;q++){ var sg=d.segments[q]; allSegs.push({ start:(sg.start||0)+segOffset, end:(sg.end||0)+segOffset, text:sg.text||'' }); } }
-        pcm.push(i16); totalLen += i16.length;
+        parts[ci]={ i16:f32ToI16(abuf.getChannelData(0)), segs:(d.segments||[]), cost:(d.cost||0), credits:(d.credits!=null?d.credits:null) };
+      }
+      async function _pool(){
+        while(!hardErr){
+          if(nextI>=chunks.length) return;
+          var ci=nextI++;
+          try{ await _fetchChunk(ci); }catch(e){ hardErr=e; return; }
+          done++; longProgSet(done/chunks.length, 'đoạn '+done+'/'+chunks.length+' xong');
+          btn.textContent='Đang đọc '+done+'/'+chunks.length+'...';
+        }
+      }
+      var _ws=[]; for(var _w=0;_w<CONC;_w++) _ws.push(_pool());
+      await Promise.all(_ws);
+      if(hardErr) throw hardErr;
+      for(var i=0;i<chunks.length;i++){          // ghép theo ĐÚNG thứ tự + tính offset SRT
+        var p=parts[i]; if(!p) continue;
+        var segOffset=totalLen/(sr||24000);
+        if(p.segs && p.segs.length){ for(var q=0;q<p.segs.length;q++){ var sg=p.segs[q]; allSegs.push({ start:(sg.start||0)+segOffset, end:(sg.end||0)+segOffset, text:sg.text||'' }); } }
+        pcm.push(p.i16); totalLen+=p.i16.length;
+        totalCost+=p.cost; if(p.credits!=null) lastCredits=(lastCredits==null?p.credits:Math.min(lastCredits,p.credits));
       }
       longProgSet(1,'đang ghép file...');
       var all=new Int16Array(totalLen), off=0;
