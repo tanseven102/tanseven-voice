@@ -375,6 +375,22 @@
             <a id="ttsDownload" class="act" download="giong-tanseven.mp3" style="margin:0">⬇️ Tải MP3</a>
             <a id="ttsSrt" class="act" style="margin:0;display:none;cursor:pointer" onclick="downloadSRT();return false">📝 Tải phụ đề SRT</a>
           </div>
+          <style>
+            .fx-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:12px}
+            .fx-row .fx-lbl{font-size:12.5px;color:var(--muted,#8892a6);font-weight:600;margin-right:2px}
+            .fx-btn{background:rgba(255,255,255,.03);border:1.5px solid var(--border,#2a3550);border-radius:99px;padding:6px 12px;font-size:12.5px;font-weight:600;cursor:pointer;color:inherit;font-family:inherit;transition:.12s}
+            .fx-btn:hover{border-color:var(--gold,#c9a227)}
+            .fx-btn.on{border-color:var(--gold,#c9a227);background:rgba(201,162,39,.14);color:var(--gold,#c9a227)}
+          </style>
+          <div class="fx-row">
+            <span class="fx-lbl">🎚️ Hiệu ứng vui:</span>
+            <button type="button" class="fx-btn on" data-fx="none" onclick="applyEffect('none')">Gốc</button>
+            <button type="button" class="fx-btn" data-fx="robot" onclick="applyEffect('robot')">🤖 Robot</button>
+            <button type="button" class="fx-btn" data-fx="tram" onclick="applyEffect('tram')">🎙️ Trầm ấm</button>
+            <button type="button" class="fx-btn" data-fx="cao" onclick="applyEffect('cao')">🐿️ Cao</button>
+            <button type="button" class="fx-btn" data-fx="vang" onclick="applyEffect('vang')">🏛️ Vang</button>
+            <button type="button" class="fx-btn" data-fx="dienthoai" onclick="applyEffect('dienthoai')">📞 Điện thoại</button>
+          </div>
         </div>
       </div>
       <div class="box hist-box">
@@ -1003,6 +1019,55 @@
   function onTtsStyle(){ var m={}; CLONE_STYLES.forEach(function(s){ m[s[0]]=s[1]; }); var sp=m[el('ttsStyle').value]||1.0; if(el('ttsSpeed')){ el('ttsSpeed').value=sp; el('ttsSpeedVal').textContent=sp.toFixed(2)+'x'; } }
   // 4.0: thêm nhịp nghỉ sau mỗi câu -> đọc biểu cảm, tự nhiên hơn
   function expressify(t){ return String(t||'').replace(/([.!?…。])\s+/g,'$1 ⏸ '); }
+  // ====== HIỆU ỨNG GIỌNG (Bản 3) — Web Audio, không cần backend, không tốn ký tự ======
+  var _origAudioSrc=null;
+  async function applyEffect(fx){
+    var a=el('ttsAudio'); if(!a||!a.src) return;
+    if(!_origAudioSrc) _origAudioSrc=a.src;   // lưu bản gốc lần đầu
+    document.querySelectorAll('.fx-btn').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-fx')===fx); });
+    if(fx==='none'){ a.src=_origAudioSrc; if(el('ttsDownload')) el('ttsDownload').href=_origAudioSrc; try{a.play();}catch(e){} return; }
+    try{
+      var ab=await (await fetch(_origAudioSrc)).arrayBuffer();
+      var AC=new (window.AudioContext||window.webkitAudioContext)();
+      var buf=await AC.decodeAudioData(ab.slice(0)); try{AC.close();}catch(e){}
+      var out=await renderEffect(buf, fx);
+      var wav=encodeWavI16(f32ToI16(out.getChannelData(0)), out.sampleRate);
+      var url=URL.createObjectURL(wav);
+      a.src=url; if(el('ttsDownload')){ el('ttsDownload').href=url; el('ttsDownload').setAttribute('download','tanseven-'+fx+'.wav'); }
+      try{a.play();}catch(e){}
+    }catch(e){ /* lỗi thì giữ bản gốc */ }
+  }
+  window.applyEffect=applyEffect;
+  async function renderEffect(buf, fx){
+    var sr=buf.sampleRate, rate=({tram:0.92,cao:1.28})[fx]||1.0;
+    var outLen=Math.max(1, Math.ceil(buf.length/rate));
+    var oac=new (window.OfflineAudioContext||window.webkitOfflineAudioContext)(1, outLen, sr);
+    var src=oac.createBufferSource(); src.buffer=buf; src.playbackRate.value=rate;
+    var node=src;
+    if(fx==='robot'){
+      var ring=oac.createGain(); ring.gain.value=0;
+      var osc=oac.createOscillator(); osc.type='sine'; osc.frequency.value=42; osc.connect(ring.gain); osc.start();
+      node.connect(ring); node=ring;
+      var bp=oac.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=1200; bp.Q.value=0.6; node.connect(bp); node=bp;
+      var mgR=oac.createGain(); mgR.gain.value=2.6; node.connect(mgR); node=mgR;
+    } else if(fx==='tram'){
+      var ls=oac.createBiquadFilter(); ls.type='lowshelf'; ls.frequency.value=350; ls.gain.value=6;
+      var lp=oac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=3600;
+      node.connect(ls); ls.connect(lp); node=lp;
+    } else if(fx==='cao'){
+      var hp=oac.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=140; node.connect(hp); node=hp;
+    } else if(fx==='vang'){
+      var dry=oac.createGain(); dry.gain.value=0.82; node.connect(dry); dry.connect(oac.destination);
+      var dl=oac.createDelay(1.0); dl.delayTime.value=0.16; var fb=oac.createGain(); fb.gain.value=0.34; var wet=oac.createGain(); wet.gain.value=0.42;
+      node.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(wet); wet.connect(oac.destination);
+      src.start(); return await oac.startRendering();
+    } else if(fx==='dienthoai'){
+      var bpf=oac.createBiquadFilter(); bpf.type='bandpass'; bpf.frequency.value=1700; bpf.Q.value=0.9; node.connect(bpf); node=bpf;
+      var mgP=oac.createGain(); mgP.gain.value=2.8; node.connect(mgP); node=mgP;
+    }
+    node.connect(oac.destination); src.start();
+    return await oac.startRendering();
+  }
   function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   // ---- Thư viện "Giọng clone của tôi" ----
@@ -1117,7 +1182,7 @@
   }
 
   // ---- Tạo audio: điều hướng VIP / Clone ----
-  function doGenerate(){ if(selectedVoice.type==='clone') return doCloneGen(); return doTTS(); }
+  function doGenerate(){ _origAudioSrc=null; document.querySelectorAll('.fx-btn').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-fx')==='none');}); if(selectedVoice.type==='clone') return doCloneGen(); return doTTS(); }
   async function doCloneGen(){
     if(!sb){ alert('Vui lòng đăng nhập.'); return; }
     if(cloneBusy) return;
