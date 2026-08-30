@@ -195,13 +195,13 @@
     <div class="demo-in">
       <textarea id="ta" spellcheck="false">Xin chào, mình là Tan Seven. Hôm nay chúng ta sẽ cùng khám phá cách tạo giọng nói AI cực hay cho kênh YouTube của bạn.</textarea>
       <div class="voices-row" id="vrow">
-        <button class="vpill on">🇻🇳 Minh Đức · Tiếng Việt</button>
-        <button class="vpill">🇻🇳 Lan Anh · Tiếng Việt</button>
-        <button class="vpill">🇺🇸 Adam · English</button>
-        <button class="vpill">🇫🇷 Chloé · Français</button>
-        <button class="vpill">🇪🇸 Sofía · Español</button>
-        <button class="vpill">🇵🇹 Beatriz · Português</button>
-        <button class="vpill">🇮🇳 Aarav · Hindi</button>
+        <button class="vpill on" data-prev="previews/vi__Minh___c.wav">🇻🇳 Minh Đức · Tiếng Việt</button>
+        <button class="vpill" data-prev="previews/vi__Thanh_B_nh.wav">🇻🇳 Thanh Bình · Tiếng Việt</button>
+        <button class="vpill" data-prev="previews/en__Adam.wav">🇺🇸 Adam · English</button>
+        <button class="vpill" data-prev="previews/f__Chlo_.wav">🇫🇷 Chloé · Français</button>
+        <button class="vpill" data-prev="previews/e__Sof_a.wav">🇪🇸 Sofía · Español</button>
+        <button class="vpill" data-prev="previews/p__Beatriz.wav">🇵🇹 Beatriz · Português</button>
+        <button class="vpill" data-prev="previews/zh__Mei.wav">🇨🇳 Mei · 中文</button>
       </div>
       <div class="demo-bar">
         <button class="play" id="play">▶</button>
@@ -299,27 +299,55 @@
   let W,H,DPR=Math.min(2,devicePixelRatio||1);
   function size(){W=cv.clientWidth;H=cv.clientHeight;cv.width=W*DPR;cv.height=H*DPR;cx.setTransform(DPR,0,0,DPR,0,0);}
   const NB=90, amps=Array.from({length:NB},(_,i)=>{const e=Math.sin(i/NB*Math.PI);return .18+e*(.35+Math.random()*.5);});
-  let playing=false, pos=0, raf=0;
+  let pos=0, raf=0;
+  var pv=new Audio(), curPrev='previews/vi__Minh___c.wav', pvOwner=null;
+  var playBtn=document.getElementById('play');
   function drawProg(){
     cx.clearRect(0,0,W,H); const bw=W/NB, mid=H/2;
     for(let i=0;i<NB;i++){const h=amps[i]*H*.92, x=i*bw+bw*.28, w=Math.max(2,bw*.42), y=mid-h/2;
       cx.fillStyle=(i/NB<=pos)?'#0b0b0c':'#d9d5cd';
       cx.beginPath(); cx.roundRect(x,y,w,h,w/2); cx.fill();}
   }
-  function tick(){ if(!playing)return; pos+=1/(8*60); if(pos>=1){pos=0;playing=false;document.getElementById('play').textContent='▶';}
-    document.getElementById('time').textContent='0:0'+Math.min(8,Math.floor(pos*8))+' / 0:08';
+  function fmtT(s){s=Math.max(0,Math.floor(s||0));return '0:'+(s<10?'0':'')+s;}
+  function tick(){ if(pv.paused)return; pos=pv.duration?pv.currentTime/pv.duration:0;
+    var t=document.getElementById('time'); if(t)t.textContent=fmtT(pv.currentTime)+' / '+fmtT(pv.duration||0);
     drawProg(); raf=requestAnimationFrame(tick);}
-  document.getElementById('play').onclick=function(){ playing=!playing; this.textContent=playing?'❚❚':'▶'; if(playing)tick(); };
+  function stopAll(){ if(playBtn)playBtn.textContent='▶'; document.querySelectorAll('#vgrid .pp').forEach(function(b){b.textContent='▶';}); }
+  function playHero(){
+    if(!pv.paused && pvOwner==='hero'){ pv.pause(); playBtn.textContent='▶'; return; }
+    stopAll(); pv.src=curPrev; pos=0; pv.play(); pvOwner='hero'; playBtn.textContent='❚❚'; tick();
+  }
+  function playCard(url, btn){
+    if(!pv.paused && pvOwner===btn){ pv.pause(); btn.textContent='▶'; return; }
+    stopAll(); pos=0; drawProg(); pv.src=url; pv.play(); pvOwner=btn; btn.textContent='❚❚';
+  }
+  window.playCard=playCard;
+  pv.onended=function(){ stopAll(); if(pvOwner==='hero'){ pos=1; drawProg(); } pvOwner=null; };
+  pv.onerror=function(){ stopAll(); pvOwner=null; };
+  if(playBtn) playBtn.onclick=playHero;
+  document.querySelectorAll('#vrow .vpill').forEach(function(p){ p.onclick=function(){
+    document.querySelectorAll('#vrow .vpill').forEach(function(x){x.classList.remove('on');}); this.classList.add('on');
+    curPrev=this.getAttribute('data-prev')||curPrev; pv.pause(); pvOwner=null; stopAll(); pos=0; drawProg();
+  };});
   size(); drawProg(); addEventListener('resize',()=>{size();drawProg();});
 
-  // voice cards
-  const VS=[['🇻🇳','Minh Đức','Tiếng Việt · Nam Bắc · Tin tức'],['🇻🇳','Lan Anh','Tiếng Việt · Nữ Nam · Kể chuyện'],['🇻🇳','Trọng Khang','Tiếng Việt · Nam trầm · Phim'],
-    ['🇺🇸','Adam','English · Nam · Deep'],['🇺🇸','Bella','English · Nữ · Warm'],
-    ['🇫🇷','Chloé','Français · Nữ · Tự nhiên'],['🇪🇸','Sofía','Español · Nữ · Đa dụng'],['🇵🇹','Beatriz','Português · Nữ · Đa dụng'],['🇮🇹','Giulia','Italiano · Nữ · Đa dụng'],
-    ['🇮🇳','Aarav','हिन्दी Hindi · Nam']];
-  document.getElementById('vgrid').innerHTML=VS.map(v=>`<div class="vcard reveal"><span class="pp">▶</span>
-    <div><div class="nm">${v[1]}</div><div class="tg">${v[2]}</div></div>
-    <span class="mini">${Array.from({length:16},()=>`<i style="height:${6+Math.random()*20|0}px"></i>`).join('')}</span></div>`).join('');
+  // voice cards (thư viện giọng) — NGHE THỬ THẬT, không cần đăng ký
+  const VS=[
+    ['🇻🇳','Minh Đức','Tiếng Việt · Nam Bắc','previews/vi__Minh___c.wav'],
+    ['🇻🇳','Thanh Bình','Tiếng Việt · Nam Bắc','previews/vi__Thanh_B_nh.wav'],
+    ['🇻🇳','Trúc Ly','Tiếng Việt · Nữ','previews/vi__Tr_c_Ly.wav'],
+    ['🇺🇸','Adam','English · Nam · Deep','previews/en__Adam.wav'],
+    ['🇺🇸','Bella','English · Nữ · Warm','previews/en__Bella.wav'],
+    ['🇫🇷','Chloé','Français · Nữ','previews/f__Chlo_.wav'],
+    ['🇪🇸','Sofía','Español · Nữ','previews/e__Sof_a.wav'],
+    ['🇵🇹','Beatriz','Português · Nữ','previews/p__Beatriz.wav'],
+    ['🇮🇹','Giulia','Italiano · Nữ','previews/i__Giulia.wav'],
+    ['🇮🇳','Aisha','Hindi · Nữ','previews/h__Aisha.wav'],
+    ['🇨🇳','Mei','中文 · Nữ','previews/zh__Mei.wav']
+  ];
+  document.getElementById('vgrid').innerHTML=VS.map(function(v){ return '<div class="vcard reveal"><span class="pp" style="cursor:pointer" onclick="playCard(\''+v[3]+'\',this)">▶</span>'+
+    '<div><div class="nm">'+v[1]+'</div><div class="tg">'+v[0]+' '+v[2]+'</div></div>'+
+    '<span class="mini">'+Array.from({length:16},function(){return '<i style="height:'+(6+(Math.random()*20|0))+'px"></i>';}).join('')+'</span></div>'; }).join('');
 
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
