@@ -712,7 +712,9 @@
         body: JSON.stringify({ text: prep(text, lang), voice: voice, lang: lang, speed: speed })
       });
       var d = await r.json();
-      if(r.status===202 || d.warming){
+      if(isRateLimited(r, d)){
+        progFail(); msg.className='msg warn'; msg.textContent=rateText(d); setCreditUI(d.credits);
+      } else if(r.status===202 || d.warming){
         progFail(); msg.className='msg warn'; msg.textContent='⏳ Máy chủ đang xử lý (văn bản dài có thể lâu hơn). Bấm “Tạo audio” lại sau chút nhé.';
       } else if(!r.ok || !d.audio_base64){
         progFail(); msg.className='msg err'; msg.textContent = 'Lỗi: ' + (d.error || ('HTTP '+r.status));
@@ -759,6 +761,16 @@
       navigator.clipboard.writeText(i.value).then(done, function(){ try{document.execCommand('copy');}catch(e){} done(); });
     } else { try{document.execCommand('copy');}catch(e){} done(); }
   }
+
+  // ====== CHONG LAM DUNG: hien lai so ky tu + bao khi bi chan toc do ======
+  function setCreditUI(v){
+    if(v==null) return;
+    var cv = Number(v).toLocaleString('vi-VN');
+    if(el('creditNum')) el('creditNum').innerHTML = cv + '<small> k\u00fd t\u1ef1</small>';
+    if(el('creditMini')) el('creditMini').textContent = cv;
+  }
+  function isRateLimited(r, d){ return !!(r && (r.status===429 || (d && d.rate_limited))); }
+  function rateText(d){ return '\ud83d\udea6 ' + ((d && d.error) || 'B\u1ea1n t\u1ea1o h\u01a1i nhanh \u2014 ngh\u1ec9 ch\u00fat r\u1ed3i th\u1eed l\u1ea1i nh\u00e9.'); }
 
   // ====== NẠP TIỀN (Phase 4) ======
   var napPoll = null, napCode = null;
@@ -1207,7 +1219,9 @@
         body:JSON.stringify(payload)
       });
       var d=await r.json();
-      if(r.status===202 || d.warming){
+      if(isRateLimited(r, d)){
+        progFail(); msg.className='msg warn'; msg.textContent=rateText(d); setCreditUI(d.credits);
+      } else if(r.status===202 || d.warming){
         progFail(); msg.className='msg warn';
         msg.textContent='⏳ Máy chủ AI đang khởi động (~1 phút). Bấm “Tạo audio” lại sau chút nhé.';
       } else if(!r.ok || !d.audio_base64){
@@ -1285,7 +1299,7 @@
       var parts=new Array(chunks.length), done=0, nextI=0, hardErr=null;
       var CONC=Math.min(3, chunks.length);   // 3 doan cung luc (khop max_workers)
       async function _fetchChunk(ci){
-        var payload = opts.build(prep(chunks[ci], opts.lang)), d=null, tries=0;
+        var payload = opts.build(prep(chunks[ci], opts.lang)), d=null, tries=0, waits=0;
         while(tries<6){
           tries++;
           try{
@@ -1293,6 +1307,7 @@
               headers:{'Authorization':'Bearer '+token,'apikey':SUPABASE_ANON_KEY,'Content-Type':'application/json'},
               body:JSON.stringify(payload)});
             d=await r.json();
+            if(isRateLimited(r,d)){ waits++; if(waits>10) throw new Error((d&&d.error)||'Bị chặn tốc độ'); tries--; longProgLabel('🚦 Đang chờ lượt (giới hạn tốc độ)...'); await _sleep(((d&&d.retry_after)||60)*1000); d=null; continue; }
             if(r.status===202 || (d&&d.warming)){ if(done===0) longProgLabel('⏳ Máy chủ đang khởi động (đoạn đầu hơi lâu)...'); await _sleep(12000); d=null; continue; }
             if(!r.ok || !d || !d.audio_base64){ if(tries<6){ await _sleep(8000); d=null; continue; } throw new Error((d&&d.error)||('HTTP '+r.status)); }
             break;
@@ -1392,12 +1407,22 @@
         var fn, payload;
         if(sel[0]==='clone'){ fn='clone-voice'; payload={text:prep(lines[i],'vi'),voice_id:sel[1],style:style,speed:speed,format:'mp3'}; }
         else { fn='smart-api'; payload={text:prep(lines[i],sel[2]),voice:sel[1],lang:sel[2],speed:speed}; }
-        var r=await fetch(SUPABASE_URL+'/functions/v1/'+fn,{method:'POST',
-          headers:{'Authorization':'Bearer '+token,'apikey':SUPABASE_ANON_KEY,'Content-Type':'application/json'},
-          body:JSON.stringify(payload)});
-        var d=await r.json();
+        var r, d, waits=0;
+        while(true){
+          r=await fetch(SUPABASE_URL+'/functions/v1/'+fn,{method:'POST',
+            headers:{'Authorization':'Bearer '+token,'apikey':SUPABASE_ANON_KEY,'Content-Type':'application/json'},
+            body:JSON.stringify(payload)});
+          d=await r.json();
+          if(isRateLimited(r,d) && waits<10){
+            waits++; item.status='warm'; item.err='đang chờ lượt (giới hạn tốc độ)...'; renderBatch();
+            await _sleep(((d&&d.retry_after)||60)*1000);
+            item.status='run'; item.err=''; renderBatch(); continue;
+          }
+          break;
+        }
         if(d.audio_base64){ item.status='ok'; item.audio=d.audio_base64;
           var cv=Number(d.credits).toLocaleString('vi-VN'); el('creditNum').innerHTML=cv+'<small> ký tự</small>'; if(el('creditMini'))el('creditMini').textContent=cv; }
+        else if(isRateLimited(r,d)){ item.status='warm'; item.err='bị chặn tốc độ, chạy lại sau'; }
         else if(r.status===202||d.warming){ item.status='warm'; item.err='máy chủ đang khởi động, chạy lại sau'; }
         else { item.status='err'; item.err=d.error||('HTTP '+r.status); }
       }catch(e){ item.status='err'; item.err=String(e); }
