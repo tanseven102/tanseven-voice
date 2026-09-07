@@ -510,6 +510,19 @@
         </div>
         <div id="pronList" style="margin-top:12px"></div>
       </div>
+
+      <div class="box" style="margin-top:16px">
+        <div class="k">🔌 Khoá API cho lập trình viên</div>
+        <div class="desc">Nối Tân Seven Voice vào phần mềm khác (n8n, Make, Python, tool của bạn).
+          Khoá dùng chung số ký tự với tài khoản này. <a href="api.html" target="_blank"><b>Xem hướng dẫn →</b></a></div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <input id="akName" placeholder="Tên khoá (VD: Tool ghép video)" style="flex:1;min-width:160px">
+          <button class="btn" id="akBtn" style="margin:0;width:auto;padding:12px 20px" onclick="akCreate()">+ Tạo khoá mới</button>
+        </div>
+        <div class="msg" id="akMsg"></div>
+        <div id="akNew" style="display:none"></div>
+        <div id="akList" style="margin-top:12px"></div>
+      </div>
     </div>
   </div>
 
@@ -649,6 +662,7 @@
       el('creditNum').innerHTML = creditVal + '<small> ký tự</small>';
       if(el('creditMini')) el('creditMini').textContent = creditVal;
       loadAffiliate();
+      akLoad();
     } else {
       el('authBox').style.display='block';
       el('dashBox').style.display='none';
@@ -1567,6 +1581,73 @@
   function pronRender(){ var g=el('pronList'); if(!g) return; if(!pronDict.length){ g.innerHTML='<div style="color:var(--muted);font-size:13px">Chưa có từ nào. Thêm từ khó để AI đọc đúng.</div>'; return; } g.innerHTML=pronDict.map(function(p,i){ return '<div class="pron-row"><span class="mono">'+esc(p.w)+'</span> <span style="color:var(--muted)">→</span> <b>'+esc(p.r)+'</b><button class="mini-x" style="margin-left:auto" onclick="pronDel('+i+')">✕</button></div>'; }).join(''); }
   function applyUserPron(t){ pronDict.forEach(function(p){ try{ t=t.replace(new RegExp("\\b"+p.w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+"\\b","gi"), p.r); }catch(e){} }); return t; }
   pronLoad();
+
+  // ====== KHOÁ API (cho lập trình viên) ======
+  var API_BASE = SUPABASE_URL + '/functions/v1/api';
+  var apiKeys = [];
+  async function akLoad(){
+    if(!sb || !el('akList')) return;
+    try{
+      var q = await sb.from('api_keys')
+        .select('id,name,key_prefix,created_at,last_used_at,calls')
+        .eq('revoked', false).order('created_at', { ascending:false });
+      apiKeys = q.data || [];
+    }catch(e){ apiKeys = []; }
+    akRender();
+  }
+  function akRender(){
+    var g = el('akList'); if(!g) return;
+    if(!apiKeys.length){
+      g.innerHTML = '<div style="color:var(--muted);font-size:13px">Chưa có khoá nào. Bấm “Tạo khoá mới” để lấy khoá dùng cho tool của bạn.</div>';
+      return;
+    }
+    g.innerHTML = apiKeys.map(function(k){
+      var d = k.created_at ? new Date(k.created_at).toLocaleDateString('vi-VN') : '';
+      var used = k.last_used_at ? new Date(k.last_used_at).toLocaleString('vi-VN') : 'chưa dùng';
+      return '<div class="pron-row"><span class="mono">'+esc(k.key_prefix)+'…</span>'
+        + ' <b style="margin-left:6px">'+esc(k.name||'Khoá API')+'</b>'
+        + ' <span style="color:var(--muted);font-size:12px;margin-left:6px">tạo '+d+' · '+(k.calls||0)+' lần gọi · dùng gần nhất: '+used+'</span>'
+        + '<button class="mini-x" style="margin-left:auto" onclick="akDel(\''+k.id+'\')">✕</button></div>';
+    }).join('');
+  }
+  async function akCreate(){
+    if(!sb){ alert('Vui lòng đăng nhập.'); return; }
+    var m = el('akMsg'), b = el('akBtn');
+    b.disabled = true; b.textContent = 'Đang tạo...';
+    try{
+      var q = await sb.rpc('create_api_key', { p_name: (el('akName').value||'').trim() });
+      if(q.error) throw new Error(q.error.message);
+      var row = Array.isArray(q.data) ? q.data[0] : q.data;
+      if(!row || !row.api_key) throw new Error('Không tạo được khoá');
+      el('akName').value = '';
+      var box = el('akNew');
+      box.style.display = 'block';
+      box.innerHTML = '<div style="margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--green-soft)">'
+        + '<div style="font-weight:700;margin-bottom:6px">🔑 Khoá của bạn (chỉ hiện MỘT LẦN — hãy lưu lại ngay)</div>'
+        + '<div class="mono" id="akVal" style="word-break:break-all;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px">'+esc(row.api_key)+'</div>'
+        + '<button class="btn" style="margin-top:10px;width:auto;padding:10px 18px" onclick="akCopy()">📋 Sao chép</button>'
+        + '</div>';
+      m.className = 'msg ok'; m.textContent = '✅ Đã tạo khoá. Lưu lại ngay — đóng trang là không xem lại được nữa.';
+      akLoad();
+    }catch(e){
+      m.className = 'msg err'; m.textContent = 'Lỗi: ' + String(e.message || e);
+    }
+    b.disabled = false; b.textContent = '+ Tạo khoá mới';
+  }
+  function akCopy(){
+    var t = el('akVal'); if(!t) return;
+    try{ navigator.clipboard.writeText(t.textContent); el('akMsg').className='msg ok'; el('akMsg').textContent='📋 Đã sao chép khoá.'; }
+    catch(e){ alert(t.textContent); }
+  }
+  async function akDel(id){
+    if(!confirm('Xoá khoá này? Mọi tool đang dùng khoá sẽ ngừng chạy.')) return;
+    try{
+      var q = await sb.from('api_keys').delete().eq('id', id);
+      if(q.error) throw new Error(q.error.message);
+      el('akMsg').className='msg ok'; el('akMsg').textContent='🗑️ Đã xoá khoá.';
+      akLoad();
+    }catch(e){ el('akMsg').className='msg err'; el('akMsg').textContent='Lỗi: '+String(e.message||e); }
+  }
   function prep(text, lang){ var raw=String(text||''); if(typeof ttsModel!=='undefined' && ttsModel==='4.0') raw=expressify(raw); var t=applyUserPron(raw.replace(/⏸/g,'. ')); return (lang==='vi'||!lang) ? normVi(t) : t; }
   // Chèn dấu nghỉ ⏸ vào vị trí con trỏ
   function insertPause(id){ var t=el(id); if(!t) return; var s=t.selectionStart, e=t.selectionEnd; if(s==null){ s=e=t.value.length; } t.value=t.value.slice(0,s)+' ⏸ '+t.value.slice(e); t.focus(); try{ t.selectionStart=t.selectionEnd=s+3; }catch(_){}; t.dispatchEvent(new Event('input')); }
