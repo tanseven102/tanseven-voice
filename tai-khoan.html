@@ -669,6 +669,7 @@
       if(el('creditMini')) el('creditMini').textContent = creditVal;
       loadAffiliate();
       akLoad();
+      loadPublicVoices();
     } else {
       el('authBox').style.display='block';
       el('dashBox').style.display='none';
@@ -947,16 +948,32 @@
   }
   function gradForName(n){ return gradFor({name:n}); }
   function allVoiceItems(){
-    var items=ALL_VOICES.map(function(v){ return {type:'vip',id:v.name,name:v.name,lang:v.lang,genre:v.genre,info:v.info,key:'vip:'+v.name}; });
+    var items=(PUBLIC_VOICES||[]).map(function(v){
+      var mt=v.meta||{};
+      return {type:'vipclone',id:v.id,name:v.name,lang:mt.lang||'en',
+              genre:mt.genre||'🎧 Đa dụng',info:mt.info||'Nam',desc:mt.desc||'',key:'vipclone:'+v.id};
+    });
+    items=items.concat(ALL_VOICES.map(function(v){ return {type:'vip',id:v.name,name:v.name,lang:v.lang,genre:v.genre,info:v.info,key:'vip:'+v.name}; }));
     (myVoices||[]).forEach(function(v){ items.push({type:'clone',id:v.id,name:v.name,lang:'vi',key:'clone:'+v.id}); });
     return items;
   }
   function openVoiceModal(){ el('voiceOverlay').style.display='flex'; if(el('favToggle')) el('favToggle').classList.toggle('on',vmFav); renderVoiceModal(); }
   function closeVoiceModal(){ el('voiceOverlay').style.display='none'; }
   function isSel(v){ return selectedVoice.type===v.type && (v.type==='vip'?selectedVoice.name===v.name:selectedVoice.id===v.id); }
+  function isCloneEngine(t){ return t==='clone'||t==='vipclone'; }
   function voiceModalCard(v){
     var on=isSel(v), fav=favVoices.has(v.key);
     var heart='<button type="button" class="vc-fav" onclick="event.stopPropagation();toggleFav(\''+v.key+'\')" title="Yêu thích">'+(fav?'❤️':'🤍')+'</button>';
+    if(v.type==='vipclone'){
+      var gnd=(v.info||'').indexOf('Nữ')>-1?'Nữ':'Nam';
+      return '<div class="vcard'+(on?' on':'')+'">'+
+        '<div class="vc-head"><span class="vc-ava" style="background:linear-gradient(135deg,#f59f00,#e8590c)">'+initsOf(v.name)+'</span>'+
+        '<div style="flex:1"><div class="vc-name">'+esc(v.name)+' <span class="vc-vip" style="background:linear-gradient(135deg,#f59f00,#e8590c)">VIP+</span></div>'+
+        '<div class="vc-pills"><span class="vp g">'+esc(v.info)+'</span><span class="vp g">'+esc(v.genre)+'</span></div></div>'+heart+'</div>'+
+        '<p class="vc-desc">'+esc(v.desc||'Giọng độc quyền của Tân Seven — chọn được cảm xúc và ngôn ngữ khi đọc.')+'</p>'+
+        '<div class="vc-foot"><button type="button" class="vc-pick" onclick="chooseVoice(\'vipclone\',\''+v.id+'\',\''+v.lang+'\')">'+(on?'Đang chọn ✓':'Dùng')+'</button></div>'+
+      '</div>';
+    }
     if(v.type==='clone'){
       return '<div class="vcard'+(on?' on':'')+'">'+
         '<div class="vc-head"><span class="vc-ava" style="background:linear-gradient(135deg,#9775fa,#7048e8)">🧬</span>'+
@@ -983,7 +1000,7 @@
     var items=allVoiceItems().filter(function(v){
       if(vmFav && !favVoices.has(v.key)) return false;
       if(lang==='clone'){ if(v.type!=='clone') return false; }
-      else if(lang!=='all'){ if(!(v.type==='vip'&&v.lang===lang)) return false; }
+      else if(lang!=='all'){ if(!((v.type==='vip'||v.type==='vipclone')&&v.lang===lang)) return false; }
       if(q && v.name.toLowerCase().indexOf(q)<0) return false;
       return true;
     });
@@ -993,10 +1010,14 @@
   }
   function chooseVoice(type,idn,lang){
     if(type==='vip'){ selectedVoice={type:'vip',name:idn,lang:lang}; }
+    else if(type==='vipclone'){
+      var pv=(PUBLIC_VOICES||[]).filter(function(x){return x.id===idn;})[0];
+      selectedVoice={type:'vipclone',id:idn,name:pv?pv.name:'Giọng VIP',lang:lang||'en'};
+    }
     else { var v=(myVoices||[]).filter(function(x){return x.id===idn;})[0]; selectedVoice={type:'clone',id:idn,name:v?v.name:'Giọng clone',lang:'vi'}; }
     updateVoiceBtn();
-    if(el('genOpts')) el('genOpts').style.display=(type==='clone')?'grid':'none';
-    if(el('cloneAdv')) el('cloneAdv').style.display=(type==='clone')?'block':'none';
+    if(el('genOpts')) el('genOpts').style.display=isCloneEngine(type)?'grid':'none';
+    if(el('cloneAdv')) el('cloneAdv').style.display=isCloneEngine(type)?'block':'none';
     if(typeof refreshModelUI==='function') refreshModelUI();
     closeVoiceModal();
   }
@@ -1028,6 +1049,12 @@
   var cloneClips=[];                 // cac doan mau da them (toi da 3)
   var CLONE_SR=24000, CLONE_MAX_TOTAL=60, CLONE_MAX_CLIPS=3, CLONE_MIN_TOTAL=3;
   var myVoices=[];
+  var PUBLIC_VOICES=[];          // giong VIP dung chung (chay bang dong co clone)
+  async function loadPublicVoices(){
+    if(!sb) return;
+    try{ var r=await sb.rpc('list_public_voices'); PUBLIC_VOICES=(r&&r.data)||[]; }
+    catch(e){ PUBLIC_VOICES=[]; }
+  }
 
   function fillCloneUI(){
     var st=el('cloneStyle'); if(st) st.innerHTML=CLONE_STYLES.map(function(s){ return '<option value="'+s[0]+'">'+s[0]+'</option>'; }).join('');
@@ -1272,7 +1299,7 @@
   }
 
   // ---- Tạo audio: điều hướng VIP / Clone ----
-  function doGenerate(){ _origAudioSrc=null; document.querySelectorAll('.fx-btn').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-fx')==='none');}); if(selectedVoice.type==='clone') return doCloneGen(); return doTTS(); }
+  function doGenerate(){ _origAudioSrc=null; document.querySelectorAll('.fx-btn').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-fx')==='none');}); if(isCloneEngine(selectedVoice.type)) return doCloneGen(); return doTTS(); }
   async function doCloneGen(){
     if(!sb){ alert('Vui lòng đăng nhập.'); return; }
     if(cloneBusy) return;
