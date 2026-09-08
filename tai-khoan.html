@@ -356,7 +356,7 @@
         <div id="cloneAdv" style="display:none">
           <label style="margin-top:14px">🎭 Độ biểu cảm: <b id="cloneExprVal" style="color:var(--gold)">Vừa</b> <span style="font-weight:400;color:var(--muted);font-size:12px">(trái = ổn định, rõ · phải = giàu cảm xúc)</span></label>
           <input type="range" id="cloneExpr" min="0" max="1" step="0.05" value="0.4" oninput="onExpr()">
-          <label class="tgl"><input type="checkbox" id="cloneDenoise" checked onchange="void 0"> 🧹 Tự lọc tạp âm mẫu giọng <span style="color:var(--muted);font-weight:400">(giúp clone rõ & giống hơn)</span></label>
+          <label class="tgl"><input type="checkbox" id="cloneDenoise" onchange="void 0"> 🧹 Lọc tạp âm mẫu giọng <span style="color:var(--muted);font-weight:400">(chỉ bật khi mẫu có tiếng ồn — mẫu sạch mà lọc sẽ kém giống)</span></label>
         </div>
         <label style="margin-top:16px">⚡ Tốc độ đọc: <b id="ttsSpeedVal" style="color:var(--gold)">1.00x</b> <span style="font-weight:400;color:var(--muted);font-size:12px">(trái = chậm · phải = nhanh)</span></label>
         <input type="range" id="ttsSpeed" min="0.7" max="1.5" step="0.01" value="1" oninput="el('ttsSpeedVal').textContent=(+this.value).toFixed(2)+'x'">
@@ -413,20 +413,26 @@
             <input type="file" id="cloneFile" accept="audio/*,.wav,.mp3,.m4a,.ogg" style="display:none" onchange="onCloneFile(this)">
             <div class="up-ico">⬆️</div>
             <div class="up-t"><b>Nhấp hoặc kéo thả tệp vào đây</b></div>
-            <div class="up-s">Thời lượng 3s – 30s · tối đa 10MB · .mp3 .wav</div>
+            <div class="up-s">Ghép được <b>tối đa 3 đoạn</b> · tổng 3s – 60s · mỗi file ≤ 12MB · .mp3 .wav<br>Nhiều đoạn với giọng điệu khác nhau ⇒ máy bắt giọng chuẩn hơn hẳn.</div>
             <div class="up-btns">
               <button type="button" class="up-btn" onclick="el('cloneFile').click()">📁 Chọn File</button>
               <button type="button" class="up-btn" id="recBtn" onclick="toggleRecord()">🎙️ Ghi âm</button>
             </div>
           </div>
           <div id="cloneFileInfo" style="display:none;margin-top:10px">
-            <div class="file-row"><span id="cloneFileName" class="mono"></span><button class="mini-x" onclick="clearCloneFile()">✕</button></div>
+            <div id="clipList"></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap">
+              <b id="clipTotal" style="font-size:13.5px"></b>
+              <button class="mini-x" style="margin-left:auto" onclick="clearCloneFile()">Xoá hết ✕</button>
+            </div>
             <audio id="cloneRefAudio" controls style="width:100%;margin-top:8px"></audio>
           </div>
           <div class="tips">
             <div class="tips-h">💡 Lưu ý cho giọng mẫu</div>
             <div class="tip">Âm thanh sạch, một người nói, không tạp âm.</div>
             <div class="tip">Chất lượng mẫu quyết định chất lượng clone.</div>
+            <div class="tip">Nên gom 2–3 đoạn: một đoạn kể bình thường, một đoạn nhấn mạnh, một đoạn câu hỏi — máy học được cả ngữ điệu.</div>
+            <div class="tip">Mẫu đã sạch thì <b>đừng bật lọc tạp âm</b> — lọc sẽ bào mất chi tiết làm giọng kém giống.</div>
           </div>
           <button class="btn" id="cvSaveBtn" onclick="saveVoice()">💾 Tạo &amp; lưu giọng</button>
           <div class="msg" id="cvMsg"></div>
@@ -1019,6 +1025,8 @@
     ["hu","🇭🇺 Hungary"],["hi","🇮🇳 Hindi"]
   ];
   var cloneRefB64=null, cloneBusy=false;
+  var cloneClips=[];                 // cac doan mau da them (toi da 3)
+  var CLONE_SR=24000, CLONE_MAX_TOTAL=60, CLONE_MAX_CLIPS=3, CLONE_MIN_TOTAL=3;
   var myVoices=[];
 
   function fillCloneUI(){
@@ -1137,27 +1145,80 @@
 
   // ---- Tải mẫu giọng (file / kéo-thả / ghi âm) ----
   function arrayBufferToBase64(buf){ var b=new Uint8Array(buf),s='',n=b.length,i; for(i=0;i<n;i+=8192){ s+=String.fromCharCode.apply(null,b.subarray(i,i+8192)); } return btoa(s); }
-  async function decodeToWav(arrbuf){ var AC=window.AudioContext||window.webkitAudioContext; var ac=new AC(); var ab=await ac.decodeAudioData(arrbuf); try{ac.close();}catch(e){} return encodeWAV(ab); }
-  function setRefFromWav(wav,name){ cloneRefB64=arrayBufferToBase64(wav); el('cloneFileName').textContent=name;
-    el('cloneRefAudio').src=URL.createObjectURL(new Blob([wav],{type:'audio/wav'})); el('cloneFileInfo').style.display='block'; el('cvMsg').className='msg'; }
-  function useAudioFile(f){
+  // ---- Nhieu doan mau: giai ma -> gom lai thanh 1 file WAV ----
+  async function decodeMono(arrbuf){
+    var AC=window.AudioContext||window.webkitAudioContext, ac=null;
+    try{ ac=new AC({sampleRate:CLONE_SR}); }catch(e){ ac=new AC(); }
+    var ab=await ac.decodeAudioData(arrbuf);
+    var src=ab.getChannelData(0), sr=ab.sampleRate;
+    var data=new Float32Array(src.length); data.set(src);
+    try{ ac.close(); }catch(e){}
+    data=resampleTo(data, sr, CLONE_SR);
+    return { data:data, dur:data.length/CLONE_SR };
+  }
+  function resampleTo(data, srIn, srOut){
+    if(srIn===srOut) return data;
+    var ratio=srOut/srIn, n=Math.round(data.length*ratio), out=new Float32Array(n), last=data.length-1;
+    for(var i=0;i<n;i++){
+      var pos=i/ratio, i0=Math.floor(pos), i1=Math.min(i0+1,last), f=pos-i0;
+      out[i]=data[i0]*(1-f)+data[i1]*f;
+    }
+    return out;
+  }
+  function clipsTotal(){ var t=0; for(var i=0;i<cloneClips.length;i++) t+=cloneClips[i].dur; return t; }
+  function buildRefWav(){
+    var gap=Math.round(CLONE_SR*0.3), n=0, i;
+    for(i=0;i<cloneClips.length;i++) n+=cloneClips[i].data.length+(i?gap:0);
+    var out=new Float32Array(n), o=0;
+    for(i=0;i<cloneClips.length;i++){ if(i) o+=gap; out.set(cloneClips[i].data,o); o+=cloneClips[i].data.length; }
+    return pcmToWav(out, CLONE_SR);
+  }
+  function renderClips(){
+    var box=el('cloneFileInfo'), list=el('clipList');
+    if(!box||!list) return;
+    if(!cloneClips.length){ box.style.display='none'; cloneRefB64=null; return; }
+    box.style.display='block';
+    list.innerHTML=cloneClips.map(function(c,i){
+      return '<div class="file-row"><span class="mono">'+(i+1)+'. '+esc(c.name)+'</span>'
+        + '<span style="color:var(--muted);font-size:12.5px;margin-left:8px">'+c.dur.toFixed(1)+'s</span>'
+        + '<button class="mini-x" style="margin-left:auto" onclick="removeClip('+i+')">✕</button></div>';
+    }).join('');
+    var t=clipsTotal();
+    el('clipTotal').textContent='Tổng '+t.toFixed(1)+'s / '+CLONE_MAX_TOTAL+'s · '+cloneClips.length+'/'+CLONE_MAX_CLIPS+' đoạn'
+      + (t<10 ? ' — nên gom thêm cho đủ 10s trở lên' : '');
+    var wav=buildRefWav();
+    cloneRefB64=arrayBufferToBase64(wav);
+    el('cloneRefAudio').src=URL.createObjectURL(new Blob([wav],{type:'audio/wav'}));
+  }
+  function removeClip(i){ cloneClips.splice(i,1); renderClips(); }
+  async function useAudioFile(f){
     var m=el('cvMsg'); if(!f) return;
+    if(cloneClips.length>=CLONE_MAX_CLIPS){
+      m.className='msg err'; m.textContent='Tối đa '+CLONE_MAX_CLIPS+' đoạn. Xoá bớt một đoạn rồi thêm lại nhé.'; return; }
     if(f.size>12*1024*1024){ m.className='msg err'; m.textContent='File quá lớn (>12MB).'; return; }
-    m.className='msg'; el('cloneFileName').textContent='(đang xử lý…)'; el('cloneFileInfo').style.display='block';
-    f.arrayBuffer().then(function(buf){
-      var AC=window.AudioContext||window.webkitAudioContext; var ac=new AC();
-      return ac.decodeAudioData(buf).then(function(ab){ try{ac.close();}catch(e){}
-        var dur=ab.duration;
-        if(dur>30.9){ el('cloneFileInfo').style.display='none'; m.className='msg err'; m.textContent='Mẫu giọng dài '+Math.round(dur)+' giây — chỉ cho phép DƯỚI 30 giây. Hãy cắt ngắn lại (10–30s giọng sạch là tốt nhất).'; return; }
-        if(dur<3){ el('cloneFileInfo').style.display='none'; m.className='msg err'; m.textContent='Mẫu giọng ngắn quá ('+dur.toFixed(1)+'s). Nên 10–30 giây để clone chuẩn.'; return; }
-        setRefFromWav(encodeWAV(ab), (f.name||'ghi-am').replace(/\.[^.]+$/,'')+'.wav');
-      });
-    }).catch(function(e){ el('cloneFileInfo').style.display='none'; m.className='msg err'; m.textContent='Không đọc được file này. Hãy thử file .mp3 hoặc .wav khác.'; });
+    m.className='msg'; m.textContent='⏳ Đang xử lý đoạn mẫu…';
+    try{
+      var c=await decodeMono(await f.arrayBuffer());
+      if(c.dur<1){ m.className='msg err'; m.textContent='Đoạn này ngắn quá ('+c.dur.toFixed(1)+'s).'; return; }
+      var con=clipsTotal();
+      if(con+c.dur>CLONE_MAX_TOTAL+0.9){
+        m.className='msg err';
+        m.textContent='Tổng mẫu sẽ thành '+Math.round(con+c.dur)+'s — vượt mức '+CLONE_MAX_TOTAL+'s. Hãy cắt ngắn đoạn này lại.';
+        return;
+      }
+      cloneClips.push({ name:(f.name||'ghi-am').replace(/\.[^.]+$/,''), data:c.data, dur:c.dur });
+      renderClips();
+      m.className='msg ok';
+      m.textContent='✅ Đã thêm đoạn '+cloneClips.length+' ('+c.dur.toFixed(1)+'s). Tổng '+clipsTotal().toFixed(1)+'s.'
+        + (cloneClips.length<CLONE_MAX_CLIPS ? ' Thêm đoạn nữa hoặc bấm lưu.' : '');
+    }catch(e){
+      m.className='msg err'; m.textContent='Không đọc được file này. Hãy thử file .mp3 hoặc .wav khác.';
+    }
   }
   function onCloneFile(inp){ var f=inp.files&&inp.files[0]; if(f) useAudioFile(f); }
   function onDropFile(e){ e.preventDefault(); if(el('upZone'))el('upZone').classList.remove('drag');
     var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) useAudioFile(f); }
-  function clearCloneFile(){ cloneRefB64=null; if(el('cloneFile'))el('cloneFile').value=''; el('cloneFileInfo').style.display='none'; }
+  function clearCloneFile(){ cloneClips=[]; cloneRefB64=null; if(el('cloneFile'))el('cloneFile').value=''; el('cloneFileInfo').style.display='none'; }
 
   // ---- Ghi âm micro -> WAV ----
   var _rec=null,_recChunks=[],_recStream=null,_recTimer=null,_recSec=0;
@@ -1171,17 +1232,19 @@
     _rec.ondataavailable=function(ev){ if(ev.data&&ev.data.size) _recChunks.push(ev.data); };
     _rec.onstop=function(){ var blob=new Blob(_recChunks,{type:(_recChunks[0]&&_recChunks[0].type)||'audio/webm'}); blobToWav(blob);
       if(_recStream){ _recStream.getTracks().forEach(function(t){t.stop();}); _recStream=null; } };
+    var conLai=Math.max(3, Math.round(CLONE_MAX_TOTAL-clipsTotal()));
     _rec.start(); _recSec=0; b.classList.add('rec'); b.textContent='⏹ Dừng (0s)';
-    _recTimer=setInterval(function(){ _recSec++; b.textContent='⏹ Dừng ('+_recSec+'s)'; if(_recSec>=30) stopRecord(); },1000);
+    _recTimer=setInterval(function(){ _recSec++; b.textContent='⏹ Dừng ('+_recSec+'s/'+conLai+'s)'; if(_recSec>=conLai) stopRecord(); },1000);
   }
   function stopRecord(){ if(_recTimer){clearInterval(_recTimer);_recTimer=null;} var b=el('recBtn'); if(b){b.classList.remove('rec');b.textContent='🎙️ Ghi âm';}
     if(_rec&&_rec.state==='recording') _rec.stop(); }
   async function blobToWav(blob){
-    try{ var wav=await decodeToWav(await blob.arrayBuffer()); setRefFromWav(wav,'ghi-am.wav'); }
+    try{ await useAudioFile(new File([blob],'ghi-am-'+(cloneClips.length+1)+'.wav',{type:blob.type||'audio/wav'})); }
     catch(e){ el('cvMsg').className='msg err'; el('cvMsg').textContent='Lỗi xử lý ghi âm: '+String(e); }
   }
-  function encodeWAV(ab){
-    var ch0=ab.getChannelData(0), sr=ab.sampleRate, n=ch0.length;
+  function encodeWAV(ab){ return pcmToWav(ab.getChannelData(0), ab.sampleRate); }
+  function pcmToWav(ch0, sr){
+    var n=ch0.length;
     var buffer=new ArrayBuffer(44+n*2), view=new DataView(buffer);
     function ws(o,s){ for(var i=0;i<s.length;i++) view.setUint8(o+i,s.charCodeAt(i)); }
     ws(0,'RIFF'); view.setUint32(4,36+n*2,true); ws(8,'WAVE'); ws(12,'fmt ');
@@ -1195,14 +1258,15 @@
   async function saveVoice(){
     if(!sb) return;
     var name=el('cvName').value.trim(), m=el('cvMsg'), btn=el('cvSaveBtn');
-    if(!cloneRefB64){ m.className='msg err'; m.textContent='Hãy tải lên (hoặc ghi âm) 1 mẫu giọng.'; return; }
+    if(!cloneClips.length || !cloneRefB64){ m.className='msg err'; m.textContent='Hãy tải lên (hoặc ghi âm) mẫu giọng.'; return; }
+    if(clipsTotal()<CLONE_MIN_TOTAL){ m.className='msg err'; m.textContent='Mẫu ngắn quá ('+clipsTotal().toFixed(1)+'s). Cần ít nhất '+CLONE_MIN_TOTAL+'s, tốt nhất 20–60s.'; return; }
     if(!name){ m.className='msg err'; m.textContent='Hãy đặt tên cho giọng.'; return; }
     btn.disabled=true; btn.textContent='Đang lưu...'; m.className='msg';
     try{
       var r=await sb.from('user_voices').insert({ name:name, ref_b64:cloneRefB64 });
       if(r.error){ m.className='msg err'; m.textContent='Lỗi lưu: '+r.error.message; }
       else { m.className='msg ok'; m.textContent='✅ Đã tạo giọng “'+name+'”! Qua tab “Văn bản thành giọng nói” để dùng.';
-        cloneRefB64=null; el('cvName').value=''; el('cloneFileInfo').style.display='none'; loadMyVoices(); }
+        cloneClips=[]; cloneRefB64=null; el('cvName').value=''; el('cloneFileInfo').style.display='none'; loadMyVoices(); }
     }catch(e){ m.className='msg err'; m.textContent='Lỗi: '+String(e); }
     btn.disabled=false; btn.textContent='💾 Tạo & lưu giọng';
   }
