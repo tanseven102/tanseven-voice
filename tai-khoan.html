@@ -971,7 +971,8 @@
         '<div style="flex:1"><div class="vc-name">'+esc(v.name)+' <span class="vc-vip" style="background:linear-gradient(135deg,#f59f00,#e8590c)">VIP+</span></div>'+
         '<div class="vc-pills"><span class="vp g">'+esc(v.info)+'</span><span class="vp g">'+esc(v.genre)+'</span></div></div>'+heart+'</div>'+
         '<p class="vc-desc">'+esc(v.desc||'Giọng độc quyền của Tân Seven — chọn được cảm xúc và ngôn ngữ khi đọc.')+'</p>'+
-        '<div class="vc-foot"><button type="button" class="vc-pick" onclick="chooseVoice(\'vipclone\',\''+v.id+'\',\''+v.lang+'\')">'+(on?'Đang chọn ✓':'Dùng')+'</button></div>'+
+        '<div class="vc-foot"><button type="button" class="vc-play" onclick="playPreview(this,\''+v.lang+'\',\''+jsq(v.name)+'\')">▶ Nghe thử</button>'+
+        '<button type="button" class="vc-pick" onclick="chooseVoice(\'vipclone\',\''+v.id+'\',\''+v.lang+'\')">'+(on?'Đang chọn ✓':'Dùng')+'</button></div>'+
       '</div>';
     }
     if(v.type==='clone'){
@@ -1052,8 +1053,14 @@
   var PUBLIC_VOICES=[];          // giong VIP dung chung (chay bang dong co clone)
   async function loadPublicVoices(){
     if(!sb) return;
-    try{ var r=await sb.rpc('list_public_voices'); PUBLIC_VOICES=(r&&r.data)||[]; }
-    catch(e){ PUBLIC_VOICES=[]; }
+    try{
+      var r=await sb.rpc('list_public_voices');
+      PUBLIC_VOICES=((r&&r.data)||[]).map(function(v){
+        var mt=v.meta;
+        if(typeof mt==='string'){ try{ mt=JSON.parse(mt); }catch(e){ mt={}; } }
+        return { id:v.id, name:v.name, meta:mt||{} };
+      });
+    }catch(e){ PUBLIC_VOICES=[]; }
   }
 
   function fillCloneUI(){
