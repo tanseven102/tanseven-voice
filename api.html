@@ -19,7 +19,33 @@
   .brand .mk{width:30px;height:30px;border-radius:9px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:16px}
 
   nav{border-bottom:1px solid var(--line); background:rgba(251,250,248,.85); backdrop-filter:blur(10px); position:sticky; top:0; z-index:10}
-  .nav-in{max-width:1080px; margin:0 auto; padding:0 22px; height:64px; display:flex; align-items:center; justify-content:space-between}
+  .nav-in{max-width:1080px; margin:0 auto; padding:0 22px; height:64px; display:flex; align-items:center; gap:14px}
+  /* language switcher (i18n) */
+  .langsw{position:relative; margin-left:auto}
+  .langsw-btn{display:inline-flex; align-items:center; gap:7px; font-family:inherit; font-size:14px; font-weight:600;
+    color:var(--ink2); background:var(--card); border:1px solid var(--line2); padding:7px 13px; border-radius:999px;
+    cursor:pointer; line-height:1; transition:border-color .15s, color .15s}
+  .langsw-btn:hover{border-color:#bdb8ae; color:var(--ink)}
+  .langsw.open .langsw-btn{border-color:var(--ink)}
+  .langsw-globe{font-size:15px; line-height:1}
+  .langsw-cur{white-space:nowrap}
+  .langsw-chev{font-size:10px; color:var(--muted); transition:transform .18s}
+  .langsw.open .langsw-chev{transform:rotate(180deg)}
+  .langsw-menu{position:absolute; top:calc(100% + 8px); right:0; min-width:178px; background:var(--card);
+    border:1px solid var(--line2); border-radius:14px; padding:6px; display:none; flex-direction:column; gap:2px;
+    box-shadow:0 18px 44px -20px rgba(20,20,20,.34); z-index:80}
+  .langsw.open .langsw-menu{display:flex}
+  .langsw-item{display:flex; align-items:center; gap:10px; width:100%; font-family:inherit; font-size:14.5px;
+    font-weight:600; color:var(--ink2); background:transparent; border:0; padding:9px 11px; border-radius:9px;
+    cursor:pointer; text-align:left}
+  .langsw-item:hover{background:var(--bg2); color:var(--ink)}
+  .langsw-flag{font-size:16px; flex:0 0 auto; line-height:1}
+  .langsw-name{flex:1}
+  .langsw-check{color:var(--good); font-weight:800; opacity:0; flex:0 0 auto}
+  .langsw-item.on{color:var(--ink)}
+  .langsw-item.on .langsw-check{opacity:1}
+  @media(max-width:520px){.langsw-cur{display:none}}
+
   .back{font-size:14.5px; font-weight:600; color:var(--ink2); display:inline-flex; align-items:center; gap:6px}
   .back:hover{color:var(--ink)}
 
@@ -59,67 +85,79 @@
 
 <nav><div class="nav-in">
   <div class="brand"><span class="mk">🎙️</span> Tan Seven <span style="color:var(--muted)">Voice</span></div>
-  <a class="back" href="index.html">← Về trang chủ</a>
+  <a class="back" href="index.html" data-i18n="a63">← Về trang chủ</a>
+
+  <div class="langsw" id="langsw">
+    <button class="langsw-btn" id="langswBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Chọn ngôn ngữ / Select language">
+      <span class="langsw-globe">🌐</span><span class="langsw-cur" id="langswCur">Tiếng Việt</span><span class="langsw-chev">▾</span>
+    </button>
+    <div class="langsw-menu" id="langswMenu" role="menu">
+      <button class="langsw-item" type="button" role="menuitem" data-lang="vi"><span class="langsw-flag">🇻🇳</span><span class="langsw-name">Tiếng Việt</span><span class="langsw-check">✓</span></button>
+      <button class="langsw-item" type="button" role="menuitem" data-lang="en"><span class="langsw-flag">🇺🇸</span><span class="langsw-name">English</span><span class="langsw-check">✓</span></button>
+      <button class="langsw-item" type="button" role="menuitem" data-lang="hi"><span class="langsw-flag">🇮🇳</span><span class="langsw-name">हिन्दी</span><span class="langsw-check">✓</span></button>
+      <button class="langsw-item" type="button" role="menuitem" data-lang="ko"><span class="langsw-flag">🇰🇷</span><span class="langsw-name">한국어</span><span class="langsw-check">✓</span></button>
+    </div>
+  </div>
 </div></nav>
 
 <header><div class="wrap">
-  <div class="eyebrow">Dành cho lập trình viên</div>
-  <h1>API tạo giọng đọc</h1>
-  <p class="lede">Nối kho 68 giọng AI của Tân Seven Voice vào phần mềm của bạn: tool ghép video, n8n,
+  <div class="eyebrow" data-i18n="a60">Dành cho lập trình viên</div>
+  <h1 data-i18n="a1">API tạo giọng đọc</h1>
+  <p class="lede" data-i18n="a2">Nối kho 68 giọng AI của Tân Seven Voice vào phần mềm của bạn: tool ghép video, n8n,
   Make, chatbot, hay bất cứ thứ gì gọi được HTTP. Trừ ký tự thẳng từ tài khoản bạn đang dùng trên web.</p>
 </div></header>
 
 <div class="wrap">
 
   <div class="intro">
-    <b>Địa chỉ gốc (base URL)</b>
+    <b data-i18n="a64">Địa chỉ gốc (base URL)</b>
     <div class="url">https://idnfafxgrbabypfokgve.supabase.co/functions/v1/api</div>
   </div>
 
   <section>
-    <h2>1. Lấy khoá API</h2>
-    <p>Đăng nhập <a href="tai-khoan.html"><b>trang tài khoản</b></a> → tab <b>Tài khoản</b> → mục
+    <h2 data-i18n="a3">1. Lấy khoá API</h2>
+    <p data-i18n="a4">Đăng nhập <a href="tai-khoan.html"><b>trang tài khoản</b></a> → tab <b>Tài khoản</b> → mục
     <b>🔌 Khoá API cho lập trình viên</b> → bấm <b>Tạo khoá mới</b>.</p>
-    <p>Khoá có dạng <code>tsv_xxxxxxxx…</code> và <b>chỉ hiện đúng một lần</b> — hãy lưu lại ngay.
+    <p data-i18n="a5">Khoá có dạng <code>tsv_xxxxxxxx…</code> và <b>chỉ hiện đúng một lần</b> — hãy lưu lại ngay.
     Mỗi tài khoản giữ tối đa 5 khoá; xoá khoá cũ bất cứ lúc nào.</p>
-    <div class="warn">⚠️ Khoá API = tiền của bạn. Đừng đặt khoá trong code chạy ở trình duyệt hay
+    <div class="warn" data-i18n="a61">⚠️ Khoá API = tiền của bạn. Đừng đặt khoá trong code chạy ở trình duyệt hay
     đẩy lên GitHub công khai — ai cầm được khoá là tiêu được ký tự của bạn. Hãy để khoá ở phía máy chủ
     hoặc trong biến môi trường.</div>
-    <p>Mọi lệnh gọi đều gửi kèm khoá ở header:</p>
+    <p data-i18n="a6">Mọi lệnh gọi đều gửi kèm khoá ở header:</p>
     <pre><code>Authorization: Bearer tsv_xxxxxxxx…</code></pre>
-    <p>Hoặc dùng header <code>x-api-key: tsv_xxxxxxxx…</code> — cái nào cũng được.</p>
+    <p data-i18n="a7">Hoặc dùng header <code>x-api-key: tsv_xxxxxxxx…</code> — cái nào cũng được.</p>
   </section>
 
   <section>
-    <h2>2. Tạo giọng đọc — <code>POST /tts</code></h2>
-    <p>Ví dụ nhanh bằng <b>curl</b>, lưu thẳng ra file MP3:</p>
-    <pre><code>curl -X POST "https://idnfafxgrbabypfokgve.supabase.co/functions/v1/api/tts" \
+    <h2 data-i18n="a8">2. Tạo giọng đọc — <code>POST /tts</code></h2>
+    <p data-i18n="a9">Ví dụ nhanh bằng <b>curl</b>, lưu thẳng ra file MP3:</p>
+    <pre><code data-i18n="code.curl">curl -X POST "https://idnfafxgrbabypfokgve.supabase.co/functions/v1/api/tts" \
   -H "Authorization: Bearer tsv_xxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{"text":"Xin chào, đây là Tân Seven Voice.","voice":"Minh Đức","lang":"vi","response":"binary"}' \
   --output giong.mp3</code></pre>
 
-    <h3>Các tham số</h3>
+    <h3 data-i18n="a10">Các tham số</h3>
     <div class="tbl-wrap"><table>
-      <tr><th>Tên</th><th>Bắt buộc</th><th>Ý nghĩa</th></tr>
-      <tr><td><code>text</code></td><td>Có</td><td>Nội dung cần đọc. Tối đa 200.000 ký tự mỗi lần gọi.
+      <tr><th data-i18n="a11">Tên</th><th data-i18n="a12">Bắt buộc</th><th data-i18n="a13">Ý nghĩa</th></tr>
+      <tr><td><code>text</code></td><td data-i18n="a14">Có</td><td data-i18n="a15">Nội dung cần đọc. Tối đa 200.000 ký tự mỗi lần gọi.
         Tiếng Việt: số, ngày tháng, giờ, tiền được đọc thành chữ tự động.</td></tr>
-      <tr><td><code>voice</code></td><td>Không</td><td>Tên giọng, VD <code>"Minh Đức"</code>. Mặc định <code>Minh Đức</code>.
+      <tr><td><code>voice</code></td><td data-i18n="a16">Không</td><td data-i18n="a17">Tên giọng, VD <code>"Minh Đức"</code>. Mặc định <code>Minh Đức</code>.
         Xem đủ 68 giọng ở mục 3.</td></tr>
-      <tr><td><code>lang</code></td><td>Không</td><td>Mã ngôn ngữ của giọng: <code>vi</code>, <code>en</code>,
+      <tr><td><code>lang</code></td><td data-i18n="a18">Không</td><td data-i18n="a19">Mã ngôn ngữ của giọng: <code>vi</code>, <code>en</code>,
         <code>zh</code>, <code>ja</code>, <code>e</code> (Tây Ban Nha), <code>p</code> (Bồ), <code>f</code> (Pháp),
         <code>i</code> (Ý), <code>h</code> (Hindi). Mặc định <code>vi</code>.</td></tr>
-      <tr><td><code>speed</code></td><td>Không</td><td>Tốc độ đọc, 0.5 – 1.5. Mặc định <code>1.0</code>.</td></tr>
-      <tr><td><code>format</code></td><td>Không</td><td><code>mp3</code> (mặc định) hoặc <code>wav</code>.</td></tr>
-      <tr><td><code>response</code></td><td>Không</td><td><code>binary</code> = trả thẳng file audio.
+      <tr><td><code>speed</code></td><td data-i18n="a20">Không</td><td data-i18n="a21">Tốc độ đọc, 0.5 – 1.5. Mặc định <code>1.0</code>.</td></tr>
+      <tr><td><code>format</code></td><td data-i18n="a22">Không</td><td data-i18n="a23"><code>mp3</code> (mặc định) hoặc <code>wav</code>.</td></tr>
+      <tr><td><code>response</code></td><td data-i18n="a24">Không</td><td data-i18n="a25"><code>binary</code> = trả thẳng file audio.
         Bỏ trống = trả JSON có <code>audio_base64</code>.</td></tr>
-      <tr><td><code>voice_id</code></td><td>Không</td><td>Dùng <b>giọng nhân bản</b> của chính bạn (lấy id ở
+      <tr><td><code>voice_id</code></td><td data-i18n="a26">Không</td><td data-i18n="a27">Dùng <b>giọng nhân bản</b> của chính bạn (lấy id ở
         tab Nhân bản giọng nói). Có tham số này thì <code>voice</code> bị bỏ qua.</td></tr>
-      <tr><td><code>style</code></td><td>Không</td><td>Chỉ cho giọng nhân bản — cảm xúc đọc, VD
+      <tr><td><code>style</code></td><td data-i18n="a28">Không</td><td data-i18n="a29">Chỉ cho giọng nhân bản — cảm xúc đọc, VD
         <code>"📖 Kể chuyện"</code>.</td></tr>
     </table></div>
 
-    <h3>Kết quả trả về (mặc định JSON)</h3>
+    <h3 data-i18n="a30">Kết quả trả về (mặc định JSON)</h3>
     <pre><code>{
   "audio_base64": "SUQzBAAAAAAA…",
   "format": "mp3",
@@ -129,17 +167,17 @@
   "voice": "Minh Đức"
 }</code></pre>
     <ul>
-      <li><code>cost</code> — số ký tự lần gọi này tiêu tốn (đúng bằng độ dài <code>text</code>).</li>
-      <li><code>credits</code> — số ký tự còn lại trong tài khoản sau khi trừ.</li>
-      <li><code>seconds</code> — độ dài audio tạo ra.</li>
+      <li data-i18n="a31"><code>cost</code> — số ký tự lần gọi này tiêu tốn (đúng bằng độ dài <code>text</code>).</li>
+      <li data-i18n="a32"><code>credits</code> — số ký tự còn lại trong tài khoản sau khi trừ.</li>
+      <li data-i18n="a33"><code>seconds</code> — độ dài audio tạo ra.</li>
     </ul>
-    <p>Nếu gửi <code>"response":"binary"</code>, kết quả là file audio thô; số liệu nằm ở header
+    <p data-i18n="a34">Nếu gửi <code>"response":"binary"</code>, kết quả là file audio thô; số liệu nằm ở header
     <code>X-Cost</code> và <code>X-Credits-Remaining</code>.</p>
   </section>
 
   <section>
-    <h2>3. Danh sách giọng — <code>GET /voices</code></h2>
-    <p>Trả về đủ 68 giọng kèm ngôn ngữ, thể loại, giới tính/vùng miền. Không tốn ký tự, không cần khoá.</p>
+    <h2 data-i18n="a35">3. Danh sách giọng — <code>GET /voices</code></h2>
+    <p data-i18n="a36">Trả về đủ 68 giọng kèm ngôn ngữ, thể loại, giới tính/vùng miền. Không tốn ký tự, không cần khoá.</p>
     <pre><code>curl "https://idnfafxgrbabypfokgve.supabase.co/functions/v1/api/voices"</code></pre>
     <pre><code>{
   "total": 68,
@@ -152,15 +190,15 @@
   </section>
 
   <section>
-    <h2>4. Xem ký tự còn lại — <code>GET /me</code></h2>
+    <h2 data-i18n="a37">4. Xem ký tự còn lại — <code>GET /me</code></h2>
     <pre><code>curl "https://idnfafxgrbabypfokgve.supabase.co/functions/v1/api/me" \
   -H "Authorization: Bearer tsv_xxxxxxxx"</code></pre>
     <pre><code>{ "credits": 9764, "name": "Tân" }</code></pre>
   </section>
 
   <section>
-    <h2>5. Ví dụ Python</h2>
-    <pre><code>import requests
+    <h2 data-i18n="a38">5. Ví dụ Python</h2>
+    <pre><code data-i18n="code.py">import requests
 
 API  = "https://idnfafxgrbabypfokgve.supabase.co/functions/v1/api"
 KEY  = "tsv_xxxxxxxx"          # để trong biến môi trường, đừng viết thẳng vào code
@@ -179,40 +217,70 @@ r.raise_for_status()
 open("giong.mp3", "wb").write(r.content)
 print("Còn lại:", r.headers.get("X-Credits-Remaining"), "ký tự")</code></pre>
 
-    <h3>Văn bản dài</h3>
-    <p>Một lần gọi nhận tối đa 200.000 ký tự, nhưng bài càng dài thì càng lâu và dễ hết thời gian chờ.
+    <h3 data-i18n="a39">Văn bản dài</h3>
+    <p data-i18n="a40">Một lần gọi nhận tối đa 200.000 ký tự, nhưng bài càng dài thì càng lâu và dễ hết thời gian chờ.
     Cách chạy êm nhất: <b>cắt thành đoạn ~1.000 ký tự</b>, gọi 2–3 đoạn song song rồi ghép file lại —
     giống hệt cách trang web đang làm.</p>
   </section>
 
   <section>
-    <h2>6. Mã lỗi</h2>
+    <h2 data-i18n="a41">6. Mã lỗi</h2>
     <div class="tbl-wrap"><table>
-      <tr><th>Mã</th><th>Nghĩa</th><th>Nên làm gì</th></tr>
-      <tr><td><code>401</code></td><td>Thiếu khoá, khoá sai hoặc đã bị xoá</td><td>Kiểm tra lại header <code>Authorization</code></td></tr>
-      <tr><td><code>402</code></td><td>Hết ký tự trong tài khoản</td><td>Nạp thêm ở trang tài khoản</td></tr>
-      <tr><td><code>429</code></td><td>Gọi quá nhanh (giới hạn 60 lần/phút · 600 lần/giờ · 2.000 lần/ngày)</td>
-          <td>Chờ số giây ghi ở <code>retry_after</code> rồi gọi lại</td></tr>
-      <tr><td><code>202</code></td><td>Máy chủ đang khởi động (khoảng 1 phút đầu)</td>
-          <td>Chờ ~60 giây rồi gọi lại — <b>không</b> bị trừ ký tự</td></tr>
-      <tr><td><code>502</code></td><td>Máy chủ giọng lỗi</td><td>Gọi lại; ký tự đã được hoàn tự động</td></tr>
+      <tr><th data-i18n="a42">Mã</th><th data-i18n="a43">Nghĩa</th><th data-i18n="a44">Nên làm gì</th></tr>
+      <tr><td><code>401</code></td><td data-i18n="a45">Thiếu khoá, khoá sai hoặc đã bị xoá</td><td data-i18n="a46">Kiểm tra lại header <code>Authorization</code></td></tr>
+      <tr><td><code>402</code></td><td data-i18n="a47">Hết ký tự trong tài khoản</td><td data-i18n="a48">Nạp thêm ở trang tài khoản</td></tr>
+      <tr><td><code>429</code></td><td data-i18n="a49">Gọi quá nhanh (giới hạn 60 lần/phút · 600 lần/giờ · 2.000 lần/ngày)</td>
+          <td data-i18n="a50">Chờ số giây ghi ở <code>retry_after</code> rồi gọi lại</td></tr>
+      <tr><td><code>202</code></td><td data-i18n="a51">Máy chủ đang khởi động (khoảng 1 phút đầu)</td>
+          <td data-i18n="a52">Chờ ~60 giây rồi gọi lại — <b>không</b> bị trừ ký tự</td></tr>
+      <tr><td><code>502</code></td><td data-i18n="a53">Máy chủ giọng lỗi</td><td data-i18n="a54">Gọi lại; ký tự đã được hoàn tự động</td></tr>
     </table></div>
-    <div class="ok">✅ Bạn chỉ bị trừ ký tự khi audio được tạo thành công. Mọi trường hợp lỗi hay
+    <div class="ok" data-i18n="a62">✅ Bạn chỉ bị trừ ký tự khi audio được tạo thành công. Mọi trường hợp lỗi hay
     máy chủ đang khởi động đều được hoàn lại tự động.</div>
   </section>
 
   <section>
-    <h2>7. Tính phí</h2>
+    <h2 data-i18n="a55">7. Tính phí</h2>
     <ul>
-      <li><b>1 ký tự văn bản = 1 ký tự</b> trong tài khoản — API và trang web dùng chung một túi.</li>
-      <li>Giọng nhân bản tính phí y như giọng thường.</li>
-      <li><code>/voices</code> và <code>/me</code> miễn phí.</li>
+      <li data-i18n="a56"><b>1 ký tự văn bản = 1 ký tự</b> trong tài khoản — API và trang web dùng chung một túi.</li>
+      <li data-i18n="a57">Giọng nhân bản tính phí y như giọng thường.</li>
+      <li data-i18n="a58"><code>/voices</code> và <code>/me</code> miễn phí.</li>
     </ul>
   </section>
 
-  <footer>
+  <footer data-i18n="a59">
     Cần hỗ trợ hoặc muốn hạn mức cao hơn? Nhắn Tân Seven. ·
     <a href="index.html">Trang chủ</a> · <a href="tai-khoan.html">Tài khoản</a> ·
     <a href="dieu-khoan.html">Điều khoản</a>
   </footer>
 </div>
+
+<script>
+  const I18N = {"vi":{"a1":"API tạo giọng đọc","a2":"Nối kho 68 giọng AI của Tân Seven Voice vào phần mềm của bạn: tool ghép video, n8n,\n  Make, chatbot, hay bất cứ thứ gì gọi được HTTP. Trừ ký tự thẳng từ tài khoản bạn đang dùng trên web.","a3":"1. Lấy khoá API","a4":"Đăng nhập <a href=\"tai-khoan.html\"><b>trang tài khoản</b></a> → tab <b>Tài khoản</b> → mục\n    <b>🔌 Khoá API cho lập trình viên</b> → bấm <b>Tạo khoá mới</b>.","a5":"Khoá có dạng <code>tsv_xxxxxxxx…</code> và <b>chỉ hiện đúng một lần</b> — hãy lưu lại ngay.\n    Mỗi tài khoản giữ tối đa 5 khoá; xoá khoá cũ bất cứ lúc nào.","a6":"Mọi lệnh gọi đều gửi kèm khoá ở header:","a7":"Hoặc dùng header <code>x-api-key: tsv_xxxxxxxx…</code> — cái nào cũng được.","a8":"2. Tạo giọng đọc — <code>POST /tts</code>","a9":"Ví dụ nhanh bằng <b>curl</b>, lưu thẳng ra file MP3:","a10":"Các tham số","a11":"Tên","a12":"Bắt buộc","a13":"Ý nghĩa","a14":"Có","a15":"Nội dung cần đọc. Tối đa 200.000 ký tự mỗi lần gọi.\n        Tiếng Việt: số, ngày tháng, giờ, tiền được đọc thành chữ tự động.","a16":"Không","a17":"Tên giọng, VD <code>\"Minh Đức\"</code>. Mặc định <code>Minh Đức</code>.\n        Xem đủ 68 giọng ở mục 3.","a18":"Không","a19":"Mã ngôn ngữ của giọng: <code>vi</code>, <code>en</code>,\n        <code>zh</code>, <code>ja</code>, <code>e</code> (Tây Ban Nha), <code>p</code> (Bồ), <code>f</code> (Pháp),\n        <code>i</code> (Ý), <code>h</code> (Hindi). Mặc định <code>vi</code>.","a20":"Không","a21":"Tốc độ đọc, 0.5 – 1.5. Mặc định <code>1.0</code>.","a22":"Không","a23":"<code>mp3</code> (mặc định) hoặc <code>wav</code>.","a24":"Không","a25":"<code>binary</code> = trả thẳng file audio.\n        Bỏ trống = trả JSON có <code>audio_base64</code>.","a26":"Không","a27":"Dùng <b>giọng nhân bản</b> của chính bạn (lấy id ở\n        tab Nhân bản giọng nói). Có tham số này thì <code>voice</code> bị bỏ qua.","a28":"Không","a29":"Chỉ cho giọng nhân bản — cảm xúc đọc, VD\n        <code>\"📖 Kể chuyện\"</code>.","a30":"Kết quả trả về (mặc định JSON)","a31":"<code>cost</code> — số ký tự lần gọi này tiêu tốn (đúng bằng độ dài <code>text</code>).","a32":"<code>credits</code> — số ký tự còn lại trong tài khoản sau khi trừ.","a33":"<code>seconds</code> — độ dài audio tạo ra.","a34":"Nếu gửi <code>\"response\":\"binary\"</code>, kết quả là file audio thô; số liệu nằm ở header\n    <code>X-Cost</code> và <code>X-Credits-Remaining</code>.","a35":"3. Danh sách giọng — <code>GET /voices</code>","a36":"Trả về đủ 68 giọng kèm ngôn ngữ, thể loại, giới tính/vùng miền. Không tốn ký tự, không cần khoá.","a37":"4. Xem ký tự còn lại — <code>GET /me</code>","a38":"5. Ví dụ Python","a39":"Văn bản dài","a40":"Một lần gọi nhận tối đa 200.000 ký tự, nhưng bài càng dài thì càng lâu và dễ hết thời gian chờ.\n    Cách chạy êm nhất: <b>cắt thành đoạn ~1.000 ký tự</b>, gọi 2–3 đoạn song song rồi ghép file lại —\n    giống hệt cách trang web đang làm.","a41":"6. Mã lỗi","a42":"Mã","a43":"Nghĩa","a44":"Nên làm gì","a45":"Thiếu khoá, khoá sai hoặc đã bị xoá","a46":"Kiểm tra lại header <code>Authorization</code>","a47":"Hết ký tự trong tài khoản","a48":"Nạp thêm ở trang tài khoản","a49":"Gọi quá nhanh (giới hạn 60 lần/phút · 600 lần/giờ · 2.000 lần/ngày)","a50":"Chờ số giây ghi ở <code>retry_after</code> rồi gọi lại","a51":"Máy chủ đang khởi động (khoảng 1 phút đầu)","a52":"Chờ ~60 giây rồi gọi lại — <b>không</b> bị trừ ký tự","a53":"Máy chủ giọng lỗi","a54":"Gọi lại; ký tự đã được hoàn tự động","a55":"7. Tính phí","a56":"<b>1 ký tự văn bản = 1 ký tự</b> trong tài khoản — API và trang web dùng chung một túi.","a57":"Giọng nhân bản tính phí y như giọng thường.","a58":"<code>/voices</code> và <code>/me</code> miễn phí.","a59":"\n    Cần hỗ trợ hoặc muốn hạn mức cao hơn? Nhắn Tân Seven. ·\n    <a href=\"index.html\">Trang chủ</a> · <a href=\"tai-khoan.html\">Tài khoản</a> ·\n    <a href=\"dieu-khoan.html\">Điều khoản</a>\n  ","a60":"Dành cho lập trình viên","a61":"⚠️ Khoá API = tiền của bạn. Đừng đặt khoá trong code chạy ở trình duyệt hay\n    đẩy lên GitHub công khai — ai cầm được khoá là tiêu được ký tự của bạn. Hãy để khoá ở phía máy chủ\n    hoặc trong biến môi trường.","a62":"✅ Bạn chỉ bị trừ ký tự khi audio được tạo thành công. Mọi trường hợp lỗi hay\n    máy chủ đang khởi động đều được hoàn lại tự động.","a63":"← Về trang chủ","a64":"Địa chỉ gốc (base URL)","doc.title":"API — Tan Seven Voice","code.curl":"curl -X POST \"https://idnfafxgrbabypfokgve.supabase.co/functions/v1/api/tts\" \\\n  -H \"Authorization: Bearer tsv_xxxxxxxx\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"text\":\"Xin chào, đây là Tân Seven Voice.\",\"voice\":\"Minh Đức\",\"lang\":\"vi\",\"response\":\"binary\"}' \\\n  --output giong.mp3","code.py":"import requests\n\nAPI  = \"https://idnfafxgrbabypfokgve.supabase.co/functions/v1/api\"\nKEY  = \"tsv_xxxxxxxx\"          # để trong biến môi trường, đừng viết thẳng vào code\n\nr = requests.post(f\"{API}/tts\",\n    headers={\"Authorization\": f\"Bearer {KEY}\"},\n    json={\n        \"text\": \"Chào mừng bạn đến với kênh của Tân Seven.\",\n        \"voice\": \"Ngọc Linh\",\n        \"lang\": \"vi\",\n        \"speed\": 1.0,\n        \"response\": \"binary\",\n    }, timeout=300)\n\nr.raise_for_status()\nopen(\"giong.mp3\", \"wb\").write(r.content)\nprint(\"Còn lại:\", r.headers.get(\"X-Credits-Remaining\"), \"ký tự\")"},"en":{"a1":"AI text-to-speech API","a2":"Plug Tan Seven Voice’s library of 68 AI voices into your own software: a video editing tool, n8n, Make, a chatbot — anything that can make an HTTP call. Characters are deducted straight from the account you already use on the website.","a3":"1. Get an API key","a4":"Sign in to the <a href=\"tai-khoan.html\"><b>account page</b></a> → the <b>Account</b> tab → <b>🔌 API key for developers</b> → press <b>New API key</b>.","a5":"A key looks like <code>tsv_xxxxxxxx…</code> and is <b>shown only once</b> — save it right away. Each account can hold up to 5 keys; delete old ones any time.","a6":"Every call sends the key in a header:","a7":"Or use the <code>x-api-key: tsv_xxxxxxxx…</code> header — either works.","a8":"2. Create speech — <code>POST /tts</code>","a9":"A quick <b>curl</b> example that writes an MP3 straight to disk:","a10":"Parameters","a11":"Name","a12":"Required","a13":"Meaning","a14":"Yes","a15":"The text to read. Up to 200,000 characters per call. For Vietnamese, numbers, dates, times and money are spelled out automatically.","a16":"No","a17":"Voice name, e.g. <code>\"Minh Đức\"</code>. Defaults to <code>Minh Đức</code>. See all 68 voices in section 3.","a18":"No","a19":"Language code of the voice: <code>vi</code>, <code>en</code>, <code>zh</code>, <code>ja</code>, <code>e</code> (Spanish), <code>p</code> (Portuguese), <code>f</code> (French), <code>i</code> (Italian), <code>h</code> (Hindi). Defaults to <code>vi</code>.","a20":"No","a21":"Reading speed, 0.5 – 1.5. Defaults to <code>1.0</code>.","a22":"No","a23":"<code>mp3</code> (default) or <code>wav</code>.","a24":"No","a25":"<code>binary</code> = return the audio file directly. Leave it out to get JSON with <code>audio_base64</code>.","a26":"No","a27":"Use one of your own <b>cloned voices</b> (get the id in the Voice cloning tab). When this is set, <code>voice</code> is ignored.","a28":"No","a29":"Cloned voices only — the reading emotion, e.g. <code>\"📖 Kể chuyện\"</code>.","a30":"Response (JSON by default)","a31":"<code>cost</code> — characters this call used (exactly the length of <code>text</code>).","a32":"<code>credits</code> — characters left in the account after the deduction.","a33":"<code>seconds</code> — length of the generated audio.","a34":"If you send <code>\"response\":\"binary\"</code> the result is the raw audio file; the figures come back in the <code>X-Cost</code> and <code>X-Credits-Remaining</code> headers.","a35":"3. Voice list — <code>GET /voices</code>","a36":"Returns all 68 voices with language, genre and gender/region. Costs no characters and needs no key.","a37":"4. Check remaining characters — <code>GET /me</code>","a38":"5. Python example","a39":"Long texts","a40":"One call accepts up to 200,000 characters, but the longer the text the slower it gets and the more likely it is to time out. The smoothest approach: <b>split it into ~1,000-character chunks</b>, run 2–3 chunks in parallel and join the files — exactly what the website itself does.","a41":"6. Error codes","a42":"Code","a43":"Meaning","a44":"What to do","a45":"Key missing, wrong, or already deleted","a46":"Check the <code>Authorization</code> header","a47":"No characters left in the account","a48":"Top up on the account page","a49":"Calling too fast (limit 60/minute · 600/hour · 2,000/day)","a50":"Wait the number of seconds in <code>retry_after</code>, then call again","a51":"The server is warming up (about the first minute)","a52":"Wait ~60 seconds and call again — <b>no</b> characters are deducted","a53":"The voice server failed","a54":"Call again; the characters were refunded automatically","a55":"7. Billing","a56":"<b>1 character of text = 1 character</b> from the account — the API and the website share one balance.","a57":"Cloned voices are billed exactly like the built-in voices.","a58":"<code>/voices</code> and <code>/me</code> are free.","a59":"Need help or a higher rate limit? Message Tan Seven. · <a href=\"index.html\">Home</a> · <a href=\"tai-khoan.html\">Account</a> · <a href=\"dieu-khoan.html\">Terms</a>","a60":"For developers","a61":"⚠️ Your API key is your money. Do not put it in code that runs in a browser or push it to a public GitHub repo — anyone who gets the key can spend your characters. Keep it on your server or in an environment variable.","a62":"✅ Characters are only deducted when the audio is generated successfully. Errors and warm-up responses are refunded automatically.","a63":"← Back to home","a64":"Base URL","doc.title":"API — Tan Seven Voice","code.curl":"curl -X POST \"https://idnfafxgrbabypfokgve.supabase.co/functions/v1/api/tts\" \\\n  -H \"Authorization: Bearer tsv_xxxxxxxx\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"text\":\"Hello, this is Tan Seven Voice.\",\"voice\":\"Minh Đức\",\"lang\":\"vi\",\"response\":\"binary\"}' \\\n  --output giong.mp3","code.py":"import requests\n\nAPI  = \"https://idnfafxgrbabypfokgve.supabase.co/functions/v1/api\"\nKEY  = \"tsv_xxxxxxxx\"          # keep this in an environment variable, never hard-code it\n\nr = requests.post(f\"{API}/tts\",\n    headers={\"Authorization\": f\"Bearer {KEY}\"},\n    json={\n        \"text\": \"Welcome to the Tan Seven channel.\",\n        \"voice\": \"Ngọc Linh\",\n        \"lang\": \"vi\",\n        \"speed\": 1.0,\n        \"response\": \"binary\",\n    }, timeout=300)\n\nr.raise_for_status()\nopen(\"giong.mp3\", \"wb\").write(r.content)\nprint(\"Remaining:\", r.headers.get(\"X-Credits-Remaining\"), \"characters\")"},"hi":{"a1":"AI टेक्स्ट-टू-स्पीच API","a2":"Tan Seven Voice की 68 AI आवाज़ों की लाइब्रेरी को अपने सॉफ़्टवेयर से जोड़ें: वीडियो टूल, n8n, Make, चैटबॉट — कुछ भी जो HTTP कॉल कर सके। अक्षर सीधे उसी खाते से कटते हैं जो आप वेबसाइट पर इस्तेमाल करते हैं।","a3":"1. API कुंजी लें","a4":"<a href=\"tai-khoan.html\"><b>खाता पेज</b></a> पर साइन इन करें → <b>खाता</b> टैब → <b>🔌 डेवलपर के लिए API कुंजी</b> → <b>नई कुंजी बनाएँ</b> दबाएँ।","a5":"कुंजी ऐसी दिखती है <code>tsv_xxxxxxxx…</code> और <b>सिर्फ़ एक बार दिखती है</b> — तुरंत सेव करें। हर खाते में अधिकतम 5 कुंजियाँ रख सकते हैं; पुरानी कभी भी हटाएँ।","a6":"हर कॉल में कुंजी हेडर में भेजें:","a7":"या <code>x-api-key: tsv_xxxxxxxx…</code> हेडर इस्तेमाल करें — दोनों चलते हैं।","a8":"2. आवाज़ बनाएँ — <code>POST /tts</code>","a9":"एक त्वरित <b>curl</b> उदाहरण, सीधे MP3 फ़ाइल में सेव:","a10":"पैरामीटर","a11":"नाम","a12":"ज़रूरी","a13":"मतलब","a14":"हाँ","a15":"पढ़ने के लिए टेक्स्ट। हर कॉल में अधिकतम 200,000 अक्षर। वियतनामी में संख्या, तारीख, समय और रकम अपने आप शब्दों में पढ़े जाते हैं।","a16":"नहीं","a17":"आवाज़ का नाम, जैसे <code>\"Minh Đức\"</code>. डिफ़ॉल्ट <code>Minh Đức</code>. सभी 68 आवाज़ें खंड 3 में देखें।","a18":"नहीं","a19":"आवाज़ का भाषा कोड: <code>vi</code>, <code>en</code>, <code>zh</code>, <code>ja</code>, <code>e</code> (स्पेनिश), <code>p</code> (पुर्तगाली), <code>f</code> (फ़्रेंच), <code>i</code> (इतालवी), <code>h</code> (हिंदी)। डिफ़ॉल्ट <code>vi</code>.","a20":"नहीं","a21":"पढ़ने की गति, 0.5 – 1.5. डिफ़ॉल्ट <code>1.0</code>.","a22":"नहीं","a23":"<code>mp3</code> (डिफ़ॉल्ट) या <code>wav</code>.","a24":"नहीं","a25":"<code>binary</code> = सीधे ऑडियो फ़ाइल लौटाएँ। छोड़ दें तो <code>audio_base64</code> वाला JSON मिलेगा।","a26":"नहीं","a27":"अपनी <b>क्लोन आवाज़</b> इस्तेमाल करें (id आवाज़ क्लोनिंग टैब में मिलेगा)। यह देने पर <code>voice</code> अनदेखा हो जाता है।","a28":"नहीं","a29":"सिर्फ़ क्लोन आवाज़ों के लिए — पढ़ने की भावना, जैसे <code>\"📖 Kể chuyện\"</code>.","a30":"जवाब (डिफ़ॉल्ट JSON)","a31":"<code>cost</code> — इस कॉल में खर्च हुए अक्षर (ठीक <code>text</code> की लंबाई)।","a32":"<code>credits</code> — कटौती के बाद खाते में बचे अक्षर।","a33":"<code>seconds</code> — बने ऑडियो की लंबाई।","a34":"अगर आप <code>\"response\":\"binary\"</code> भेजते हैं तो नतीजा कच्ची ऑडियो फ़ाइल होती है; आँकड़े <code>X-Cost</code> और <code>X-Credits-Remaining</code> हेडर में आते हैं।","a35":"3. आवाज़ों की सूची — <code>GET /voices</code>","a36":"सभी 68 आवाज़ें भाषा, शैली और लिंग/क्षेत्र के साथ लौटाता है। कोई अक्षर खर्च नहीं, कोई कुंजी नहीं चाहिए।","a37":"4. बचे हुए अक्षर देखें — <code>GET /me</code>","a38":"5. Python उदाहरण","a39":"लंबा टेक्स्ट","a40":"एक कॉल अधिकतम 200,000 अक्षर लेता है, लेकिन टेक्स्ट जितना लंबा होगा उतना धीमा और टाइम-आउट का ख़तरा उतना ज़्यादा। सबसे अच्छा तरीका: <b>~1,000 अक्षर के टुकड़ों में बाँटें</b>, 2–3 टुकड़े समानांतर चलाएँ और फ़ाइलें जोड़ दें — वेबसाइट भी यही करती है।","a41":"6. एरर कोड","a42":"कोड","a43":"मतलब","a44":"क्या करें","a45":"कुंजी नहीं है, ग़लत है या हटा दी गई है","a46":"<code>Authorization</code> हेडर जाँचें","a47":"खाते में अक्षर खत्म","a48":"खाता पेज पर टॉप-अप करें","a49":"बहुत तेज़ कॉल (सीमा 60/मिनट · 600/घंटा · 2,000/दिन)","a50":"<code>retry_after</code> में दिए सेकंड इंतज़ार करके दोबारा कॉल करें","a51":"सर्वर शुरू हो रहा है (लगभग पहला मिनट)","a52":"~60 सेकंड रुककर दोबारा कॉल करें — अक्षर <b>नहीं</b> कटते","a53":"आवाज़ सर्वर में गड़बड़ी","a54":"दोबारा कॉल करें; अक्षर अपने आप वापस कर दिए गए हैं","a55":"7. शुल्क","a56":"<b>टेक्स्ट का 1 अक्षर = खाते का 1 अक्षर</b> — API और वेबसाइट एक ही बैलेंस इस्तेमाल करते हैं।","a57":"क्लोन आवाज़ों का शुल्क सामान्य आवाज़ों जैसा ही है।","a58":"<code>/voices</code> और <code>/me</code> मुफ़्त हैं।","a59":"मदद चाहिए या ज़्यादा लिमिट? Tan Seven को संदेश भेजें। · <a href=\"index.html\">होम</a> · <a href=\"tai-khoan.html\">खाता</a> · <a href=\"dieu-khoan.html\">शर्तें</a>","a60":"डेवलपर के लिए","a61":"⚠️ आपकी API कुंजी = आपका पैसा। इसे ब्राउज़र में चलने वाले कोड में या सार्वजनिक GitHub पर न डालें — जिसके हाथ कुंजी लगी, वह आपके अक्षर खर्च कर सकता है। कुंजी सर्वर पर या एनवायरनमेंट वेरिएबल में रखें।","a62":"✅ अक्षर सिर्फ़ तभी कटते हैं जब ऑडियो सफलतापूर्वक बन जाए। एरर या सर्वर शुरू होने की स्थिति में अपने आप वापस कर दिए जाते हैं।","a63":"← होम पर वापस","a64":"बेस URL","doc.title":"API — Tan Seven Voice","code.curl":"curl -X POST \"https://idnfafxgrbabypfokgve.supabase.co/functions/v1/api/tts\" \\\n  -H \"Authorization: Bearer tsv_xxxxxxxx\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"text\":\"नमस्ते, यह Tan Seven Voice है।\",\"voice\":\"Minh Đức\",\"lang\":\"vi\",\"response\":\"binary\"}' \\\n  --output giong.mp3","code.py":"import requests\n\nAPI  = \"https://idnfafxgrbabypfokgve.supabase.co/functions/v1/api\"\nKEY  = \"tsv_xxxxxxxx\"          # इसे एनवायरनमेंट वेरिएबल में रखें, कोड में सीधे न लिखें\n\nr = requests.post(f\"{API}/tts\",\n    headers={\"Authorization\": f\"Bearer {KEY}\"},\n    json={\n        \"text\": \"Tan Seven के चैनल में आपका स्वागत है।\",\n        \"voice\": \"Ngọc Linh\",\n        \"lang\": \"vi\",\n        \"speed\": 1.0,\n        \"response\": \"binary\",\n    }, timeout=300)\n\nr.raise_for_status()\nopen(\"giong.mp3\", \"wb\").write(r.content)\nprint(\"शेष:\", r.headers.get(\"X-Credits-Remaining\"), \"अक्षर\")"},"ko":{"a1":"AI 음성 합성 API","a2":"Tan Seven Voice의 AI 음성 68종을 여러분의 소프트웨어에 연결하세요: 영상 편집 툴, n8n, Make, 챗봇 등 HTTP 호출이 가능한 모든 곳. 글자 수는 웹사이트에서 쓰는 계정에서 그대로 차감됩니다.","a3":"1. API 키 발급","a4":"<a href=\"tai-khoan.html\"><b>계정 페이지</b></a>에 로그인 → <b>계정</b> 탭 → <b>🔌 개발자용 API 키</b> → <b>새 키 만들기</b>를 누르세요.","a5":"키는 <code>tsv_xxxxxxxx…</code> 형태이며 <b>한 번만 표시</b>됩니다 — 바로 저장하세요. 계정당 최대 5개까지 보관할 수 있고, 오래된 키는 언제든 삭제할 수 있습니다.","a6":"모든 호출은 헤더에 키를 담아 보냅니다:","a7":"또는 <code>x-api-key: tsv_xxxxxxxx…</code> 헤더를 써도 됩니다 — 둘 다 동작합니다.","a8":"2. 음성 생성 — <code>POST /tts</code>","a9":"<b>curl</b> 예시 — MP3 파일로 바로 저장:","a10":"파라미터","a11":"이름","a12":"필수","a13":"설명","a14":"예","a15":"읽을 텍스트. 호출당 최대 200,000자. 베트남어는 숫자, 날짜, 시간, 금액이 자동으로 풀어 읽힙니다.","a16":"아니요","a17":"음성 이름, 예: <code>\"Minh Đức\"</code>. 기본값은 <code>Minh Đức</code>. 68종 전체는 3번 항목 참고.","a18":"아니요","a19":"음성의 언어 코드: <code>vi</code>, <code>en</code>, <code>zh</code>, <code>ja</code>, <code>e</code> (스페인어), <code>p</code> (포르투갈어), <code>f</code> (프랑스어), <code>i</code> (이탈리아어), <code>h</code> (힌디어). 기본값 <code>vi</code>.","a20":"아니요","a21":"낭독 속도, 0.5 ~ 1.5. 기본값 <code>1.0</code>.","a22":"아니요","a23":"<code>mp3</code> (기본) 또는 <code>wav</code>.","a24":"아니요","a25":"<code>binary</code> = 오디오 파일을 그대로 반환. 비워 두면 <code>audio_base64</code>가 담긴 JSON을 반환합니다.","a26":"아니요","a27":"직접 만든 <b>복제 음성</b>을 사용합니다 (id는 음성 복제 탭에서 확인). 이 값을 주면 <code>voice</code>는 무시됩니다.","a28":"아니요","a29":"복제 음성 전용 — 낭독 감정, 예: <code>\"📖 Kể chuyện\"</code>.","a30":"응답 (기본 JSON)","a31":"<code>cost</code> — 이번 호출에 사용한 글자 수 (<code>text</code> 길이와 동일).","a32":"<code>credits</code> — 차감 후 계정에 남은 글자 수.","a33":"<code>seconds</code> — 생성된 오디오 길이.","a34":"<code>\"response\":\"binary\"</code>를 보내면 오디오 파일 원본이 반환되고, 수치는 <code>X-Cost</code>와 <code>X-Credits-Remaining</code> 헤더로 옵니다.","a35":"3. 음성 목록 — <code>GET /voices</code>","a36":"68종 음성을 언어, 장르, 성별/지역과 함께 반환합니다. 글자 수를 쓰지 않고 키도 필요 없습니다.","a37":"4. 남은 글자 수 확인 — <code>GET /me</code>","a38":"5. Python 예제","a39":"긴 텍스트","a40":"한 번 호출에 최대 200,000자를 받지만, 길수록 느려지고 타임아웃이 나기 쉽습니다. 가장 안정적인 방법: <b>약 1,000자 단위로 나누어</b> 2~3개씩 병렬로 호출한 뒤 파일을 합치세요 — 웹사이트도 똑같이 동작합니다.","a41":"6. 오류 코드","a42":"코드","a43":"의미","a44":"대처 방법","a45":"키 없음, 잘못된 키, 또는 이미 삭제된 키","a46":"<code>Authorization</code> 헤더를 확인하세요","a47":"계정에 남은 글자 수가 없음","a48":"계정 페이지에서 충전하세요","a49":"호출이 너무 잦음 (분당 60회 · 시간당 600회 · 하루 2,000회 제한)","a50":"<code>retry_after</code>에 표시된 초만큼 기다린 뒤 다시 호출하세요","a51":"서버가 준비 중입니다 (초기 약 1분)","a52":"약 60초 후 다시 호출하세요 — 글자는 차감되지 <b>않습니다</b>","a53":"음성 서버 오류","a54":"다시 호출하세요. 글자는 자동으로 환급되었습니다","a55":"7. 요금","a56":"<b>텍스트 1자 = 계정 1자</b> — API와 웹사이트는 같은 잔액을 씁니다.","a57":"복제 음성도 기본 음성과 동일하게 과금됩니다.","a58":"<code>/voices</code>와 <code>/me</code>는 무료입니다.","a59":"도움이 필요하거나 더 높은 한도가 필요하신가요? Tan Seven에 문의하세요. · <a href=\"index.html\">홈</a> · <a href=\"tai-khoan.html\">계정</a> · <a href=\"dieu-khoan.html\">이용약관</a>","a60":"개발자용","a61":"⚠️ API 키는 곧 돈입니다. 브라우저에서 실행되는 코드에 넣거나 공개 GitHub에 올리지 마세요 — 키를 얻은 사람은 여러분의 글자를 쓸 수 있습니다. 키는 서버나 환경 변수에 보관하세요.","a62":"✅ 오디오가 정상 생성될 때만 글자가 차감됩니다. 오류나 서버 준비 중 응답은 자동으로 환급됩니다.","a63":"← 홈으로","a64":"기본 URL","doc.title":"API — Tan Seven Voice","code.curl":"curl -X POST \"https://idnfafxgrbabypfokgve.supabase.co/functions/v1/api/tts\" \\\n  -H \"Authorization: Bearer tsv_xxxxxxxx\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"text\":\"안녕하세요, Tan Seven Voice입니다.\",\"voice\":\"Minh Đức\",\"lang\":\"vi\",\"response\":\"binary\"}' \\\n  --output giong.mp3","code.py":"import requests\n\nAPI  = \"https://idnfafxgrbabypfokgve.supabase.co/functions/v1/api\"\nKEY  = \"tsv_xxxxxxxx\"          # 환경 변수에 보관하세요. 코드에 직접 쓰지 마세요\n\nr = requests.post(f\"{API}/tts\",\n    headers={\"Authorization\": f\"Bearer {KEY}\"},\n    json={\n        \"text\": \"Tan Seven 채널에 오신 것을 환영합니다.\",\n        \"voice\": \"Ngọc Linh\",\n        \"lang\": \"vi\",\n        \"speed\": 1.0,\n        \"response\": \"binary\",\n    }, timeout=300)\n\nr.raise_for_status()\nopen(\"giong.mp3\", \"wb\").write(r.content)\nprint(\"남은 글자:\", r.headers.get(\"X-Credits-Remaining\"), \"자\")"}};
+  const LANG_NAMES = { vi:'Tiếng Việt', en:'English', hi:'हिन्दी', ko:'한국어' };
+  function setLang(code){
+    if(!I18N[code]) code='vi';
+    document.documentElement.lang=code;
+    var dict=I18N[code], base=I18N.vi;
+    document.querySelectorAll('[data-i18n]').forEach(function(e){
+      var k=e.getAttribute('data-i18n'); var v=(dict[k]!=null)?dict[k]:base[k];
+      if(v!=null) e.innerHTML=v;
+    });
+    if(dict['doc.title']) document.title=dict['doc.title'];
+    var cur=document.getElementById('langswCur'); if(cur) cur.textContent=LANG_NAMES[code]||code;
+    document.querySelectorAll('.langsw-item').forEach(function(it){ it.classList.toggle('on', it.getAttribute('data-lang')===code); });
+    try{ localStorage.setItem('ts_lang', code); }catch(e){}
+  }
+  (function(){
+    var box=document.getElementById('langsw'), btn=document.getElementById('langswBtn');
+    function close(){ if(box) box.classList.remove('open'); if(btn) btn.setAttribute('aria-expanded','false'); }
+    if(btn) btn.addEventListener('click', function(e){ e.stopPropagation(); var o=box.classList.toggle('open'); btn.setAttribute('aria-expanded', o?'true':'false'); });
+    document.querySelectorAll('.langsw-item').forEach(function(it){
+      it.addEventListener('click', function(e){ e.stopPropagation(); setLang(it.getAttribute('data-lang')); close(); });
+    });
+    document.addEventListener('click', function(e){ if(box && !box.contains(e.target)) close(); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+    var saved='vi'; try{ saved=localStorage.getItem('ts_lang')||'vi'; }catch(e){}
+    setLang(saved);
+  })();
+</script>

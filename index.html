@@ -193,15 +193,15 @@
   <!-- DEMO widget -->
   <div class="demo reveal">
     <div class="demo-in">
-      <textarea id="ta" spellcheck="false">Xin chào, mình là Tan Seven. Hôm nay chúng ta sẽ cùng khám phá cách tạo giọng nói AI cực hay cho kênh YouTube của bạn.</textarea>
+      <textarea id="ta" spellcheck="false" data-i18n="demo.text">Xin chào, mình là Tan Seven. Hôm nay chúng ta sẽ cùng khám phá cách tạo giọng nói AI cực hay cho kênh YouTube của bạn.</textarea>
       <div class="voices-row" id="vrow">
-        <button class="vpill on" data-prev="previews/vi__Minh___c.wav">🇻🇳 Minh Đức · Tiếng Việt</button>
-        <button class="vpill" data-prev="previews/vi__Thanh_B_nh.wav">🇻🇳 Thanh Bình · Tiếng Việt</button>
-        <button class="vpill" data-prev="previews/en__Adam.wav">🇺🇸 Adam · English</button>
-        <button class="vpill" data-prev="previews/f__Chlo_.wav">🇫🇷 Chloé · Français</button>
-        <button class="vpill" data-prev="previews/e__Sof_a.wav">🇪🇸 Sofía · Español</button>
-        <button class="vpill" data-prev="previews/p__Beatriz.wav">🇵🇹 Beatriz · Português</button>
-        <button class="vpill" data-prev="previews/zh__Mei.wav">🇨🇳 Mei · 中文</button>
+        <button class="vpill on" data-prev="previews/vi__Minh___c.wav" data-i18n="demo.v1">🇻🇳 Minh Đức · Tiếng Việt</button>
+        <button class="vpill" data-prev="previews/vi__Thanh_B_nh.wav" data-i18n="demo.v2">🇻🇳 Thanh Bình · Tiếng Việt</button>
+        <button class="vpill" data-prev="previews/en__Adam.wav" data-i18n="demo.v3">🇺🇸 Adam · English</button>
+        <button class="vpill" data-prev="previews/f__Chlo_.wav" data-i18n="demo.v4">🇫🇷 Chloé · Français</button>
+        <button class="vpill" data-prev="previews/e__Sof_a.wav" data-i18n="demo.v5">🇪🇸 Sofía · Español</button>
+        <button class="vpill" data-prev="previews/p__Beatriz.wav" data-i18n="demo.v6">🇵🇹 Beatriz · Português</button>
+        <button class="vpill" data-prev="previews/zh__Mei.wav" data-i18n="demo.v7">🇨🇳 Mei · 中文</button>
       </div>
       <div class="demo-bar">
         <button class="play" id="play">▶</button>
@@ -213,7 +213,7 @@
   </div>
 
   <div class="logos"><p data-i18n="logos.for">Dành cho dân làm nội dung</p>
-    <div class="row"><span>▶ YouTube</span><span>🎧 Podcast</span><span>📕 Sách nói</span><span>🎬 Lồng tiếng</span><span>📱 TikTok</span></div>
+    <div class="row"><span>▶ YouTube</span><span>🎧 Podcast</span><span data-i18n="logos.audiobook">📕 Sách nói</span><span data-i18n="logos.dub">🎬 Lồng tiếng</span><span>📱 TikTok</span></div>
   </div>
 </div></header>
 
@@ -282,6 +282,12 @@
 </div></footer>
 
 <script>
+/* voice-card descriptors: Vietnamese source text is the key */
+var TS_LANG="vi"; try{ var _s=localStorage.getItem("ts_lang"); if(/^(vi|en|hi|ko)$/.test(_s)) TS_LANG=_s; }catch(e){}
+var TSV_TR={"en":{"Tiếng Việt · Nam Bắc":"Vietnamese · Male, Northern","Tiếng Việt · Nữ":"Vietnamese · Female","English · Nam · Deep":"English · Male · Deep","English · Nữ · Warm":"English · Female · Warm","Français · Nữ":"French · Female","Español · Nữ":"Spanish · Female","Português · Nữ":"Portuguese · Female","Italiano · Nữ":"Italian · Female","Hindi · Nữ":"Hindi · Female","中文 · Nữ":"Chinese · Female"},"hi":{"Tiếng Việt · Nam Bắc":"वियतनामी · पुरुष, उत्तरी","Tiếng Việt · Nữ":"वियतनामी · महिला","English · Nam · Deep":"अंग्रेज़ी · पुरुष · गहरी","English · Nữ · Warm":"अंग्रेज़ी · महिला · आत्मीय","Français · Nữ":"फ़्रेंच · महिला","Español · Nữ":"स्पेनिश · महिला","Português · Nữ":"पुर्तगाली · महिला","Italiano · Nữ":"इतालवी · महिला","Hindi · Nữ":"हिंदी · महिला","中文 · Nữ":"चीनी · महिला"},"ko":{"Tiếng Việt · Nam Bắc":"베트남어 · 남성, 북부","Tiếng Việt · Nữ":"베트남어 · 여성","English · Nam · Deep":"영어 · 남성 · 저음","English · Nữ · Warm":"영어 · 여성 · 따뜻한","Français · Nữ":"프랑스어 · 여성","Español · Nữ":"스페인어 · 여성","Português · Nữ":"포르투갈어 · 여성","Italiano · Nữ":"이탈리아어 · 여성","Hindi · Nữ":"힌디어 · 여성","中文 · Nữ":"중국어 · 여성"}};
+function tv(s){ if(TS_LANG==="vi") return s; var d=TSV_TR[TS_LANG]; return (d&&d[s]!=null)?d[s]:s; }
+</script>
+<script>
   // Bắt mã giới thiệu affiliate từ URL (?ref=CODE) → lưu để dùng khi đăng ký
   (function(){ try{ var r=new URLSearchParams(location.search).get('ref'); if(r) localStorage.setItem('ts_ref', r); }catch(e){} })();
 
@@ -345,9 +351,12 @@
     ['🇮🇳','Aisha','Hindi · Nữ','previews/h__Aisha.wav'],
     ['🇨🇳','Mei','中文 · Nữ','previews/zh__Mei.wav']
   ];
-  document.getElementById('vgrid').innerHTML=VS.map(function(v){ return '<div class="vcard reveal"><span class="pp" style="cursor:pointer" onclick="playCard(\''+v[3]+'\',this)">▶</span>'+
-    '<div><div class="nm">'+v[1]+'</div><div class="tg">'+v[0]+' '+v[2]+'</div></div>'+
+  function renderVGrid(){
+    document.getElementById('vgrid').innerHTML=VS.map(function(v){ return '<div class="vcard reveal"><span class="pp" style="cursor:pointer" onclick="playCard(\''+v[3]+'\',this)">▶</span>'+
+    '<div><div class="nm">'+v[1]+'</div><div class="tg">'+v[0]+' '+tv(v[2])+'</div></div>'+
     '<span class="mini">'+Array.from({length:16},function(){return '<i style="height:'+(6+(Math.random()*20|0))+'px"></i>';}).join('')+'</span></div>'; }).join('');
+  }
+  renderVGrid();
 
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
@@ -357,6 +366,16 @@
   /* ===== i18n — multi-language switcher (self-contained, no libraries) ===== */
   const I18N = {
     vi: {
+      'demo.text':"Xin chào, mình là Tan Seven. Hôm nay chúng ta sẽ cùng khám phá cách tạo giọng nói AI cực hay cho kênh YouTube của bạn.",
+      'demo.v1':"🇻🇳 Minh Đức · Tiếng Việt",
+      'demo.v2':"🇻🇳 Thanh Bình · Tiếng Việt",
+      'demo.v3':"🇺🇸 Adam · English",
+      'demo.v4':"🇫🇷 Chloé · Français",
+      'demo.v5':"🇪🇸 Sofía · Español",
+      'demo.v6':"🇵🇹 Beatriz · Português",
+      'demo.v7':"🇨🇳 Mei · 中文",
+      'logos.audiobook':"📕 Sách nói",
+      'logos.dub':"🎬 Lồng tiếng",
       'nav.voices':'Giọng nói',
       'nav.features':'Tính năng',
       'nav.pricing':'Bảng giá',
@@ -421,6 +440,16 @@
       'footer.disclaimer':'⚠️ <b>Về tính năng Clone giọng:</b> bạn chỉ được clone <b>giọng của mình</b> hoặc giọng <b>bạn có quyền sử dụng</b>. Không dùng để mạo danh, lừa đảo hay mục đích trái pháp luật. Người dùng tự chịu trách nhiệm về giọng mình clone.'
     },
     en: {
+      'demo.text':"Hi, I am Tan Seven. Today we are going to explore how to create really great AI voices for your YouTube channel.",
+      'demo.v1':"🇻🇳 Minh Đức · Vietnamese",
+      'demo.v2':"🇻🇳 Thanh Bình · Vietnamese",
+      'demo.v3':"🇺🇸 Adam · English",
+      'demo.v4':"🇫🇷 Chloé · French",
+      'demo.v5':"🇪🇸 Sofía · Spanish",
+      'demo.v6':"🇵🇹 Beatriz · Portuguese",
+      'demo.v7':"🇨🇳 Mei · Chinese",
+      'logos.audiobook':"📕 Audiobooks",
+      'logos.dub':"🎬 Dubbing",
       'nav.voices':'Voices',
       'nav.features':'Features',
       'nav.pricing':'Pricing',
@@ -485,6 +514,16 @@
       'footer.disclaimer':'⚠️ <b>About voice cloning:</b> you may only clone <b>your own voice</b> or a voice <b>you have the rights to use</b>. Do not use it for impersonation, fraud, or any unlawful purpose. Users are responsible for the voices they clone.'
     },
     hi: {
+      'demo.text':"नमस्ते, मैं Tan Seven हूँ। आज हम देखेंगे कि आपके YouTube चैनल के लिए शानदार AI आवाज़ें कैसे बनाई जाती हैं।",
+      'demo.v1':"🇻🇳 Minh Đức · वियतनामी",
+      'demo.v2':"🇻🇳 Thanh Bình · वियतनामी",
+      'demo.v3':"🇺🇸 Adam · अंग्रेज़ी",
+      'demo.v4':"🇫🇷 Chloé · फ़्रेंच",
+      'demo.v5':"🇪🇸 Sofía · स्पेनिश",
+      'demo.v6':"🇵🇹 Beatriz · पुर्तगाली",
+      'demo.v7':"🇨🇳 Mei · चीनी",
+      'logos.audiobook':"📕 ऑडियोबुक",
+      'logos.dub':"🎬 डबिंग",
       'nav.voices':'आवाज़ें',
       'nav.features':'फ़ीचर्स',
       'nav.pricing':'मूल्य',
@@ -549,6 +588,16 @@
       'footer.disclaimer':'⚠️ <b>वॉइस क्लोनिंग के बारे में:</b> आप केवल <b>अपनी आवाज़</b> या ऐसी आवाज़ क्लोन कर सकते हैं <b>जिसका उपयोग करने का आपको अधिकार है</b>। इसका उपयोग किसी की नकल, धोखाधड़ी या किसी गैरकानूनी काम के लिए न करें। क्लोन की गई आवाज़ों की ज़िम्मेदारी उपयोगकर्ता की है।'
     },
     ko: {
+      'demo.text':"안녕하세요, Tan Seven입니다. 오늘은 여러분의 유튜브 채널을 위한 멋진 AI 음성을 만드는 방법을 알아보겠습니다.",
+      'demo.v1':"🇻🇳 Minh Đức · 베트남어",
+      'demo.v2':"🇻🇳 Thanh Bình · 베트남어",
+      'demo.v3':"🇺🇸 Adam · 영어",
+      'demo.v4':"🇫🇷 Chloé · 프랑스어",
+      'demo.v5':"🇪🇸 Sofía · 스페인어",
+      'demo.v6':"🇵🇹 Beatriz · 포르투갈어",
+      'demo.v7':"🇨🇳 Mei · 중국어",
+      'logos.audiobook':"📕 오디오북",
+      'logos.dub':"🎬 더빙",
       'nav.voices':'음성',
       'nav.features':'기능',
       'nav.pricing':'요금제',
@@ -623,8 +672,12 @@
     document.querySelectorAll('[data-i18n]').forEach(function(el){
       var k = el.getAttribute('data-i18n');
       var val = (dict && dict[k] != null) ? dict[k] : base[k];
-      if(val != null) el.innerHTML = val;
+      if(val == null) return;
+      if(el.tagName === 'TEXTAREA'){ el.value = val; el.defaultValue = val; }
+      else el.innerHTML = val;
     });
+    TS_LANG = code;
+    if(typeof renderVGrid === 'function') renderVGrid();
     var cur = document.getElementById('langswCur');
     if(cur) cur.textContent = LANG_NAMES[code] || code;
     document.querySelectorAll('.langsw-item').forEach(function(it){
