@@ -4,6 +4,31 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
 <style>
+  /* language switcher (i18n) */
+  .langsw{position:relative;margin-left:auto;margin-right:12px}
+  .langsw-btn{display:inline-flex;align-items:center;gap:7px;font-family:inherit;font-size:13.5px;font-weight:700;
+    color:var(--ink2);background:var(--card);border:1px solid var(--line2);padding:7px 12px;border-radius:999px;
+    cursor:pointer;line-height:1;transition:border-color .15s,color .15s}
+  .langsw-btn:hover{border-color:var(--gold);color:var(--ink)}
+  .langsw.open .langsw-btn{border-color:var(--ink)}
+  .langsw-globe{font-size:15px;line-height:1}
+  .langsw-cur{white-space:nowrap}
+  .langsw-chev{font-size:10px;color:var(--muted);transition:transform .18s}
+  .langsw.open .langsw-chev{transform:rotate(180deg)}
+  .langsw-menu{position:absolute;top:calc(100% + 8px);right:0;min-width:178px;background:var(--card);
+    border:1px solid var(--line2);border-radius:14px;padding:6px;display:none;flex-direction:column;gap:2px;
+    box-shadow:var(--shadow);z-index:80}
+  .langsw.open .langsw-menu{display:flex}
+  .langsw-item{display:flex;align-items:center;gap:10px;width:100%;font-family:inherit;font-size:14.5px;
+    font-weight:600;color:var(--ink2);background:transparent;border:0;padding:9px 11px;border-radius:9px;
+    cursor:pointer;text-align:left}
+  .langsw-item:hover{background:var(--field);color:var(--ink)}
+  .langsw-flag{font-size:16px;flex:0 0 auto;line-height:1}
+  .langsw-name{flex:1}
+  .langsw-check{color:var(--green);font-weight:800;opacity:0;flex:0 0 auto}
+  .langsw-item.on{color:var(--ink)}
+  .langsw-item.on .langsw-check{opacity:1}
+  @media(max-width:560px){.langsw-cur{display:none}}
   :root{--bg:#fbfaf8;--bg2:#f3f1ec;--card:#fff;--ink:#0b0b0c;--ink2:#33322f;--muted:#78766f;
     --line:#e9e6df;--line2:#dbd7ce;--field:#f6f4ef;--gold:#c98a1e;--gold-soft:#fbf1dd;
     --green:#1f9d55;--green-soft:#e7f5ec;--red:#e0483d;--shadow:0 26px 60px -34px rgba(30,22,10,.45)}
@@ -253,7 +278,20 @@
 
 <nav><div class="nav-in">
   <a class="brand" href="index.html"><span class="mk">🎙️</span> Tan Seven <span>Voice</span></a>
-  <button class="logout" id="logoutBtn" style="display:none" onclick="doLogout()">Đăng xuất</button>
+  <div style="display:flex;align-items:center;gap:10px">
+  <div class="langsw" id="langsw">
+    <button class="langsw-btn" id="langswBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Chọn ngôn ngữ / Select language">
+      <span class="langsw-globe">🌐</span><span class="langsw-cur" id="langswCur">Tiếng Việt</span><span class="langsw-chev">▾</span>
+    </button>
+    <div class="langsw-menu" id="langswMenu" role="menu">
+      <button class="langsw-item" type="button" role="menuitem" data-lang="vi"><span class="langsw-flag">🇻🇳</span><span class="langsw-name">Tiếng Việt</span><span class="langsw-check">✓</span></button>
+      <button class="langsw-item" type="button" role="menuitem" data-lang="en"><span class="langsw-flag">🇺🇸</span><span class="langsw-name">English</span><span class="langsw-check">✓</span></button>
+      <button class="langsw-item" type="button" role="menuitem" data-lang="hi"><span class="langsw-flag">🇮🇳</span><span class="langsw-name">हिन्दी</span><span class="langsw-check">✓</span></button>
+      <button class="langsw-item" type="button" role="menuitem" data-lang="ko"><span class="langsw-flag">🇰🇷</span><span class="langsw-name">한국어</span><span class="langsw-check">✓</span></button>
+    </div>
+  </div>
+  <button class="logout" id="logoutBtn" style="display:none" onclick="doLogout()" data-i18n="nav.logout">Đăng xuất</button>
+  </div>
 </div></nav>
 
 <div class="wrap">
@@ -261,31 +299,31 @@
   <!-- ====== CHƯA ĐĂNG NHẬP: form đăng nhập / đăng ký ====== -->
   <div class="auth" id="authBox">
     <div class="tabs">
-      <button id="tabLogin" class="on" onclick="switchTab('login')">Đăng nhập</button>
-      <button id="tabReg" onclick="switchTab('reg')">Đăng ký</button>
+      <button id="tabLogin" class="on" onclick="switchTab('login')" data-i18n="auth.tabLogin">Đăng nhập</button>
+      <button id="tabReg" onclick="switchTab('reg')" data-i18n="auth.tabReg">Đăng ký</button>
     </div>
 
     <div id="loginForm">
-      <h1>Đăng nhập</h1>
-      <p class="sub">Vào tài khoản để dùng giọng đọc AI.</p>
-      <label>Email</label>
-      <input id="lgEmail" type="email" placeholder="ban@email.com">
-      <label>Mật khẩu</label>
+      <h1 data-i18n="login.h1">Đăng nhập</h1>
+      <p class="sub" data-i18n="login.sub">Vào tài khoản để dùng giọng đọc AI.</p>
+      <label data-i18n="f.email">Email</label>
+      <input id="lgEmail" type="email" placeholder="ban@email.com" data-i18n-ph="ph.email">
+      <label data-i18n="f.pass">Mật khẩu</label>
       <input id="lgPass" type="password" placeholder="••••••••">
-      <button class="btn" id="lgBtn" onclick="doLogin()">Đăng nhập</button>
-      <div style="text-align:center;margin-top:14px"><a href="#" onclick="forgotPass();return false" style="color:var(--muted);font-size:13.5px;text-decoration:underline">Quên mật khẩu?</a></div>
+      <button class="btn" id="lgBtn" onclick="doLogin()" data-i18n="login.btn">Đăng nhập</button>
+      <div style="text-align:center;margin-top:14px"><a href="#" onclick="forgotPass();return false" style="color:var(--muted);font-size:13.5px;text-decoration:underline" data-i18n="login.forgot">Quên mật khẩu?</a></div>
     </div>
 
     <div id="regForm" style="display:none">
-      <h1>Tạo tài khoản</h1>
-      <p class="sub">Đăng ký miễn phí — tặng ngay <b>2.000 ký tự</b> dùng thử.</p>
-      <label>Họ và tên</label>
-      <input id="rgName" placeholder="Nguyễn Văn A">
-      <label>Email</label>
-      <input id="rgEmail" type="email" placeholder="ban@email.com">
-      <label>Mật khẩu (tối thiểu 6 ký tự)</label>
+      <h1 data-i18n="reg.h1">Tạo tài khoản</h1>
+      <p class="sub" data-i18n="reg.sub">Đăng ký miễn phí — tặng ngay <b>2.000 ký tự</b> dùng thử.</p>
+      <label data-i18n="f.name">Họ và tên</label>
+      <input id="rgName" placeholder="Nguyễn Văn A" data-i18n-ph="ph.name">
+      <label data-i18n="f.email">Email</label>
+      <input id="rgEmail" type="email" placeholder="ban@email.com" data-i18n-ph="ph.email">
+      <label data-i18n="f.pass6">Mật khẩu (tối thiểu 6 ký tự)</label>
       <input id="rgPass" type="password" placeholder="••••••••">
-      <button class="btn" id="rgBtn" onclick="doRegister()">Đăng ký miễn phí →</button>
+      <button class="btn" id="rgBtn" onclick="doRegister()" data-i18n="reg.btn">Đăng ký miễn phí →</button>
     </div>
 
     <div class="msg" id="authMsg"></div>
@@ -293,38 +331,38 @@
 
   <!-- ====== ĐẶT LẠI MẬT KHẨU (mở từ link trong email) ====== -->
   <div class="auth" id="resetBox" style="display:none">
-    <h1>🔑 Đặt lại mật khẩu</h1>
-    <p class="sub">Nhập mật khẩu mới cho tài khoản của bạn.</p>
-    <label>Mật khẩu mới (≥ 6 ký tự)</label>
+    <h1 data-i18n="rs.h1">🔑 Đặt lại mật khẩu</h1>
+    <p class="sub" data-i18n="rs.sub">Nhập mật khẩu mới cho tài khoản của bạn.</p>
+    <label data-i18n="rs.lbl">Mật khẩu mới (≥ 6 ký tự)</label>
     <input id="resetPass" type="password" placeholder="••••••••">
-    <button class="btn" onclick="doReset()">Đổi mật khẩu</button>
+    <button class="btn" onclick="doReset()" data-i18n="rs.btn">Đổi mật khẩu</button>
     <div class="msg" id="resetMsg"></div>
   </div>
 
   <!-- ====== ĐÃ ĐĂNG NHẬP: dashboard ====== -->
   <div class="dash" id="dashBox">
     <div class="dash-nav">
-      <button id="navAudio" class="on" onclick="showView('audio')">🎙️ Văn bản thành giọng nói</button>
-      <button id="navClone" onclick="showView('clone')">🧬 Nhân bản giọng nói</button>
-      <button id="navBatch" onclick="showView('batch')">📚 Tạo hàng loạt</button>
-      <button id="navAffiliate" onclick="showView('affiliate')">🤝 Affiliate</button>
-      <button id="navAccount" onclick="showView('account')">👤 Tài khoản</button>
-      <span class="dash-credit">💎 <b id="creditMini">—</b> ký tự</span>
+      <button id="navAudio" class="on" onclick="showView('audio')" data-i18n="nav.tts">🎙️ Văn bản thành giọng nói</button>
+      <button id="navClone" onclick="showView('clone')" data-i18n="nav.clone">🧬 Nhân bản giọng nói</button>
+      <button id="navBatch" onclick="showView('batch')" data-i18n="nav.batch">📚 Tạo hàng loạt</button>
+      <button id="navAffiliate" onclick="showView('affiliate')" data-i18n="nav.aff">🤝 Affiliate</button>
+      <button id="navAccount" onclick="showView('account')" data-i18n="nav.acc">👤 Tài khoản</button>
+      <span class="dash-credit">💎 <b id="creditMini">—</b> <span data-i18n="unit.chars">ký tự</span></span>
     </div>
 
     <!-- ===== TAB: TẠO GIỌNG ===== -->
     <div id="audioView">
       <div class="audio-layout">
       <div class="box">
-        <div class="k">🎙️ Văn bản thành giọng nói</div>
-        <textarea id="ttsText" placeholder="Dán kịch bản cần đọc vào đây... (tối đa 200.000 ký tự)" maxlength="200000"></textarea>
-        <div class="tts-tools"><button type="button" class="tool-btn" onclick="insertPause('ttsText')">⏸ Chèn nghỉ</button><span class="tool-hint">Chèn dấu <b>⏸</b> vào chỗ muốn ngắt nghỉ — nhiều dấu = nghỉ lâu hơn. (Dấu phẩy/chấm cũng tạo nhịp nghỉ tự nhiên.)</span></div>
+        <div class="k" data-i18n="tts.h">🎙️ Văn bản thành giọng nói</div>
+        <textarea id="ttsText" placeholder="Dán kịch bản cần đọc vào đây... (tối đa 200.000 ký tự)" maxlength="200000" data-i18n-ph="ph.ttsText"></textarea>
+        <div class="tts-tools"><button type="button" class="tool-btn" onclick="insertPause('ttsText')" data-i18n="tts.pause">⏸ Chèn nghỉ</button><span class="tool-hint" data-i18n="tts.pauseHint">Chèn dấu <b>⏸</b> vào chỗ muốn ngắt nghỉ — nhiều dấu = nghỉ lâu hơn. (Dấu phẩy/chấm cũng tạo nhịp nghỉ tự nhiên.)</span></div>
         <!-- CHỌN GIỌNG NÓI: bấm để mở popup -->
-        <div class="vs-lbl">🎙️ Chọn giọng nói</div>
+        <div class="vs-lbl" data-i18n="tts.pickVoice">🎙️ Chọn giọng nói</div>
         <button type="button" class="voice-select-btn" onclick="openVoiceModal()">
           <span class="vsb-ava" id="vsbAva">M</span>
           <span class="vsb-info"><span class="vsb-name" id="vsbName">Minh Đức</span><span class="vsb-sub" id="vsbSub">Giọng Tan Seven VIP · Nam · Bắc</span></span>
-          <span class="vsb-chev">Đổi giọng →</span>
+          <span class="vsb-chev" data-i18n="tts.changeVoice">Đổi giọng →</span>
         </button>
 
         <style>
@@ -338,42 +376,42 @@
           @media (prefers-reduced-motion:reduce){.mdl-vip{animation:none}}
           .mdl-note{background:rgba(201,162,39,.10);border:1px solid var(--gold,#c9a227);border-radius:10px;padding:9px 12px;margin-top:11px;font-size:12.5px;line-height:1.5}
         </style>
-        <div class="vs-lbl" style="margin-top:16px">🎛️ Chọn Model đọc</div>
+        <div class="vs-lbl" style="margin-top:16px" data-i18n="tts.modelH">🎛️ Chọn Model đọc</div>
         <div class="model-row">
-          <button type="button" id="mdl30" class="model-btn on" onclick="setModel('3.0')"><b>⚡ Tan Seven 3.0</b><small>Nhanh · chuẩn</small></button>
-          <button type="button" id="mdl40" class="model-btn" onclick="setModel('4.0')"><b>✨ Tan Seven 4.0<span class="mdl-vip">VIP</span></b><small>Biểu cảm · hay hơn</small></button>
+          <button type="button" id="mdl30" class="model-btn on" onclick="setModel('3.0')" data-i18n="tts.mdl30"><b>⚡ Tan Seven 3.0</b><small>Nhanh · chuẩn</small></button>
+          <button type="button" id="mdl40" class="model-btn" onclick="setModel('4.0')" data-i18n="tts.mdl40"><b>✨ Tan Seven 4.0<span class="mdl-vip">VIP</span></b><small>Biểu cảm · hay hơn</small></button>
         </div>
         <div id="mdl40box" style="display:none">
-          <div class="mdl-note">⏳ <b>Đọc chậm rãi + nhiều nhịp nghỉ</b> → nghe <b>cảm xúc, tự nhiên</b> hơn (hợp kể chuyện, quảng cáo, phim). Bù lại tạo lâu hơn chút.</div>
-          <div><label style="margin:11px 0 5px;display:block">🎭 Cách đọc</label><select id="ttsStyle" onchange="onTtsStyle()"></select></div>
+          <div class="mdl-note" data-i18n="tts.mdlNote">⏳ <b>Đọc chậm rãi + nhiều nhịp nghỉ</b> → nghe <b>cảm xúc, tự nhiên</b> hơn (hợp kể chuyện, quảng cáo, phim). Bù lại tạo lâu hơn chút.</div>
+          <div><label style="margin:11px 0 5px;display:block" data-i18n="tts.readStyle">🎭 Cách đọc</label><select id="ttsStyle" onchange="onTtsStyle()"></select></div>
         </div>
 
         <!-- ==== TUỲ CHỈNH TẠO AUDIO (chung cho mọi giọng) ==== -->
         <div id="genOpts" class="gen-opts" style="display:none">
-          <div><label style="margin:0 0 5px">🎭 Cảm xúc</label><select id="cloneStyle" onchange="onCloneStyle()"></select></div>
-          <div><label style="margin:0 0 5px">🌍 Ngôn ngữ</label><select id="cloneLang"></select></div>
+          <div><label style="margin:0 0 5px" data-i18n="tts.emotion">🎭 Cảm xúc</label><select id="cloneStyle" onchange="onCloneStyle()"></select></div>
+          <div><label style="margin:0 0 5px" data-i18n="tts.language">🌍 Ngôn ngữ</label><select id="cloneLang"></select></div>
         </div>
         <div id="cloneAdv" style="display:none">
-          <label style="margin-top:14px">🎭 Độ biểu cảm: <b id="cloneExprVal" style="color:var(--gold)">Vừa</b> <span style="font-weight:400;color:var(--muted);font-size:12px">(trái = ổn định, rõ · phải = giàu cảm xúc)</span></label>
+          <label style="margin-top:14px"><span data-i18n="tts.expr">🎭 Độ biểu cảm:</span> <b id="cloneExprVal" style="color:var(--gold)" data-i18n="tts.exprVal">Vừa</b> <span style="font-weight:400;color:var(--muted);font-size:12px" data-i18n="tts.exprHint">(trái = ổn định, rõ · phải = giàu cảm xúc)</span></label>
           <input type="range" id="cloneExpr" min="0" max="1" step="0.05" value="0.4" oninput="onExpr()">
-          <label class="tgl"><input type="checkbox" id="cloneDenoise" onchange="void 0"> 🧹 Lọc tạp âm mẫu giọng <span style="color:var(--muted);font-weight:400">(chỉ bật khi mẫu có tiếng ồn — mẫu sạch mà lọc sẽ kém giống)</span></label>
+          <label class="tgl"><input type="checkbox" id="cloneDenoise" onchange="void 0"> <span data-i18n="tts.denoise">🧹 Lọc tạp âm mẫu giọng</span> <span style="color:var(--muted);font-weight:400" data-i18n="tts.denoiseHint">(chỉ bật khi mẫu có tiếng ồn — mẫu sạch mà lọc sẽ kém giống)</span></label>
         </div>
-        <label style="margin-top:16px">⚡ Tốc độ đọc: <b id="ttsSpeedVal" style="color:var(--gold)">1.00x</b> <span style="font-weight:400;color:var(--muted);font-size:12px">(trái = chậm · phải = nhanh)</span></label>
+        <label style="margin-top:16px"><span data-i18n="tts.speed">⚡ Tốc độ đọc:</span> <b id="ttsSpeedVal" style="color:var(--gold)">1.00x</b> <span style="font-weight:400;color:var(--muted);font-size:12px" data-i18n="tts.speedHint">(trái = chậm · phải = nhanh)</span></label>
         <input type="range" id="ttsSpeed" min="0.7" max="1.5" step="0.01" value="1" oninput="el('ttsSpeedVal').textContent=(+this.value).toFixed(2)+'x'">
         <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px">
-          <span id="ttsCount" style="color:var(--muted);font-size:13px">0 ký tự</span>
-          <button class="btn" id="ttsBtn" style="margin:0;width:auto;padding:12px 26px" onclick="doGenerate()">🎙️ Tạo audio</button>
+          <span id="ttsCount" style="color:var(--muted);font-size:13px" data-i18n="tts.count0">0 ký tự</span>
+          <button class="btn" id="ttsBtn" style="margin:0;width:auto;padding:12px 26px" onclick="doGenerate()" data-i18n="tts.btn">🎙️ Tạo audio</button>
         </div>
         <div class="msg" id="ttsMsg"></div>
         <div id="genProg" class="gen-prog" style="display:none">
           <div class="gp-bar"><div id="genProgFill" class="gp-fill"></div></div>
-          <div class="gp-txt"><b id="genProgTxt">0%</b> · đang tạo audio…</div>
+          <div class="gp-txt"><b id="genProgTxt">0%</b> · <span data-i18n="tts.progress">đang tạo audio…</span></div>
         </div>
         <div id="ttsResult" style="display:none;margin-top:14px">
           <audio id="ttsAudio" controls></audio>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
-            <a id="ttsDownload" class="act" download="giong-tanseven.mp3" style="margin:0">⬇️ Tải MP3</a>
-            <a id="ttsSrt" class="act" style="margin:0;display:none;cursor:pointer" onclick="downloadSRT();return false">📝 Tải phụ đề SRT</a>
+            <a id="ttsDownload" class="act" download="giong-tanseven.mp3" style="margin:0" data-i18n="tts.dlMp3">⬇️ Tải MP3</a>
+            <a id="ttsSrt" class="act" style="margin:0;display:none;cursor:pointer" onclick="downloadSRT();return false" data-i18n="tts.dlSrt">📝 Tải phụ đề SRT</a>
           </div>
           <style>
             .fx-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:12px}
@@ -383,19 +421,19 @@
             .fx-btn.on{border-color:var(--gold,#c9a227);background:rgba(201,162,39,.14);color:var(--gold,#c9a227)}
           </style>
           <div class="fx-row">
-            <span class="fx-lbl">🎚️ Hiệu ứng vui:</span>
-            <button type="button" class="fx-btn on" data-fx="none" onclick="applyEffect('none')">Gốc</button>
-            <button type="button" class="fx-btn" data-fx="robot" onclick="applyEffect('robot')">🤖 Robot</button>
-            <button type="button" class="fx-btn" data-fx="tram" onclick="applyEffect('tram')">🎙️ Trầm ấm</button>
-            <button type="button" class="fx-btn" data-fx="cao" onclick="applyEffect('cao')">🐿️ Cao</button>
-            <button type="button" class="fx-btn" data-fx="vang" onclick="applyEffect('vang')">🏛️ Vang</button>
-            <button type="button" class="fx-btn" data-fx="dienthoai" onclick="applyEffect('dienthoai')">📞 Điện thoại</button>
+            <span class="fx-lbl" data-i18n="fx.lbl">🎚️ Hiệu ứng vui:</span>
+            <button type="button" class="fx-btn on" data-fx="none" onclick="applyEffect('none')" data-i18n="fx.none">Gốc</button>
+            <button type="button" class="fx-btn" data-fx="robot" onclick="applyEffect('robot')" data-i18n="fx.robot">🤖 Robot</button>
+            <button type="button" class="fx-btn" data-fx="tram" onclick="applyEffect('tram')" data-i18n="fx.deep">🎙️ Trầm ấm</button>
+            <button type="button" class="fx-btn" data-fx="cao" onclick="applyEffect('cao')" data-i18n="fx.high">🐿️ Cao</button>
+            <button type="button" class="fx-btn" data-fx="vang" onclick="applyEffect('vang')" data-i18n="fx.echo">🏛️ Vang</button>
+            <button type="button" class="fx-btn" data-fx="dienthoai" onclick="applyEffect('dienthoai')" data-i18n="fx.phone">📞 Điện thoại</button>
           </div>
         </div>
       </div>
       <div class="box hist-box">
-        <div class="k">🕘 Lịch sử <span id="histCount" class="mono" style="color:var(--muted);font-weight:600;font-size:12px"></span></div>
-        <div style="color:var(--muted);font-size:12px;margin:3px 0 4px">Tự động xoá sau 24 giờ.</div>
+        <div class="k"><span data-i18n="hist.h">🕘 Lịch sử</span> <span id="histCount" class="mono" style="color:var(--muted);font-weight:600;font-size:12px"></span></div>
+        <div style="color:var(--muted);font-size:12px;margin:3px 0 4px" data-i18n="hist.auto">Tự động xoá sau 24 giờ.</div>
         <div id="histList" class="hist-list"></div>
       </div>
       </div>
@@ -405,40 +443,40 @@
     <div id="cloneView" style="display:none">
       <div class="clone-mgr">
         <div class="box">
-          <div class="k">🧬 Tạo giọng nhân bản</div>
-          <label style="margin-top:14px">Tên giọng nói <span style="color:var(--red)">*</span></label>
-          <input id="cvName" placeholder="Nhập tên giọng nói (VD: Giọng của tôi)" maxlength="40">
-          <label style="margin-top:16px">Tải lên tệp âm thanh <span style="color:var(--red)">*</span></label>
+          <div class="k" data-i18n="cv.h">🧬 Tạo giọng nhân bản</div>
+          <label style="margin-top:14px"><span data-i18n="cv.name">Tên giọng nói</span> <span style="color:var(--red)">*</span></label>
+          <input id="cvName" placeholder="Nhập tên giọng nói (VD: Giọng của tôi)" maxlength="40" data-i18n-ph="ph.cvName">
+          <label style="margin-top:16px"><span data-i18n="cv.upload">Tải lên tệp âm thanh</span> <span style="color:var(--red)">*</span></label>
           <div class="up-zone" id="upZone" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="onDropFile(event)">
             <input type="file" id="cloneFile" accept="audio/*,.wav,.mp3,.m4a,.ogg" style="display:none" onchange="onCloneFile(this)">
             <div class="up-ico">⬆️</div>
-            <div class="up-t"><b>Nhấp hoặc kéo thả tệp vào đây</b></div>
-            <div class="up-s">Ghép được <b>tối đa 3 đoạn</b> · tổng 3s – 60s · mỗi file ≤ 12MB · .mp3 .wav<br>Nhiều đoạn với giọng điệu khác nhau ⇒ máy bắt giọng chuẩn hơn hẳn.</div>
+            <div class="up-t" data-i18n="cv.drop"><b>Nhấp hoặc kéo thả tệp vào đây</b></div>
+            <div class="up-s" data-i18n="cv.dropSub">Ghép được <b>tối đa 3 đoạn</b> · tổng 3s – 60s · mỗi file ≤ 12MB · .mp3 .wav<br>Nhiều đoạn với giọng điệu khác nhau ⇒ máy bắt giọng chuẩn hơn hẳn.</div>
             <div class="up-btns">
-              <button type="button" class="up-btn" onclick="el('cloneFile').click()">📁 Chọn File</button>
-              <button type="button" class="up-btn" id="recBtn" onclick="toggleRecord()">🎙️ Ghi âm</button>
+              <button type="button" class="up-btn" onclick="el('cloneFile').click()" data-i18n="cv.pickFile">📁 Chọn File</button>
+              <button type="button" class="up-btn" id="recBtn" onclick="toggleRecord()" data-i18n="cv.record">🎙️ Ghi âm</button>
             </div>
           </div>
           <div id="cloneFileInfo" style="display:none;margin-top:10px">
             <div id="clipList"></div>
             <div style="display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap">
               <b id="clipTotal" style="font-size:13.5px"></b>
-              <button class="mini-x" style="margin-left:auto" onclick="clearCloneFile()">Xoá hết ✕</button>
+              <button class="mini-x" style="margin-left:auto" onclick="clearCloneFile()" data-i18n="cv.clearAll">Xoá hết ✕</button>
             </div>
             <audio id="cloneRefAudio" controls style="width:100%;margin-top:8px"></audio>
           </div>
           <div class="tips">
-            <div class="tips-h">💡 Lưu ý cho giọng mẫu</div>
-            <div class="tip">Âm thanh sạch, một người nói, không tạp âm.</div>
-            <div class="tip">Chất lượng mẫu quyết định chất lượng clone.</div>
-            <div class="tip">Nên gom 2–3 đoạn: một đoạn kể bình thường, một đoạn nhấn mạnh, một đoạn câu hỏi — máy học được cả ngữ điệu.</div>
-            <div class="tip">Mẫu đã sạch thì <b>đừng bật lọc tạp âm</b> — lọc sẽ bào mất chi tiết làm giọng kém giống.</div>
+            <div class="tips-h" data-i18n="cv.tipsH">💡 Lưu ý cho giọng mẫu</div>
+            <div class="tip" data-i18n="cv.tip1">Âm thanh sạch, một người nói, không tạp âm.</div>
+            <div class="tip" data-i18n="cv.tip2">Chất lượng mẫu quyết định chất lượng clone.</div>
+            <div class="tip" data-i18n="cv.tip3">Nên gom 2–3 đoạn: một đoạn kể bình thường, một đoạn nhấn mạnh, một đoạn câu hỏi — máy học được cả ngữ điệu.</div>
+            <div class="tip" data-i18n="cv.tip4">Mẫu đã sạch thì <b>đừng bật lọc tạp âm</b> — lọc sẽ bào mất chi tiết làm giọng kém giống.</div>
           </div>
-          <button class="btn" id="cvSaveBtn" onclick="saveVoice()">💾 Tạo &amp; lưu giọng</button>
+          <button class="btn" id="cvSaveBtn" onclick="saveVoice()" data-i18n="cv.save">💾 Tạo &amp; lưu giọng</button>
           <div class="msg" id="cvMsg"></div>
         </div>
         <div class="box">
-          <div class="k">🎧 Giọng của tôi <span id="myVoiceCount2" class="mono" style="color:var(--muted);font-weight:600"></span></div>
+          <div class="k"><span data-i18n="cv.myVoices">🎧 Giọng của tôi</span> <span id="myVoiceCount2" class="mono" style="color:var(--muted);font-weight:600"></span></div>
           <div id="myVoicesList" class="mv-list"></div>
         </div>
       </div>
@@ -447,18 +485,18 @@
     <!-- ===== TAB: TẠO HÀNG LOẠT ===== -->
     <div id="batchView" style="display:none">
       <div class="box">
-        <div class="k">📚 Tạo hàng loạt</div>
-        <p class="desc" style="margin-top:6px">Mỗi <b>dòng</b> = 1 file audio riêng. Nhập nhiều dòng để tạo hàng loạt, rồi tải về từng file hoặc cả gói <b>.zip</b>.</p>
-        <textarea id="batchText" placeholder="Dòng 1: Xin chào các bạn, đây là video hôm nay...&#10;Dòng 2: Đừng quên like và đăng ký kênh nhé...&#10;Dòng 3: Hẹn gặp lại các bạn ở video sau!" style="min-height:150px"></textarea>
+        <div class="k" data-i18n="bt.h">📚 Tạo hàng loạt</div>
+        <p class="desc" style="margin-top:6px" data-i18n="bt.desc">Mỗi <b>dòng</b> = 1 file audio riêng. Nhập nhiều dòng để tạo hàng loạt, rồi tải về từng file hoặc cả gói <b>.zip</b>.</p>
+        <textarea id="batchText" placeholder="Dòng 1: Xin chào các bạn, đây là video hôm nay...&#10;Dòng 2: Đừng quên like và đăng ký kênh nhé...&#10;Dòng 3: Hẹn gặp lại các bạn ở video sau!" style="min-height:150px" data-i18n-ph="ph.batchText"></textarea>
         <div class="gen-opts" style="display:grid;margin-top:14px">
-          <div><label style="margin:0 0 5px">🎙️ Giọng đọc</label><select id="batchVoice"></select></div>
-          <div><label style="margin:0 0 5px">🎭 Cảm xúc <span style="font-weight:400;color:var(--muted);font-size:11px">(giọng clone)</span></label><select id="batchStyle"></select></div>
+          <div><label style="margin:0 0 5px" data-i18n="bt.voice">🎙️ Giọng đọc</label><select id="batchVoice"></select></div>
+          <div><label style="margin:0 0 5px"><span data-i18n="tts.emotion">🎭 Cảm xúc</span> <span style="font-weight:400;color:var(--muted);font-size:11px" data-i18n="bt.cloneOnly">(giọng clone)</span></label><select id="batchStyle"></select></div>
         </div>
-        <label style="margin-top:14px">⚡ Tốc độ: <b id="batchSpeedVal" style="color:var(--gold)">1.00x</b></label>
+        <label style="margin-top:14px"><span data-i18n="bt.speed">⚡ Tốc độ:</span> <b id="batchSpeedVal" style="color:var(--gold)">1.00x</b></label>
         <input type="range" id="batchSpeed" min="0.7" max="1.5" step="0.01" value="1" oninput="el('batchSpeedVal').textContent=(+this.value).toFixed(2)+'x'">
         <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px">
-          <button class="btn" id="batchBtn" style="margin:0;width:auto;padding:12px 26px" onclick="doBatch()">🚀 Tạo hàng loạt</button>
-          <a class="act" id="batchDl" style="margin:0;display:none;cursor:pointer" onclick="downloadAllZip();return false">⬇️ Tải tất cả (.zip)</a>
+          <button class="btn" id="batchBtn" style="margin:0;width:auto;padding:12px 26px" onclick="doBatch()" data-i18n="bt.btn">🚀 Tạo hàng loạt</button>
+          <a class="act" id="batchDl" style="margin:0;display:none;cursor:pointer" onclick="downloadAllZip();return false" data-i18n="bt.dlZip">⬇️ Tải tất cả (.zip)</a>
         </div>
         <div class="msg" id="batchMsg"></div>
         <div id="batchResults" style="margin-top:14px;display:flex;flex-direction:column;gap:8px"></div>
@@ -468,19 +506,19 @@
     <!-- ===== TAB: AFFILIATE ===== -->
     <div id="affiliateView" style="display:none">
       <div class="box">
-        <div class="k">🤝 Affiliate — hoa hồng 12%</div>
+        <div class="k" data-i18n="af.h">🤝 Affiliate — hoa hồng 12%</div>
         <div style="display:flex;gap:32px;margin-top:10px;flex-wrap:wrap">
-          <div><div class="credit" style="font-size:34px" id="affCount">0</div><div class="desc" style="margin:0">Người giới thiệu</div></div>
-          <div><div class="credit" style="font-size:34px;color:var(--gold)" id="affComm">0đ</div><div class="desc" style="margin:0">Hoa hồng đã kiếm</div></div>
+          <div><div class="credit" style="font-size:34px" id="affCount">0</div><div class="desc" style="margin:0" data-i18n="af.refs">Người giới thiệu</div></div>
+          <div><div class="credit" style="font-size:34px;color:var(--gold)" id="affComm">0đ</div><div class="desc" style="margin:0" data-i18n="af.earned">Hoa hồng đã kiếm</div></div>
         </div>
       </div>
 
       <div class="box" id="affBox" style="margin-top:16px">
-        <div class="k">🔗 Link giới thiệu của bạn</div>
-        <div class="desc">Chia sẻ link này cho bạn bè, hội nhóm. Ai bấm vào rồi <b>đăng ký + mua ký tự</b>, bạn nhận ngay <b>12%</b> số tiền họ mua — khách vẫn trả giá như thường, bạn có thêm thu nhập.</div>
+        <div class="k" data-i18n="af.linkH">🔗 Link giới thiệu của bạn</div>
+        <div class="desc" data-i18n="af.desc">Chia sẻ link này cho bạn bè, hội nhóm. Ai bấm vào rồi <b>đăng ký + mua ký tự</b>, bạn nhận ngay <b>12%</b> số tiền họ mua — khách vẫn trả giá như thường, bạn có thêm thu nhập.</div>
         <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
-          <input id="affLink" readonly style="flex:1;min-width:220px;font-size:13px" value="Đăng nhập để lấy link...">
-          <button class="btn" id="affCopyBtn" style="margin:0;width:auto;padding:12px 22px" onclick="copyAff()">📋 Copy</button>
+          <input id="affLink" readonly style="flex:1;min-width:220px;font-size:13px" value="Đăng nhập để lấy link..." data-i18n-val="af.loginFirst">
+          <button class="btn" id="affCopyBtn" style="margin:0;width:auto;padding:12px 22px" onclick="copyAff()" data-i18n="af.copy">📋 Copy</button>
         </div>
         <div class="msg" id="affMsg"></div>
       </div>
@@ -488,42 +526,42 @@
 
     <!-- ===== TAB: TÀI KHOẢN ===== -->
     <div id="accountView" style="display:none">
-      <div class="hello">Chào <span id="userName">bạn</span>! 👋</div>
+      <div class="hello"><span data-i18n="ac.hello">Chào</span> <span id="userName" data-i18n="ac.you">bạn</span>! 👋</div>
       <div class="sub" id="userEmail" style="color:var(--muted)"></div>
       <div class="box" style="margin-top:16px">
-        <div class="k">💎 Ký tự còn lại</div>
-        <div class="credit" id="creditNum">—<small> ký tự</small></div>
-        <div class="desc">Mỗi ký tự = 1 lần đọc. Hết thì nạp thêm.</div>
-        <a class="act" href="#" onclick="openNap();return false">+ Nạp thêm</a>
+        <div class="k" data-i18n="ac.creditH">💎 Ký tự còn lại</div>
+        <div class="credit" id="creditNum" data-i18n="ac.creditInit">—<small> ký tự</small></div>
+        <div class="desc" data-i18n="ac.creditDesc">Mỗi ký tự = 1 lần đọc. Hết thì nạp thêm.</div>
+        <a class="act" href="#" onclick="openNap();return false" data-i18n="ac.topup">+ Nạp thêm</a>
       </div>
 
       <div class="box" style="margin-top:16px">
-        <div class="k">🔒 Đổi mật khẩu</div>
+        <div class="k" data-i18n="ac.passH">🔒 Đổi mật khẩu</div>
         <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-          <input id="newPass" type="password" placeholder="Mật khẩu mới (≥ 6 ký tự)" style="flex:1;min-width:200px">
-          <button class="btn" style="margin:0;width:auto;padding:12px 24px" onclick="changePass()">Đổi mật khẩu</button>
+          <input id="newPass" type="password" placeholder="Mật khẩu mới (≥ 6 ký tự)" style="flex:1;min-width:200px" data-i18n-ph="ph.newPass">
+          <button class="btn" style="margin:0;width:auto;padding:12px 24px" onclick="changePass()" data-i18n="ac.passBtn">Đổi mật khẩu</button>
         </div>
         <div class="msg" id="passMsg"></div>
       </div>
 
       <div class="box" style="margin-top:16px">
-        <div class="k">📖 Từ điển phát âm riêng</div>
-        <div class="desc">Dạy AI đọc đúng những từ khó (tên riêng, thương hiệu, từ nước ngoài). Áp dụng cho mọi giọng, lưu trên máy bạn.</div>
+        <div class="k" data-i18n="ac.pronH">📖 Từ điển phát âm riêng</div>
+        <div class="desc" data-i18n="ac.pronDesc">Dạy AI đọc đúng những từ khó (tên riêng, thương hiệu, từ nước ngoài). Áp dụng cho mọi giọng, lưu trên máy bạn.</div>
         <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-          <input id="pronWord" placeholder="Từ (VD: Nguyễn)" style="flex:1;min-width:110px">
-          <input id="pronRead" placeholder="Đọc là (VD: Ngwiễn)" style="flex:1;min-width:110px">
-          <button class="btn" style="margin:0;width:auto;padding:12px 20px" onclick="pronAdd()">+ Thêm</button>
+          <input id="pronWord" placeholder="Từ (VD: Nguyễn)" style="flex:1;min-width:110px" data-i18n-ph="ph.pronWord">
+          <input id="pronRead" placeholder="Đọc là (VD: Ngwiễn)" style="flex:1;min-width:110px" data-i18n-ph="ph.pronRead">
+          <button class="btn" style="margin:0;width:auto;padding:12px 20px" onclick="pronAdd()" data-i18n="ac.pronAdd">+ Thêm</button>
         </div>
         <div id="pronList" style="margin-top:12px"></div>
       </div>
 
       <div class="box" style="margin-top:16px">
-        <div class="k">🔌 Khoá API cho lập trình viên</div>
-        <div class="desc">Nối Tân Seven Voice vào phần mềm khác (n8n, Make, Python, tool của bạn).
+        <div class="k" data-i18n="ac.apiH">🔌 Khoá API cho lập trình viên</div>
+        <div class="desc" data-i18n="ac.apiDesc">Nối Tân Seven Voice vào phần mềm khác (n8n, Make, Python, tool của bạn).
           Khoá dùng chung số ký tự với tài khoản này. <a href="api.html" target="_blank"><b>Xem hướng dẫn →</b></a></div>
         <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-          <input id="akName" placeholder="Tên khoá (VD: Tool ghép video)" style="flex:1;min-width:160px">
-          <button class="btn" id="akBtn" style="margin:0;width:auto;padding:12px 20px" onclick="akCreate()">+ Tạo khoá mới</button>
+          <input id="akName" placeholder="Tên khoá (VD: Tool ghép video)" style="flex:1;min-width:160px" data-i18n-ph="ph.akName">
+          <button class="btn" id="akBtn" style="margin:0;width:auto;padding:12px 20px" onclick="akCreate()" data-i18n="ac.akCreate">+ Tạo khoá mới</button>
         </div>
         <div class="msg" id="akMsg"></div>
         <div id="akNew" style="display:none"></div>
@@ -533,7 +571,7 @@
   </div>
 
   <!-- Cảnh báo chưa cấu hình Supabase -->
-  <div class="config-warn" id="configWarn">
+  <div class="config-warn" id="configWarn" data-i18n="cfg.warn">
     ⚙️ <b>Chưa nối Supabase.</b> Trang này đã sẵn sàng — chỉ cần điền <b>SUPABASE_URL</b> và <b>SUPABASE_ANON_KEY</b>
     (lấy từ project Supabase) vào đầu file là chạy được đăng ký/đăng nhập thật.
   </div>
@@ -543,35 +581,35 @@
   <div class="nap-box">
     <button class="nap-x" onclick="closeNap()">✕</button>
     <div id="napStep1">
-      <h2 class="nap-h">💳 Nạp thêm ký tự</h2>
-      <p class="nap-sub">Mua 1 lần — ký tự dùng <b>vĩnh viễn</b>, không hết hạn.</p>
+      <h2 class="nap-h" data-i18n="np.h">💳 Nạp thêm ký tự</h2>
+      <p class="nap-sub" data-i18n="np.sub">Mua 1 lần — ký tự dùng <b>vĩnh viễn</b>, không hết hạn.</p>
       <div class="nap-packs">
         <button class="nap-pack" onclick="chooseNap('basic')">
-          <div class="np-nm">💚 Cơ bản</div>
+          <div class="np-nm" data-i18n="np.basic">💚 Cơ bản</div>
           <div class="np-amt">99.000đ</div>
-          <div class="np-cr">1.100.000 ký tự · ~18 giờ audio</div>
+          <div class="np-cr" data-i18n="np.basicCr">1.100.000 ký tự · ~18 giờ audio</div>
         </button>
         <button class="nap-pack hot" onclick="chooseNap('pro')">
-          <div class="np-badge">LỢI NHẤT</div>
-          <div class="np-nm">💛 Pro</div>
+          <div class="np-badge" data-i18n="np.badge">LỢI NHẤT</div>
+          <div class="np-nm" data-i18n="np.pro">💛 Pro</div>
           <div class="np-amt">299.000đ</div>
-          <div class="np-cr">3.800.000 ký tự · ~63 giờ audio</div>
+          <div class="np-cr" data-i18n="np.proCr">3.800.000 ký tự · ~63 giờ audio</div>
         </button>
       </div>
     </div>
     <div id="napStep2" style="display:none">
-      <h2 class="nap-h">📲 Quét mã để chuyển khoản</h2>
-      <div class="nap-qr"><img id="napQR" alt="QR chuyển khoản"></div>
+      <h2 class="nap-h" data-i18n="np.h2">📲 Quét mã để chuyển khoản</h2>
+      <div class="nap-qr"><img id="napQR" alt="QR" data-i18n-alt="np.qrAlt"></div>
       <div class="nap-info">
-        <div><span>Ngân hàng</span><b id="napBank"></b></div>
-        <div><span>Số tài khoản</span><b id="napAcc"></b></div>
-        <div><span>Chủ tài khoản</span><b id="napOwner"></b></div>
-        <div><span>Số tiền</span><b id="napAmount"></b></div>
-        <div class="hl"><span>Nội dung CK</span><b id="napCode"></b></div>
+        <div><span data-i18n="np.bank">Ngân hàng</span><b id="napBank"></b></div>
+        <div><span data-i18n="np.acc">Số tài khoản</span><b id="napAcc"></b></div>
+        <div><span data-i18n="np.owner">Chủ tài khoản</span><b id="napOwner"></b></div>
+        <div><span data-i18n="np.amount">Số tiền</span><b id="napAmount"></b></div>
+        <div class="hl"><span data-i18n="np.code">Nội dung CK</span><b id="napCode"></b></div>
       </div>
-      <p class="nap-note">⚠️ Chuyển <b>đúng số tiền</b> và <b>đúng nội dung</b> ở trên. Hệ thống tự cộng ký tự sau 1–2 phút.</p>
-      <div id="napWait" class="nap-wait">⏳ Đang chờ chuyển khoản...</div>
-      <div id="napDone" class="nap-done" style="display:none">🎉 Đã nhận tiền! Ký tự đã được cộng vào tài khoản.</div>
+      <p class="nap-note" data-i18n="np.note">⚠️ Chuyển <b>đúng số tiền</b> và <b>đúng nội dung</b> ở trên. Hệ thống tự cộng ký tự sau 1–2 phút.</p>
+      <div id="napWait" class="nap-wait" data-i18n="np.wait">⏳ Đang chờ chuyển khoản...</div>
+      <div id="napDone" class="nap-done" style="display:none" data-i18n="np.done">🎉 Đã nhận tiền! Ký tự đã được cộng vào tài khoản.</div>
     </div>
   </div>
 </div>
@@ -579,11 +617,11 @@
 <div id="voiceOverlay" class="nap-overlay" onclick="if(event.target===this)closeVoiceModal()">
   <div class="voice-modal">
     <button class="nap-x" onclick="closeVoiceModal()">✕</button>
-    <h2 class="nap-h">🎙️ Chọn giọng nói</h2>
-    <input id="voiceSearch" placeholder="🔍 Tìm giọng theo tên..." oninput="renderVoiceModal()" style="margin-bottom:12px">
+    <h2 class="nap-h" data-i18n="vm.h">🎙️ Chọn giọng nói</h2>
+    <input id="voiceSearch" placeholder=t("🔍 Tìm giọng theo tên...") oninput="renderVoiceModal()" style="margin-bottom:12px" data-i18n-ph="ph.voiceSearch">
     <div class="voice-filter-row">
       <select id="voiceLang" onchange="renderVoiceModal()"></select>
-      <button type="button" id="favToggle" class="vp-chip" onclick="toggleFavFilter()">❤️ Yêu thích</button>
+      <button type="button" id="favToggle" class="vp-chip" onclick="toggleFavFilter()" data-i18n="vm.fav">❤️ Yêu thích</button>
     </div>
     <div class="vp-grid" id="voiceModalGrid" style="max-height:54vh"></div>
   </div>
@@ -591,6 +629,15 @@
 
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ===== i18n runtime (Vietnamese source strings are the keys) ===== */
+var TS_LANGS_OK={vi:1,en:1,hi:1,ko:1};
+var TS_LANG='vi';
+try{ var _sv=localStorage.getItem('ts_lang'); if(_sv && TS_LANGS_OK[_sv]) TS_LANG=_sv; }catch(e){}
+document.documentElement.lang=TS_LANG;
+var TS_TR={"en":{" <span style=\"color:var(--muted);font-size:12px;margin-left:6px\">tạo ":" <span style=\"color:var(--muted);font-size:12px;margin-left:6px\">created "," Còn: ":" Left: "," Thêm đoạn nữa hoặc bấm lưu.":" Add another clip or press save."," giọng":" voices"," không tạo được":" failed"," ký tự":" characters"," ký tự.":" characters."," ký tự. Còn lại: ":" characters. Left: "," lần gọi · dùng gần nhất: ":" calls · last used: "," đoạn":" parts"," đoạn → 1 file (":" parts → 1 file ("," đoạn). Sẽ trừ nhiều ký tự và mất vài phút. Tiếp tục?":" parts). This will use a lot of characters and take a few minutes. Continue?"," đoạn, xử lý SONG SONG cho nhanh...":" parts, processing IN PARALLEL for speed..."," đoạn. Xoá bớt một đoạn rồi thêm lại nhé.":" clips. Remove one clip, then add again."," — nên gom thêm cho đủ 10s trở lên":" — add more to reach at least 10s","')\" title=\"Yêu thích\">":"')\" title=\"Favorite\">","')\">▶ Nghe thử</button>":"')\">▶ Preview</button>","');return false\">⬇️ Tải</a></div>":"');return false\">⬇️ Download</a></div>","). Trừ ":"). Used ","+ Tạo khoá mới":"+ New API key",". Hợp ":". Good for ",". Mở email (xem cả mục Spam) rồi bấm link trong đó.":". Open your email (check Spam too) and click the link inside.","<button class=\"btn\" style=\"margin-top:10px;width:auto;padding:10px 18px\" onclick=\"akCopy()\">📋 Sao chép</button>":"<button class=\"btn\" style=\"margin-top:10px;width:auto;padding:10px 18px\" onclick=\"akCopy()\">📋 Copy</button>","<button class=\"hist-del\" title=\"Xoá\" onclick=\"histDel('":"<button class=\"hist-del\" title=\"Delete\" onclick=\"histDel('","<button class=\"mv-del\" title=\"Xoá\" onclick=\"event.stopPropagation();deleteMyVoice('":"<button class=\"mv-del\" title=\"Delete\" onclick=\"event.stopPropagation();deleteMyVoice('","<div class=\"mv-empty\">Chưa có giọng clone nào.<br>Bấm “➕ Tạo / quản lý giọng clone”.</div>":"<div class=\"mv-empty\">No cloned voices yet.<br>Press “➕ Create / manage cloned voices”.</div>","<div class=\"mv-empty\">Chưa có giọng nói nào.<br>Tải lên tệp âm thanh để tạo giọng đầu tiên.</div>":"<div class=\"mv-empty\">No voices yet.<br>Upload an audio file to create your first voice.</div>","<div class=\"mv-empty\">Chưa có lịch sử.<br>Tạo audio để lưu vào đây.</div>":"<div class=\"mv-empty\">No history yet.<br>Create audio and it will be saved here.</div>","<div class=\"vc-pills\"><span class=\"vp other\">Giọng của bạn</span></div></div>":"<div class=\"vc-pills\"><span class=\"vp other\">Your voice</span></div></div>","<div style=\"color:var(--muted);font-size:13px\">Chưa có khoá nào. Bấm “Tạo khoá mới” để lấy khoá dùng cho tool của bạn.</div>":"<div style=\"color:var(--muted);font-size:13px\">No keys yet. Press “New API key” to get a key for your own tools.</div>","<div style=\"color:var(--muted);font-size:13px\">Chưa có từ nào. Thêm từ khó để AI đọc đúng.</div>":"<div style=\"color:var(--muted);font-size:13px\">No words yet. Add hard words so the AI reads them correctly.</div>","<div style=\"font-weight:700;margin-bottom:6px\">🔑 Khoá của bạn (chỉ hiện MỘT LẦN — hãy lưu lại ngay)</div>":"<div style=\"font-weight:700;margin-bottom:6px\">🔑 Your key (shown ONCE ONLY — save it now)</div>","<optgroup label=\"🌟 Giọng Tan Seven VIP\">":"<optgroup label=\"🌟 Tan Seven VIP voices\">","<optgroup label=\"🧬 Giọng Clone của tôi\">":"<optgroup label=\"🧬 My cloned voices\">","<p class=\"vc-desc\">Giọng bạn tự nhân bản — đọc mọi văn bản bằng chính giọng này.</p>":"<p class=\"vc-desc\">A voice you cloned yourself — read any text in your own voice.</p>","<small> ký tự</small>":"<small> characters</small>","Anh–Mỹ":"American English voice","Audio đã hết hạn (quá 24h).":"This audio has expired (over 24h).","Biểu cảm":"Expressive","Bấm để chọn đọc":"Tap to use","Bị chặn tốc độ":"Rate limited","Bồ Đào Nha":"Portuguese voice","Chloé":"Chloé","Chưa có dữ liệu phụ đề.":"No subtitle data yet.","Chưa có file nào.":"No files yet.","Chưa có giọng clone. Vào tab “Nhân bản giọng nói” để tạo giọng của bạn.":"No cloned voices. Go to the “Voice cloning” tab to create your own voice.","Chưa có giọng yêu thích ở mục này. Bấm 🤍 trên giọng để thêm.":"No favourite voices here yet. Press 🤍 on a voice to add it.","Chọn giọng đọc.":"Choose a voice.","Cần cho phép quyền micro để ghi âm.":"Microphone permission is required to record.","Dùng":"Use","File quá lớn (>12MB).":"File too large (>12MB).","Giọng ":"","Giọng VIP":"VIP voice","Giọng clone":"Cloned voice","Giọng clone của bạn":"Your cloned voice","Giọng độc quyền của Tân Seven — chọn được cảm xúc và ngôn ngữ khi đọc.":"An exclusive Tan Seven voice — pick the emotion and language it reads in.","Hãy chọn 1 giọng clone (bấm “Chọn giọng nói” → mục 🧬 Giọng của tôi).":"Please pick a cloned voice (press “Choose voice” → 🧬 My voices).","Hãy tải lên (hoặc ghi âm) mẫu giọng.":"Please upload (or record) a voice sample.","Hãy đặt tên cho giọng.":"Please name the voice.","Khoá API":"API key","Không có giọng cho mục này.":"No voices in this category.","Không phát được.":"Could not play.","Không tạo được khoá":"Could not create the key","Không tải được.":"Could not download.","Không đọc được file này. Hãy thử file .mp3 hoặc .wav khác.":"Could not read this file. Please try another .mp3 or .wav file.","Lỗi lưu: ":"Save error: ","Lỗi tạo đơn: ":"Order error: ","Lỗi xử lý ghi âm: ":"Recording error: ","Lỗi: ":"Error: ","Minh Triết":"Minh Triết","Minh Đức":"Minh Đức","Miền Bắc":"Northern","Miền Nam":"Southern","Miền Trung":"Central","Mẫu ngắn quá (":"Sample too short (","Mật khẩu phải ≥ 6 ký tự.":"Password must be at least 6 characters.","Nam":"Male","Ngọc Linh":"Ngọc Linh","Ngọc Trân":"Ngọc Trân","Nhập email và mật khẩu.":"Enter your email and password.","Nhập email đã đăng ký để nhận link đặt lại mật khẩu:":"Enter your registered email to get a password reset link:","Nhập nội dung cần đọc.":"Enter the text to read.","Nhập ít nhất 1 dòng.":"Enter at least 1 line.","Nhật":"Japanese voice","Nữ":"Female","Pháp":"French voice","Phạm Tuyên":"Phạm Tuyên","Quang Sơn":"Quang Sơn","Rất biểu cảm":"Very expressive","Sai email hoặc mật khẩu.":"Wrong email or password.","Sofía":"Sofía","Thanh Bình":"Thanh Bình","Thái Sơn":"Thái Sơn","Thùy Dung":"Thùy Dung","Thư viện nén chưa sẵn sàng, thử lại sau.":"The zip library is not ready yet, please try again.","Thục Đoan":"Thục Đoan","Trình duyệt không hỗ trợ ghi âm.":"This browser does not support recording.","Trúc Ly":"Trúc Ly","Tây Ban Nha":"Spanish voice","Tối đa ":"Maximum ","Tổng ":"Total ","Tổng mẫu sẽ thành ":"The total sample would be ","Vui lòng đăng nhập.":"Please sign in.","Văn bản rất dài (":"Very long text (","Vừa":"Medium","Xoá giọng clone này khỏi thư viện?":"Delete this cloned voice from your library?","Xoá khoá này? Mọi tool đang dùng khoá sẽ ngừng chạy.":"Delete this key? Every tool using it will stop working.","Xuân Vĩnh":"Xuân Vĩnh","bản tin, thời sự, phóng sự, video cập nhật":"news bulletins, current affairs, reports, update videos","bị chặn tốc độ, chạy lại sau":"rate limited, will retry","chưa dùng":"unused","kể chuyện, truyện dài, podcast":"storytelling, long stories, podcasts","kể chuyện, truyện dài, podcast, review":"storytelling, long stories, podcasts, reviews","miền Bắc":"Northern Vietnamese voice","miền Nam":"Southern Vietnamese voice","miền Trung":"Central Vietnamese voice","máy chủ đang khởi động, chạy lại sau":"server warming up, will retry","mạnh mẽ, kịch tính":"strong, dramatic","nam":"Male","nhiều loại nội dung":"many kinds of content","nhiều loại nội dung khác nhau":"many different kinds of content","năng động, tươi mới":"energetic, fresh","nữ":"Female","phim tài liệu, hồi ký, nội dung cảm xúc":"documentaries, memoirs, emotional content","phim tài liệu, thuyết minh, nội dung dài":"documentaries, narration, long-form content","quảng cáo, TVC, giới thiệu sản phẩm":"ads, TVCs, product introductions","rõ ràng, dứt khoát, chuyên nghiệp":"clear, decisive, professional","rõ ràng, điềm đạm":"clear, composed","s — vượt mức ":"s — over the limit of ","s). Cần ít nhất ":"s). At least ","s). Tổng ":"s). Total ","s, tốt nhất 20–60s.":"s needed, 20–60s is best.","s. Hãy cắt ngắn đoạn này lại.":"s. Please shorten this clip.","sách nói, tài liệu, nội dung dài":"audiobooks, documents, long-form content","sôi nổi, cuốn hút":"lively, engaging","thiền, ASMR, nội dung chữa lành":"meditation, ASMR, healing content","trailer, giới thiệu, nội dung khí thế":"trailers, intros, high-energy content","truyền cảm, cuốn hút":"warm, captivating","trầm ấm, sâu lắng":"deep, mellow","tự nhiên, dễ nghe":"natural, easy to listen to","tự nhiên, gần gũi, dễ nghe":"natural, warm, easy to listen to","tự nhiên, đa năng":"natural, versatile","video lễ hội, chúc mừng, nội dung gia đình":"holiday videos, greetings, family content","vlog, giải trí, review":"vlogs, entertainment, reviews","vlog, review, hướng dẫn, nội dung hằng ngày":"vlogs, reviews, tutorials, everyday content","vui tươi, ấm áp":"cheerful, warm","Ý":"Italian voice","êm dịu, thư thái":"gentle, soothing","Đang chọn ✓":"Selected ✓","Đang lưu...":"Saving...","Đang tạo ":"Creating ","Đang tạo...":"Creating...","Đang vào...":"Signing in...","Đang đọc ":"Reading ","Điền đủ tên, email, mật khẩu ≥6 ký tự.":"Please fill in your name, email and a password of at least 6 characters.","Đoan Trang":"Đoan Trang","Đoạn này ngắn quá (":"This clip is too short (","Đăng ký miễn phí →":"Sign up free →","Đăng nhập":"Sign in","đ":"₫","đang chờ lượt (giới hạn tốc độ)...":"waiting in queue (rate limit)...","đang chờ...":"waiting...","đang ghép file...":"merging files...","đoạn ":"part ","Ổn định":"Steady","”! Qua tab “Văn bản thành giọng nói” để dùng.":"”! Go to the “Text to speech” tab to use it.","”. Trừ ":"”. Used ","⏳ Máy chủ AI đang khởi động (~1 phút). Bấm “Tạo audio” lại sau chút nhé.":"⏳ The AI server is starting up (~1 minute). Press “Create audio” again in a moment.","⏳ Máy chủ đang khởi động (đoạn đầu hơi lâu)...":"⏳ The server is starting up (the first part takes a bit longer)...","⏳ Máy chủ đang xử lý (văn bản dài có thể lâu hơn). Bấm “Tạo audio” lại sau chút nhé.":"⏳ The server is busy (long text can take longer). Press “Create audio” again in a moment.","⏳ Đang xử lý đoạn mẫu…":"⏳ Processing the sample clip…","⏸ Đang phát":"⏸ Playing","⏹ Dừng (":"⏹ Stop (","⏹ Dừng (0s)":"⏹ Stop (0s)","⚠️ chưa có":"⚠️ not available","✅ Đã copy link! Gửi cho bạn bè để kiếm hoa hồng.":"✅ Link copied! Share it with friends to earn commission.","✅ Đã thêm đoạn ":"✅ Added clip ","✅ Đã tạo giọng “":"✅ Created the voice “","✅ Đã tạo khoá. Lưu lại ngay — đóng trang là không xem lại được nữa.":"✅ Key created. Save it now — once you close this page you cannot see it again.","✅ Đã đổi mật khẩu thành công!":"✅ Password changed successfully!","✅ Đổi mật khẩu thành công! Đang vào tài khoản...":"✅ Password changed! Signing you in...","✝️ Kinh thánh":"✝️ Scripture","🇨🇳 Tiếng Trung":"🇨🇳 Chinese","🇨🇿 Tiếng Séc":"🇨🇿 Czech","🇩🇪 Tiếng Đức":"🇩🇪 German","🇪🇸 Tây Ban Nha":"🇪🇸 Spanish","🇫🇷 Pháp":"🇫🇷 French","🇫🇷 Tiếng Pháp":"🇫🇷 French","🇬🇧 Tiếng Anh":"🇬🇧 English","🇮🇹 Tiếng Ý":"🇮🇹 Italian","🇮🇹 Ý":"🇮🇹 Italian","🇯🇵 Nhật":"🇯🇵 Japanese","🇯🇵 Tiếng Nhật":"🇯🇵 Japanese","🇰🇷 Tiếng Hàn":"🇰🇷 Korean","🇳🇱 Hà Lan":"🇳🇱 Dutch","🇵🇹 Bồ Đào Nha":"🇵🇹 Portuguese","🇷🇺 Tiếng Nga":"🇷🇺 Russian","🇸🇦 Ả Rập":"🇸🇦 Arabic","🇹🇷 Thổ Nhĩ Kỳ":"🇹🇷 Turkish","🇺🇸 Anh–Mỹ":"🇺🇸 American English","🇺🇸🇬🇧 Tiếng Anh":"🇺🇸🇬🇧 English","🇻🇳 Tiếng Việt":"🇻🇳 Vietnamese","🌐 Tất cả ngôn ngữ":"🌐 All languages","🌙 Thơ / Ngâm":"🌙 Poetry / Recital","🌟 Giọng Tan Seven VIP":"🌟 Tan Seven VIP voice","🎄 Lễ hội":"🎄 Festive","🎉 Tạo tài khoản thành công! Đang vào tài khoản...":"🎉 Account created! Signing you in...","🎉 Xong! Giọng “":"🎉 Done! Voice “","🎉 Xong! Trừ ":"🎉 Done! Used ","🎙️ Ghi âm":"🎙️ Record","🎙️ Trang trọng / MC":"🎙️ Formal / MC","🎙️ Tạo audio":"🎙️ Create audio","🎧 Tự nhiên":"🎧 Natural","🎧 Đa dụng":"🎧 Versatile","🎬 Quảng cáo (sôi động)":"🎬 Advertising (upbeat)","👶 Thiếu nhi (vui tươi)":"👶 Kids (cheerful)","💾 Tạo & lưu giọng":"💾 Create & save voice","📋 Đã sao chép khoá.":"📋 Key copied.","📖 Kể chuyện":"📖 Storytelling","📖 Truyện":"📖 Stories","📚 Sách nói":"📚 Audiobook","📚 Tài liệu":"📚 Documentary","📜 Văn bản dài — chia ":"📜 Long text — split into ","📣 Quảng cáo":"📣 Advertising","📧 Đã gửi link đặt lại tới ":"📧 A reset link has been sent to ","📰 Tin tức":"📰 News","🔍 Tìm giọng theo tên...":"🔍 Search voices by name...","🗑️ Đã xoá khoá.":"🗑️ Key deleted.","🚀 Tạo hàng loạt":"🚀 Create batch","🚦 Đang chờ lượt (giới hạn tốc độ)...":"🚦 Waiting in queue (rate limit)...","🤖 Tự động (cân bằng)":"🤖 Auto (balanced)","🧘 Thư giãn":"🧘 Relaxing","🧘 Tâm linh / Thiền":"🧘 Spiritual / Meditation","🧬 Giọng Clone của bạn":"🧬 Your cloned voice","🧬 Giọng của tôi":"🧬 My voices","🧬 Đang tạo...":"🧬 Creating...","Anh–Anh":"British English voice","Trung":"Chinese voice","Hindi":"Hindi voice","Bạn tạo hơi nhanh — nghỉ chút rồi thử lại nhé.":"You are generating a bit too fast — take a short break and try again.","🎬 Vlog":"🎬 Vlog","🎬 Trailer":"🎬 Trailer","🎧 Trầm ấm":"🎧 Deep &amp; warm","Adam · Nam (Mỹ)":"Adam · Male (US)","Aisha · Nữ":"Aisha · Female","Alice · Nữ (Anh-Anh)":"Alice · Female (UK)","Anh · Nữ":"UK · Female","Aria · Nữ (Mỹ)":"Aria · Female (US)","Ava · Nữ (Mỹ)":"Ava · Female (US)","Beatriz · Nữ":"Beatriz · Female","Bella · Nữ (Mỹ)":"Bella · Female (US)","Chloé · Nữ":"Chloé · Female","Eric · Nam (Mỹ)":"Eric · Male (US)","Ethan · Nam (Mỹ)":"Ethan · Male (US)","Giulia · Nữ":"Giulia · Female","Ivy · Nữ (Anh-Anh)":"Ivy · Female (UK)","Jack · Nam (Mỹ)":"Jack · Male (US)","Jessica · Nữ (Mỹ)":"Jessica · Female (US)","Kaia · Nữ (Mỹ)":"Kaia · Female (US)","Lan Anh · Nữ":"Lan Anh · Female","Leo · Nam (Mỹ)":"Leo · Male (US)","Liam · Nam (Mỹ)":"Liam · Male (US)","Lily · Nữ (Anh-Anh)":"Lily · Female (UK)","Luna · Nữ (Mỹ)":"Luna · Female (US)","Marcus · Nam (Mỹ)":"Marcus · Male (US)","Mason · Nam (Mỹ)":"Mason · Male (US)","Minh Đức · Nam":"Minh Đức · Male","Mỹ · Nam":"US · Male","Mỹ · Nữ":"US · Female","Nam · Bắc":"Male · North","Nhật · Nam":"JP · Male","Nhật · Nữ":"JP · Female","Nick · Nam (Mỹ)":"Nick · Male (US)","Nicole · Nữ (Mỹ)":"Nicole · Female (US)","Nova · Nữ (Mỹ)":"Nova · Female (US)","Nữ · Bắc":"Female · North","Nữ · Nam":"Female · South","Nữ · Trung":"Female · Central","River · Nữ (Mỹ)":"River · Female (US)","Rose · Nữ (Anh-Anh)":"Rose · Female (UK)","Sarah · Nữ (Mỹ)":"Sarah · Female (US)","Sky · Nữ (Mỹ)":"Sky · Female (US)","Sofía · Nữ":"Sofía · Female","Trung · Nữ":"CN · Female"},"hi":{" <span style=\"color:var(--muted);font-size:12px;margin-left:6px\">tạo ":" <span style=\"color:var(--muted);font-size:12px;margin-left:6px\">बनाया "," Còn: ":" शेष: "," Thêm đoạn nữa hoặc bấm lưu.":" एक और क्लिप जोड़ें या सेव दबाएँ।"," giọng":" आवाज़ें"," không tạo được":" नहीं बन सका"," ký tự":" अक्षर"," ký tự.":" अक्षर।"," ký tự. Còn lại: ":" अक्षर। शेष: "," lần gọi · dùng gần nhất: ":" कॉल · अंतिम उपयोग: "," đoạn":" हिस्से"," đoạn → 1 file (":" हिस्से → 1 फ़ाइल ("," đoạn). Sẽ trừ nhiều ký tự và mất vài phút. Tiếp tục?":" हिस्से)। इसमें बहुत सारे अक्षर खर्च होंगे और कुछ मिनट लगेंगे। जारी रखें?"," đoạn, xử lý SONG SONG cho nhanh...":" हिस्से, तेज़ी के लिए समानांतर प्रोसेसिंग..."," đoạn. Xoá bớt một đoạn rồi thêm lại nhé.":" क्लिप। एक क्लिप हटाकर दोबारा जोड़ें।"," — nên gom thêm cho đủ 10s trở lên":" — कम से कम 10 सेकंड के लिए और जोड़ें","')\" title=\"Yêu thích\">":"')\" title=\"पसंदीदा\">","')\">▶ Nghe thử</button>":"')\">▶ सुनें</button>","');return false\">⬇️ Tải</a></div>":"');return false\">⬇️ डाउनलोड</a></div>","). Trừ ":"). कटे ","+ Tạo khoá mới":"+ नई कुंजी बनाएँ",". Hợp ":". के लिए बढ़िया: ",". Mở email (xem cả mục Spam) rồi bấm link trong đó.":". अपना ईमेल खोलें (स्पैम भी देखें) और उसमें दिए लिंक पर क्लिक करें।","<button class=\"btn\" style=\"margin-top:10px;width:auto;padding:10px 18px\" onclick=\"akCopy()\">📋 Sao chép</button>":"<button class=\"btn\" style=\"margin-top:10px;width:auto;padding:10px 18px\" onclick=\"akCopy()\">📋 कॉपी</button>","<button class=\"hist-del\" title=\"Xoá\" onclick=\"histDel('":"<button class=\"hist-del\" title=\"हटाएँ\" onclick=\"histDel('","<button class=\"mv-del\" title=\"Xoá\" onclick=\"event.stopPropagation();deleteMyVoice('":"<button class=\"mv-del\" title=\"हटाएँ\" onclick=\"event.stopPropagation();deleteMyVoice('","<div class=\"mv-empty\">Chưa có giọng clone nào.<br>Bấm “➕ Tạo / quản lý giọng clone”.</div>":"<div class=\"mv-empty\">अभी कोई क्लोन आवाज़ नहीं।<br>“➕ क्लोन आवाज़ बनाएँ / प्रबंधित करें” दबाएँ।</div>","<div class=\"mv-empty\">Chưa có giọng nói nào.<br>Tải lên tệp âm thanh để tạo giọng đầu tiên.</div>":"<div class=\"mv-empty\">अभी कोई आवाज़ नहीं।<br>पहली आवाज़ बनाने के लिए ऑडियो फ़ाइल अपलोड करें।</div>","<div class=\"mv-empty\">Chưa có lịch sử.<br>Tạo audio để lưu vào đây.</div>":"<div class=\"mv-empty\">अभी कोई इतिहास नहीं।<br>ऑडियो बनाएँ, यहाँ सेव हो जाएगा।</div>","<div class=\"vc-pills\"><span class=\"vp other\">Giọng của bạn</span></div></div>":"<div class=\"vc-pills\"><span class=\"vp other\">आपकी आवाज़</span></div></div>","<div style=\"color:var(--muted);font-size:13px\">Chưa có khoá nào. Bấm “Tạo khoá mới” để lấy khoá dùng cho tool của bạn.</div>":"<div style=\"color:var(--muted);font-size:13px\">अभी कोई कुंजी नहीं। अपने टूल के लिए कुंजी पाने हेतु “नई कुंजी बनाएँ” दबाएँ।</div>","<div style=\"color:var(--muted);font-size:13px\">Chưa có từ nào. Thêm từ khó để AI đọc đúng.</div>":"<div style=\"color:var(--muted);font-size:13px\">अभी कोई शब्द नहीं। कठिन शब्द जोड़ें ताकि AI सही पढ़े।</div>","<div style=\"font-weight:700;margin-bottom:6px\">🔑 Khoá của bạn (chỉ hiện MỘT LẦN — hãy lưu lại ngay)</div>":"<div style=\"font-weight:700;margin-bottom:6px\">🔑 आपकी कुंजी (सिर्फ़ एक बार दिखेगी — अभी सेव करें)</div>","<optgroup label=\"🌟 Giọng Tan Seven VIP\">":"<optgroup label=\"🌟 Tan Seven VIP आवाज़ें\">","<optgroup label=\"🧬 Giọng Clone của tôi\">":"<optgroup label=\"🧬 मेरी क्लोन आवाज़ें\">","<p class=\"vc-desc\">Giọng bạn tự nhân bản — đọc mọi văn bản bằng chính giọng này.</p>":"<p class=\"vc-desc\">आपकी खुद क्लोन की हुई आवाज़ — किसी भी टेक्स्ट को अपनी आवाज़ में पढ़ें।</p>","<small> ký tự</small>":"<small> अक्षर</small>","Anh–Mỹ":"अमेरिकी अंग्रेज़ी आवाज़","Audio đã hết hạn (quá 24h).":"यह ऑडियो समाप्त हो चुका है (24 घंटे से ज़्यादा)।","Biểu cảm":"भावपूर्ण","Bấm để chọn đọc":"पढ़ने के लिए चुनें","Bị chặn tốc độ":"गति सीमित","Bồ Đào Nha":"पुर्तगाली आवाज़","Chloé":"Chloé","Chưa có dữ liệu phụ đề.":"अभी कोई सबटाइटल डेटा नहीं।","Chưa có file nào.":"अभी कोई फ़ाइल नहीं।","Chưa có giọng clone. Vào tab “Nhân bản giọng nói” để tạo giọng của bạn.":"कोई क्लोन आवाज़ नहीं। अपनी आवाज़ बनाने के लिए “आवाज़ क्लोनिंग” टैब पर जाएँ।","Chưa có giọng yêu thích ở mục này. Bấm 🤍 trên giọng để thêm.":"यहाँ अभी कोई पसंदीदा आवाज़ नहीं। किसी आवाज़ पर 🤍 दबाकर जोड़ें।","Chọn giọng đọc.":"आवाज़ चुनें।","Cần cho phép quyền micro để ghi âm.":"रिकॉर्ड करने के लिए माइक्रोफ़ोन की अनुमति चाहिए।","Dùng":"चुनें","File quá lớn (>12MB).":"फ़ाइल बहुत बड़ी है (>12MB)।","Giọng ":"","Giọng VIP":"VIP आवाज़","Giọng clone":"क्लोन आवाज़","Giọng clone của bạn":"आपकी क्लोन आवाज़","Giọng độc quyền của Tân Seven — chọn được cảm xúc và ngôn ngữ khi đọc.":"Tan Seven की विशेष आवाज़ — पढ़ने की भावना और भाषा चुनें।","Hãy chọn 1 giọng clone (bấm “Chọn giọng nói” → mục 🧬 Giọng của tôi).":"कृपया एक क्लोन आवाज़ चुनें (“आवाज़ चुनें” → 🧬 मेरी आवाज़ें)।","Hãy tải lên (hoặc ghi âm) mẫu giọng.":"कृपया आवाज़ का नमूना अपलोड करें (या रिकॉर्ड करें)।","Hãy đặt tên cho giọng.":"कृपया आवाज़ का नाम दें।","Khoá API":"API कुंजी","Không có giọng cho mục này.":"इस श्रेणी में कोई आवाज़ नहीं।","Không phát được.":"चला नहीं सका।","Không tạo được khoá":"कुंजी नहीं बन सकी","Không tải được.":"डाउनलोड नहीं हो सका।","Không đọc được file này. Hãy thử file .mp3 hoặc .wav khác.":"यह फ़ाइल पढ़ी नहीं जा सकी। कृपया कोई दूसरी .mp3 या .wav फ़ाइल आज़माएँ।","Lỗi lưu: ":"सेव त्रुटि: ","Lỗi tạo đơn: ":"ऑर्डर त्रुटि: ","Lỗi xử lý ghi âm: ":"रिकॉर्डिंग त्रुटि: ","Lỗi: ":"त्रुटि: ","Minh Triết":"Minh Triết","Minh Đức":"Minh Đức","Miền Bắc":"उत्तरी","Miền Nam":"दक्षिणी","Miền Trung":"मध्य","Mẫu ngắn quá (":"नमूना बहुत छोटा (","Mật khẩu phải ≥ 6 ký tự.":"पासवर्ड कम से कम 6 अक्षर का होना चाहिए।","Nam":"पुरुष","Ngọc Linh":"Ngọc Linh","Ngọc Trân":"Ngọc Trân","Nhập email và mật khẩu.":"अपना ईमेल और पासवर्ड डालें।","Nhập email đã đăng ký để nhận link đặt lại mật khẩu:":"पासवर्ड रीसेट लिंक पाने के लिए अपना पंजीकृत ईमेल डालें:","Nhập nội dung cần đọc.":"पढ़ने के लिए टेक्स्ट डालें।","Nhập ít nhất 1 dòng.":"कम से कम 1 पंक्ति डालें।","Nhật":"जापानी आवाज़","Nữ":"महिला","Pháp":"फ़्रेंच आवाज़","Phạm Tuyên":"Phạm Tuyên","Quang Sơn":"Quang Sơn","Rất biểu cảm":"बहुत भावपूर्ण","Sai email hoặc mật khẩu.":"ईमेल या पासवर्ड ग़लत है।","Sofía":"Sofía","Thanh Bình":"Thanh Bình","Thái Sơn":"Thái Sơn","Thùy Dung":"Thùy Dung","Thư viện nén chưa sẵn sàng, thử lại sau.":"ज़िप लाइब्रेरी अभी तैयार नहीं है, कृपया दोबारा कोशिश करें।","Thục Đoan":"Thục Đoan","Trình duyệt không hỗ trợ ghi âm.":"यह ब्राउज़र रिकॉर्डिंग का समर्थन नहीं करता।","Trúc Ly":"Trúc Ly","Tây Ban Nha":"स्पेनिश आवाज़","Tối đa ":"अधिकतम ","Tổng ":"कुल ","Tổng mẫu sẽ thành ":"कुल नमूना हो जाएगा ","Vui lòng đăng nhập.":"कृपया साइन इन करें।","Văn bản rất dài (":"बहुत लंबा टेक्स्ट (","Vừa":"मध्यम","Xoá giọng clone này khỏi thư viện?":"इस क्लोन आवाज़ को लाइब्रेरी से हटाएँ?","Xoá khoá này? Mọi tool đang dùng khoá sẽ ngừng chạy.":"यह कुंजी हटाएँ? इसका उपयोग करने वाले सभी टूल बंद हो जाएँगे।","Xuân Vĩnh":"Xuân Vĩnh","bản tin, thời sự, phóng sự, video cập nhật":"समाचार बुलेटिन, करंट अफेयर्स, रिपोर्ट, अपडेट वीडियो","bị chặn tốc độ, chạy lại sau":"गति सीमित, दोबारा कोशिश होगी","chưa dùng":"अप्रयुक्त","kể chuyện, truyện dài, podcast":"कहानी सुनाना, लंबी कहानियाँ, पॉडकास्ट","kể chuyện, truyện dài, podcast, review":"कहानी सुनाना, लंबी कहानियाँ, पॉडकास्ट, रिव्यू","miền Bắc":"उत्तरी वियतनामी आवाज़","miền Nam":"दक्षिणी वियतनामी आवाज़","miền Trung":"मध्य वियतनामी आवाज़","máy chủ đang khởi động, chạy lại sau":"सर्वर शुरू हो रहा है, दोबारा कोशिश होगी","mạnh mẽ, kịch tính":"दमदार, नाटकीय","nam":"पुरुष","nhiều loại nội dung":"कई तरह का कंटेंट","nhiều loại nội dung khác nhau":"कई अलग-अलग तरह का कंटेंट","năng động, tươi mới":"ऊर्जावान, ताज़ा","nữ":"महिला","phim tài liệu, hồi ký, nội dung cảm xúc":"डॉक्यूमेंट्री, संस्मरण, भावनात्मक कंटेंट","phim tài liệu, thuyết minh, nội dung dài":"डॉक्यूमेंट्री, नैरेशन, लंबा कंटेंट","quảng cáo, TVC, giới thiệu sản phẩm":"विज्ञापन, TVC, प्रोडक्ट परिचय","rõ ràng, dứt khoát, chuyên nghiệp":"स्पष्ट, दृढ़, पेशेवर","rõ ràng, điềm đạm":"स्पष्ट, संयत","s — vượt mức ":"से — सीमा से ज़्यादा ","s). Cần ít nhất ":"से)। कम से कम ","s). Tổng ":"से)। कुल ","s, tốt nhất 20–60s.":"से चाहिए, 20–60 सेकंड सबसे अच्छा।","s. Hãy cắt ngắn đoạn này lại.":"से। कृपया इस क्लिप को छोटा करें।","sách nói, tài liệu, nội dung dài":"ऑडियोबुक, दस्तावेज़, लंबा कंटेंट","sôi nổi, cuốn hút":"जोशीला, आकर्षक","thiền, ASMR, nội dung chữa lành":"ध्यान, ASMR, हीलिंग कंटेंट","trailer, giới thiệu, nội dung khí thế":"ट्रेलर, इंट्रो, हाई-एनर्जी कंटेंट","truyền cảm, cuốn hút":"भावपूर्ण, मनमोहक","trầm ấm, sâu lắng":"गहरी, मधुर","tự nhiên, dễ nghe":"स्वाभाविक, सुनने में आसान","tự nhiên, gần gũi, dễ nghe":"स्वाभाविक, आत्मीय, सुनने में आसान","tự nhiên, đa năng":"स्वाभाविक, बहुउपयोगी","video lễ hội, chúc mừng, nội dung gia đình":"त्योहारी वीडियो, शुभकामनाएँ, पारिवारिक कंटेंट","vlog, giải trí, review":"व्लॉग, मनोरंजन, रिव्यू","vlog, review, hướng dẫn, nội dung hằng ngày":"व्लॉग, रिव्यू, ट्यूटोरियल, रोज़मर्रा का कंटेंट","vui tươi, ấm áp":"हँसमुख, गर्मजोशी भरा","Ý":"इतालवी आवाज़","êm dịu, thư thái":"कोमल, सुकून भरा","Đang chọn ✓":"चयनित ✓","Đang lưu...":"सेव हो रहा है...","Đang tạo ":"बन रहा है ","Đang tạo...":"बन रहा है...","Đang vào...":"साइन इन हो रहा है...","Đang đọc ":"पढ़ रहा है ","Điền đủ tên, email, mật khẩu ≥6 ký tự.":"कृपया नाम, ईमेल और कम से कम 6 अक्षर का पासवर्ड भरें।","Đoan Trang":"Đoan Trang","Đoạn này ngắn quá (":"यह क्लिप बहुत छोटी है (","Đăng ký miễn phí →":"मुफ़्त रजिस्टर करें →","Đăng nhập":"साइन इन","đ":"₫","đang chờ lượt (giới hạn tốc độ)...":"कतार में प्रतीक्षा (गति सीमा)...","đang chờ...":"प्रतीक्षा में...","đang ghép file...":"फ़ाइलें जोड़ी जा रही हैं...","đoạn ":"हिस्सा ","Ổn định":"स्थिर","”! Qua tab “Văn bản thành giọng nói” để dùng.":"”! इसे इस्तेमाल करने के लिए “टेक्स्ट से आवाज़” टैब पर जाएँ।","”. Trừ ":"”. कटे ","⏳ Máy chủ AI đang khởi động (~1 phút). Bấm “Tạo audio” lại sau chút nhé.":"⏳ AI सर्वर शुरू हो रहा है (~1 मिनट)। थोड़ी देर बाद “ऑडियो बनाएँ” दोबारा दबाएँ।","⏳ Máy chủ đang khởi động (đoạn đầu hơi lâu)...":"⏳ सर्वर शुरू हो रहा है (पहला हिस्सा थोड़ा लंबा लगेगा)...","⏳ Máy chủ đang xử lý (văn bản dài có thể lâu hơn). Bấm “Tạo audio” lại sau chút nhé.":"⏳ सर्वर व्यस्त है (लंबा टेक्स्ट ज़्यादा समय ले सकता है)। थोड़ी देर बाद “ऑडियो बनाएँ” दोबारा दबाएँ।","⏳ Đang xử lý đoạn mẫu…":"⏳ नमूना क्लिप प्रोसेस हो रही है…","⏸ Đang phát":"⏸ चल रहा है","⏹ Dừng (":"⏹ रोकें (","⏹ Dừng (0s)":"⏹ रोकें (0s)","⚠️ chưa có":"⚠️ उपलब्ध नहीं","✅ Đã copy link! Gửi cho bạn bè để kiếm hoa hồng.":"✅ लिंक कॉपी हो गया! कमीशन कमाने के लिए दोस्तों को भेजें।","✅ Đã thêm đoạn ":"✅ क्लिप जोड़ी गई ","✅ Đã tạo giọng “":"✅ आवाज़ बन गई “","✅ Đã tạo khoá. Lưu lại ngay — đóng trang là không xem lại được nữa.":"✅ कुंजी बन गई। अभी सेव करें — पेज बंद करने के बाद दोबारा नहीं दिखेगी।","✅ Đã đổi mật khẩu thành công!":"✅ पासवर्ड सफलतापूर्वक बदल गया!","✅ Đổi mật khẩu thành công! Đang vào tài khoản...":"✅ पासवर्ड बदल गया! साइन इन हो रहा है...","✝️ Kinh thánh":"✝️ धर्मग्रंथ","🇨🇳 Tiếng Trung":"🇨🇳 चीनी","🇨🇿 Tiếng Séc":"🇨🇿 चेक","🇩🇪 Tiếng Đức":"🇩🇪 जर्मन","🇪🇸 Tây Ban Nha":"🇪🇸 स्पेनिश","🇫🇷 Pháp":"🇫🇷 फ़्रेंच","🇫🇷 Tiếng Pháp":"🇫🇷 फ़्रेंच","🇬🇧 Tiếng Anh":"🇬🇧 अंग्रेज़ी","🇮🇹 Tiếng Ý":"🇮🇹 इतालवी","🇮🇹 Ý":"🇮🇹 इतालवी","🇯🇵 Nhật":"🇯🇵 जापानी","🇯🇵 Tiếng Nhật":"🇯🇵 जापानी","🇰🇷 Tiếng Hàn":"🇰🇷 कोरियाई","🇳🇱 Hà Lan":"🇳🇱 डच","🇵🇹 Bồ Đào Nha":"🇵🇹 पुर्तगाली","🇷🇺 Tiếng Nga":"🇷🇺 रूसी","🇸🇦 Ả Rập":"🇸🇦 अरबी","🇹🇷 Thổ Nhĩ Kỳ":"🇹🇷 तुर्की","🇺🇸 Anh–Mỹ":"🇺🇸 अमेरिकी अंग्रेज़ी","🇺🇸🇬🇧 Tiếng Anh":"🇺🇸🇬🇧 अंग्रेज़ी","🇻🇳 Tiếng Việt":"🇻🇳 वियतनामी","🌐 Tất cả ngôn ngữ":"🌐 सभी भाषाएँ","🌙 Thơ / Ngâm":"🌙 कविता / पाठ","🌟 Giọng Tan Seven VIP":"🌟 Tan Seven VIP आवाज़","🎄 Lễ hội":"🎄 त्योहार","🎉 Tạo tài khoản thành công! Đang vào tài khoản...":"🎉 खाता बन गया! साइन इन हो रहा है...","🎉 Xong! Giọng “":"🎉 हो गया! आवाज़ “","🎉 Xong! Trừ ":"🎉 हो गया! कटे ","🎙️ Ghi âm":"🎙️ रिकॉर्ड","🎙️ Trang trọng / MC":"🎙️ औपचारिक / MC","🎙️ Tạo audio":"🎙️ ऑडियो बनाएँ","🎧 Tự nhiên":"🎧 स्वाभाविक","🎧 Đa dụng":"🎧 बहुउपयोगी","🎬 Quảng cáo (sôi động)":"🎬 विज्ञापन (जोशीला)","👶 Thiếu nhi (vui tươi)":"👶 बच्चे (हँसमुख)","💾 Tạo & lưu giọng":"💾 आवाज़ बनाएँ और सेव करें","📋 Đã sao chép khoá.":"📋 कुंजी कॉपी हो गई।","📖 Kể chuyện":"📖 कहानी","📖 Truyện":"📖 कहानियाँ","📚 Sách nói":"📚 ऑडियोबुक","📚 Tài liệu":"📚 डॉक्यूमेंट्री","📜 Văn bản dài — chia ":"📜 लंबा टेक्स्ट — बाँटा गया ","📣 Quảng cáo":"📣 विज्ञापन","📧 Đã gửi link đặt lại tới ":"📧 रीसेट लिंक भेजा गया ","📰 Tin tức":"📰 समाचार","🔍 Tìm giọng theo tên...":"🔍 नाम से आवाज़ खोजें...","🗑️ Đã xoá khoá.":"🗑️ कुंजी हटा दी गई।","🚀 Tạo hàng loạt":"🚀 बैच बनाएँ","🚦 Đang chờ lượt (giới hạn tốc độ)...":"🚦 कतार में प्रतीक्षा (गति सीमा)...","🤖 Tự động (cân bằng)":"🤖 ऑटो (संतुलित)","🧘 Thư giãn":"🧘 आराम","🧘 Tâm linh / Thiền":"🧘 आध्यात्मिक / ध्यान","🧬 Giọng Clone của bạn":"🧬 आपकी क्लोन आवाज़","🧬 Giọng của tôi":"🧬 मेरी आवाज़ें","🧬 Đang tạo...":"🧬 बन रहा है...","Anh–Anh":"ब्रिटिश अंग्रेज़ी आवाज़","Trung":"चीनी आवाज़","Hindi":"हिंदी आवाज़","Bạn tạo hơi nhanh — nghỉ chút rồi thử lại nhé.":"आप कुछ ज़्यादा तेज़ी से बना रहे हैं — थोड़ा रुककर दोबारा कोशिश करें।","🎬 Vlog":"🎬 व्लॉग","🎬 Trailer":"🎬 ट्रेलर","🎧 Trầm ấm":"🎧 गहरी और मधुर","Adam · Nam (Mỹ)":"Adam · पुरुष (अमेरिका)","Aisha · Nữ":"Aisha · महिला","Alice · Nữ (Anh-Anh)":"Alice · महिला (ब्रिटेन)","Anh · Nữ":"ब्रिटेन · महिला","Aria · Nữ (Mỹ)":"Aria · महिला (अमेरिका)","Ava · Nữ (Mỹ)":"Ava · महिला (अमेरिका)","Beatriz · Nữ":"Beatriz · महिला","Bella · Nữ (Mỹ)":"Bella · महिला (अमेरिका)","Chloé · Nữ":"Chloé · महिला","Eric · Nam (Mỹ)":"Eric · पुरुष (अमेरिका)","Ethan · Nam (Mỹ)":"Ethan · पुरुष (अमेरिका)","Giulia · Nữ":"Giulia · महिला","Ivy · Nữ (Anh-Anh)":"Ivy · महिला (ब्रिटेन)","Jack · Nam (Mỹ)":"Jack · पुरुष (अमेरिका)","Jessica · Nữ (Mỹ)":"Jessica · महिला (अमेरिका)","Kaia · Nữ (Mỹ)":"Kaia · महिला (अमेरिका)","Lan Anh · Nữ":"Lan Anh · महिला","Leo · Nam (Mỹ)":"Leo · पुरुष (अमेरिका)","Liam · Nam (Mỹ)":"Liam · पुरुष (अमेरिका)","Lily · Nữ (Anh-Anh)":"Lily · महिला (ब्रिटेन)","Luna · Nữ (Mỹ)":"Luna · महिला (अमेरिका)","Marcus · Nam (Mỹ)":"Marcus · पुरुष (अमेरिका)","Mason · Nam (Mỹ)":"Mason · पुरुष (अमेरिका)","Minh Đức · Nam":"Minh Đức · पुरुष","Mỹ · Nam":"अमेरिका · पुरुष","Mỹ · Nữ":"अमेरिका · महिला","Nam · Bắc":"पुरुष · उत्तर","Nhật · Nam":"जापान · पुरुष","Nhật · Nữ":"जापान · महिला","Nick · Nam (Mỹ)":"Nick · पुरुष (अमेरिका)","Nicole · Nữ (Mỹ)":"Nicole · महिला (अमेरिका)","Nova · Nữ (Mỹ)":"Nova · महिला (अमेरिका)","Nữ · Bắc":"महिला · उत्तर","Nữ · Nam":"महिला · दक्षिण","Nữ · Trung":"महिला · मध्य","River · Nữ (Mỹ)":"River · महिला (अमेरिका)","Rose · Nữ (Anh-Anh)":"Rose · महिला (ब्रिटेन)","Sarah · Nữ (Mỹ)":"Sarah · महिला (अमेरिका)","Sky · Nữ (Mỹ)":"Sky · महिला (अमेरिका)","Sofía · Nữ":"Sofía · महिला","Trung · Nữ":"चीन · महिला"},"ko":{" <span style=\"color:var(--muted);font-size:12px;margin-left:6px\">tạo ":" <span style=\"color:var(--muted);font-size:12px;margin-left:6px\">생성 "," Còn: ":" 남음: "," Thêm đoạn nữa hoặc bấm lưu.":" 클립을 더 추가하거나 저장을 누르세요."," giọng":" 개"," không tạo được":" 생성 실패"," ký tự":" 자"," ký tự.":" 자."," ký tự. Còn lại: ":" 자. 남음: "," lần gọi · dùng gần nhất: ":" 회 호출 · 마지막 사용: "," đoạn":" 조각"," đoạn → 1 file (":" 조각 → 1개 파일 ("," đoạn). Sẽ trừ nhiều ký tự và mất vài phút. Tiếp tục?":" 조각). 글자를 많이 사용하고 몇 분 걸립니다. 계속할까요?"," đoạn, xử lý SONG SONG cho nhanh...":" 조각, 빠르게 병렬 처리 중..."," đoạn. Xoá bớt một đoạn rồi thêm lại nhé.":" 개. 클립을 하나 지운 뒤 다시 추가하세요."," — nên gom thêm cho đủ 10s trở lên":" — 10초 이상이 되도록 더 추가하세요","')\" title=\"Yêu thích\">":"')\" title=\"즐겨찾기\">","')\">▶ Nghe thử</button>":"')\">▶ 미리듣기</button>","');return false\">⬇️ Tải</a></div>":"');return false\">⬇️ 다운로드</a></div>","). Trừ ":"). 차감 ","+ Tạo khoá mới":"+ 새 키 만들기",". Hợp ":". 적합: ",". Mở email (xem cả mục Spam) rồi bấm link trong đó.":". 이메일(스팸함 포함)을 열어 링크를 클릭하세요.","<button class=\"btn\" style=\"margin-top:10px;width:auto;padding:10px 18px\" onclick=\"akCopy()\">📋 Sao chép</button>":"<button class=\"btn\" style=\"margin-top:10px;width:auto;padding:10px 18px\" onclick=\"akCopy()\">📋 복사</button>","<button class=\"hist-del\" title=\"Xoá\" onclick=\"histDel('":"<button class=\"hist-del\" title=\"삭제\" onclick=\"histDel('","<button class=\"mv-del\" title=\"Xoá\" onclick=\"event.stopPropagation();deleteMyVoice('":"<button class=\"mv-del\" title=\"삭제\" onclick=\"event.stopPropagation();deleteMyVoice('","<div class=\"mv-empty\">Chưa có giọng clone nào.<br>Bấm “➕ Tạo / quản lý giọng clone”.</div>":"<div class=\"mv-empty\">아직 복제 음성이 없습니다.<br>“➕ 복제 음성 만들기 / 관리”를 누르세요.</div>","<div class=\"mv-empty\">Chưa có giọng nói nào.<br>Tải lên tệp âm thanh để tạo giọng đầu tiên.</div>":"<div class=\"mv-empty\">아직 음성이 없습니다.<br>오디오 파일을 올려 첫 음성을 만들어 보세요.</div>","<div class=\"mv-empty\">Chưa có lịch sử.<br>Tạo audio để lưu vào đây.</div>":"<div class=\"mv-empty\">기록이 없습니다.<br>오디오를 만들면 여기에 저장됩니다.</div>","<div class=\"vc-pills\"><span class=\"vp other\">Giọng của bạn</span></div></div>":"<div class=\"vc-pills\"><span class=\"vp other\">내 음성</span></div></div>","<div style=\"color:var(--muted);font-size:13px\">Chưa có khoá nào. Bấm “Tạo khoá mới” để lấy khoá dùng cho tool của bạn.</div>":"<div style=\"color:var(--muted);font-size:13px\">키가 없습니다. “새 키 만들기”를 눌러 내 툴에서 쓸 키를 받으세요.</div>","<div style=\"color:var(--muted);font-size:13px\">Chưa có từ nào. Thêm từ khó để AI đọc đúng.</div>":"<div style=\"color:var(--muted);font-size:13px\">등록된 단어가 없습니다. 어려운 단어를 추가해 AI가 정확히 읽게 하세요.</div>","<div style=\"font-weight:700;margin-bottom:6px\">🔑 Khoá của bạn (chỉ hiện MỘT LẦN — hãy lưu lại ngay)</div>":"<div style=\"font-weight:700;margin-bottom:6px\">🔑 내 키 (한 번만 표시됩니다 — 지금 저장하세요)</div>","<optgroup label=\"🌟 Giọng Tan Seven VIP\">":"<optgroup label=\"🌟 Tan Seven VIP 음성\">","<optgroup label=\"🧬 Giọng Clone của tôi\">":"<optgroup label=\"🧬 내 복제 음성\">","<p class=\"vc-desc\">Giọng bạn tự nhân bản — đọc mọi văn bản bằng chính giọng này.</p>":"<p class=\"vc-desc\">직접 복제한 음성 — 어떤 텍스트든 내 목소리로 읽습니다.</p>","<small> ký tự</small>":"<small> 자</small>","Anh–Mỹ":"미국식 영어 음성","Audio đã hết hạn (quá 24h).":"오디오가 만료되었습니다 (24시간 초과).","Biểu cảm":"풍부하게","Bấm để chọn đọc":"눌러서 선택","Bị chặn tốc độ":"속도 제한","Bồ Đào Nha":"포르투갈어 음성","Chloé":"Chloé","Chưa có dữ liệu phụ đề.":"자막 데이터가 없습니다.","Chưa có file nào.":"파일이 없습니다.","Chưa có giọng clone. Vào tab “Nhân bản giọng nói” để tạo giọng của bạn.":"복제 음성이 없습니다. “음성 복제” 탭에서 내 음성을 만들어 보세요.","Chưa có giọng yêu thích ở mục này. Bấm 🤍 trên giọng để thêm.":"즐겨찾기한 음성이 없습니다. 음성의 🤍를 눌러 추가하세요.","Chọn giọng đọc.":"음성을 선택하세요.","Cần cho phép quyền micro để ghi âm.":"녹음하려면 마이크 권한이 필요합니다.","Dùng":"사용","File quá lớn (>12MB).":"파일이 너무 큽니다 (>12MB).","Giọng ":"","Giọng VIP":"VIP 음성","Giọng clone":"복제 음성","Giọng clone của bạn":"내 복제 음성","Giọng độc quyền của Tân Seven — chọn được cảm xúc và ngôn ngữ khi đọc.":"Tan Seven 전용 음성 — 감정과 언어를 골라 읽힐 수 있습니다.","Hãy chọn 1 giọng clone (bấm “Chọn giọng nói” → mục 🧬 Giọng của tôi).":"복제 음성을 선택하세요 (“음성 선택” → 🧬 내 음성).","Hãy tải lên (hoặc ghi âm) mẫu giọng.":"음성 샘플을 올리거나 녹음해 주세요.","Hãy đặt tên cho giọng.":"음성 이름을 입력하세요.","Khoá API":"API 키","Không có giọng cho mục này.":"이 항목에 음성이 없습니다.","Không phát được.":"재생할 수 없습니다.","Không tạo được khoá":"키를 만들지 못했습니다","Không tải được.":"다운로드할 수 없습니다.","Không đọc được file này. Hãy thử file .mp3 hoặc .wav khác.":"이 파일을 읽을 수 없습니다. 다른 .mp3 또는 .wav 파일을 사용해 보세요.","Lỗi lưu: ":"저장 오류: ","Lỗi tạo đơn: ":"주문 오류: ","Lỗi xử lý ghi âm: ":"녹음 오류: ","Lỗi: ":"오류: ","Minh Triết":"Minh Triết","Minh Đức":"Minh Đức","Miền Bắc":"북부","Miền Nam":"남부","Miền Trung":"중부","Mẫu ngắn quá (":"샘플이 너무 짧습니다 (","Mật khẩu phải ≥ 6 ký tự.":"비밀번호는 6자 이상이어야 합니다.","Nam":"남성","Ngọc Linh":"Ngọc Linh","Ngọc Trân":"Ngọc Trân","Nhập email và mật khẩu.":"이메일과 비밀번호를 입력하세요.","Nhập email đã đăng ký để nhận link đặt lại mật khẩu:":"비밀번호 재설정 링크를 받을 가입 이메일을 입력하세요:","Nhập nội dung cần đọc.":"읽을 내용을 입력하세요.","Nhập ít nhất 1 dòng.":"최소 1줄을 입력하세요.","Nhật":"일본어 음성","Nữ":"여성","Pháp":"프랑스어 음성","Phạm Tuyên":"Phạm Tuyên","Quang Sơn":"Quang Sơn","Rất biểu cảm":"매우 풍부하게","Sai email hoặc mật khẩu.":"이메일 또는 비밀번호가 올바르지 않습니다.","Sofía":"Sofía","Thanh Bình":"Thanh Bình","Thái Sơn":"Thái Sơn","Thùy Dung":"Thùy Dung","Thư viện nén chưa sẵn sàng, thử lại sau.":"압축 라이브러리가 아직 준비되지 않았습니다. 다시 시도해 주세요.","Thục Đoan":"Thục Đoan","Trình duyệt không hỗ trợ ghi âm.":"이 브라우저는 녹음을 지원하지 않습니다.","Trúc Ly":"Trúc Ly","Tây Ban Nha":"스페인어 음성","Tối đa ":"최대 ","Tổng ":"총 ","Tổng mẫu sẽ thành ":"샘플 총 길이가 ","Vui lòng đăng nhập.":"로그인해 주세요.","Văn bản rất dài (":"텍스트가 매우 깁니다 (","Vừa":"보통","Xoá giọng clone này khỏi thư viện?":"이 복제 음성을 라이브러리에서 삭제할까요?","Xoá khoá này? Mọi tool đang dùng khoá sẽ ngừng chạy.":"이 키를 삭제할까요? 이 키를 쓰는 모든 툴이 중단됩니다.","Xuân Vĩnh":"Xuân Vĩnh","bản tin, thời sự, phóng sự, video cập nhật":"뉴스, 시사, 리포트, 속보 영상","bị chặn tốc độ, chạy lại sau":"속도 제한, 나중에 재시도","chưa dùng":"미사용","kể chuyện, truyện dài, podcast":"스토리텔링, 장편 이야기, 팟캐스트","kể chuyện, truyện dài, podcast, review":"스토리텔링, 장편 이야기, 팟캐스트, 리뷰","miền Bắc":"북부 베트남어 음성","miền Nam":"남부 베트남어 음성","miền Trung":"중부 베트남어 음성","máy chủ đang khởi động, chạy lại sau":"서버 준비 중, 나중에 재시도","mạnh mẽ, kịch tính":"강렬하고 극적인","nam":"남성","nhiều loại nội dung":"다양한 콘텐츠","nhiều loại nội dung khác nhau":"여러 종류의 콘텐츠","năng động, tươi mới":"활기차고 산뜻한","nữ":"여성","phim tài liệu, hồi ký, nội dung cảm xúc":"다큐멘터리, 회고록, 감성 콘텐츠","phim tài liệu, thuyết minh, nội dung dài":"다큐멘터리, 내레이션, 장편 콘텐츠","quảng cáo, TVC, giới thiệu sản phẩm":"광고, TVC, 제품 소개","rõ ràng, dứt khoát, chuyên nghiệp":"명확하고 단호하며 전문적인","rõ ràng, điềm đạm":"또렷하고 차분한","s — vượt mức ":"초 — 한도 ","s). Cần ít nhất ":"초). 최소 ","s). Tổng ":"초). 총 ","s, tốt nhất 20–60s.":"초 필요, 20~60초가 가장 좋습니다.","s. Hãy cắt ngắn đoạn này lại.":"초. 이 클립을 줄여 주세요.","sách nói, tài liệu, nội dung dài":"오디오북, 문서, 장편 콘텐츠","sôi nổi, cuốn hút":"생동감 있고 매력적인","thiền, ASMR, nội dung chữa lành":"명상, ASMR, 힐링 콘텐츠","trailer, giới thiệu, nội dung khí thế":"예고편, 인트로, 강렬한 콘텐츠","truyền cảm, cuốn hút":"감성적이고 매력적인","trầm ấm, sâu lắng":"깊고 부드러운","tự nhiên, dễ nghe":"자연스럽고 듣기 편한","tự nhiên, gần gũi, dễ nghe":"자연스럽고 친근하며 듣기 편한","tự nhiên, đa năng":"자연스럽고 다용도","video lễ hội, chúc mừng, nội dung gia đình":"명절 영상, 축하 인사, 가족 콘텐츠","vlog, giải trí, review":"브이로그, 엔터테인먼트, 리뷰","vlog, review, hướng dẫn, nội dung hằng ngày":"브이로그, 리뷰, 튜토리얼, 일상 콘텐츠","vui tươi, ấm áp":"밝고 따뜻한","Ý":"이탈리아어 음성","êm dịu, thư thái":"부드럽고 편안한","Đang chọn ✓":"선택됨 ✓","Đang lưu...":"저장 중...","Đang tạo ":"생성 중 ","Đang tạo...":"생성 중...","Đang vào...":"로그인 중...","Đang đọc ":"읽는 중 ","Điền đủ tên, email, mật khẩu ≥6 ký tự.":"이름, 이메일, 6자 이상 비밀번호를 모두 입력하세요.","Đoan Trang":"Đoan Trang","Đoạn này ngắn quá (":"이 클립은 너무 짧습니다 (","Đăng ký miễn phí →":"무료로 가입 →","Đăng nhập":"로그인","đ":"₫","đang chờ lượt (giới hạn tốc độ)...":"대기 중 (속도 제한)...","đang chờ...":"대기 중...","đang ghép file...":"파일 병합 중...","đoạn ":"조각 ","Ổn định":"안정적으로","”! Qua tab “Văn bản thành giọng nói” để dùng.":"”! “텍스트 음성 변환” 탭에서 사용하세요.","”. Trừ ":"”. 차감 ","⏳ Máy chủ AI đang khởi động (~1 phút). Bấm “Tạo audio” lại sau chút nhé.":"⏳ AI 서버가 시작 중입니다 (~1분). 잠시 후 “오디오 만들기”를 다시 누르세요.","⏳ Máy chủ đang khởi động (đoạn đầu hơi lâu)...":"⏳ 서버가 시작 중입니다 (첫 조각은 조금 더 걸립니다)...","⏳ Máy chủ đang xử lý (văn bản dài có thể lâu hơn). Bấm “Tạo audio” lại sau chút nhé.":"⏳ 서버가 처리 중입니다 (긴 텍스트는 더 걸릴 수 있음). 잠시 후 “오디오 만들기”를 다시 누르세요.","⏳ Đang xử lý đoạn mẫu…":"⏳ 샘플 클립 처리 중…","⏸ Đang phát":"⏸ 재생 중","⏹ Dừng (":"⏹ 정지 (","⏹ Dừng (0s)":"⏹ 정지 (0초)","⚠️ chưa có":"⚠️ 없음","✅ Đã copy link! Gửi cho bạn bè để kiếm hoa hồng.":"✅ 링크를 복사했습니다! 친구에게 공유하고 수수료를 받으세요.","✅ Đã thêm đoạn ":"✅ 클립 추가됨 ","✅ Đã tạo giọng “":"✅ 음성을 만들었습니다 “","✅ Đã tạo khoá. Lưu lại ngay — đóng trang là không xem lại được nữa.":"✅ 키를 만들었습니다. 지금 저장하세요 — 페이지를 닫으면 다시 볼 수 없습니다.","✅ Đã đổi mật khẩu thành công!":"✅ 비밀번호를 변경했습니다!","✅ Đổi mật khẩu thành công! Đang vào tài khoản...":"✅ 비밀번호를 변경했습니다! 로그인 중...","✝️ Kinh thánh":"✝️ 성경","🇨🇳 Tiếng Trung":"🇨🇳 중국어","🇨🇿 Tiếng Séc":"🇨🇿 체코어","🇩🇪 Tiếng Đức":"🇩🇪 독일어","🇪🇸 Tây Ban Nha":"🇪🇸 스페인어","🇫🇷 Pháp":"🇫🇷 프랑스어","🇫🇷 Tiếng Pháp":"🇫🇷 프랑스어","🇬🇧 Tiếng Anh":"🇬🇧 영어","🇮🇹 Tiếng Ý":"🇮🇹 이탈리아어","🇮🇹 Ý":"🇮🇹 이탈리아어","🇯🇵 Nhật":"🇯🇵 일본어","🇯🇵 Tiếng Nhật":"🇯🇵 일본어","🇰🇷 Tiếng Hàn":"🇰🇷 한국어","🇳🇱 Hà Lan":"🇳🇱 네덜란드어","🇵🇹 Bồ Đào Nha":"🇵🇹 포르투갈어","🇷🇺 Tiếng Nga":"🇷🇺 러시아어","🇸🇦 Ả Rập":"🇸🇦 아랍어","🇹🇷 Thổ Nhĩ Kỳ":"🇹🇷 튀르키예어","🇺🇸 Anh–Mỹ":"🇺🇸 미국식 영어","🇺🇸🇬🇧 Tiếng Anh":"🇺🇸🇬🇧 영어","🇻🇳 Tiếng Việt":"🇻🇳 베트남어","🌐 Tất cả ngôn ngữ":"🌐 모든 언어","🌙 Thơ / Ngâm":"🌙 시 / 낭송","🌟 Giọng Tan Seven VIP":"🌟 Tan Seven VIP 음성","🎄 Lễ hội":"🎄 명절","🎉 Tạo tài khoản thành công! Đang vào tài khoản...":"🎉 계정을 만들었습니다! 로그인 중...","🎉 Xong! Giọng “":"🎉 완료! 음성 “","🎉 Xong! Trừ ":"🎉 완료! 차감 ","🎙️ Ghi âm":"🎙️ 녹음","🎙️ Trang trọng / MC":"🎙️ 격식 / 진행","🎙️ Tạo audio":"🎙️ 오디오 만들기","🎧 Tự nhiên":"🎧 자연스러운","🎧 Đa dụng":"🎧 다용도","🎬 Quảng cáo (sôi động)":"🎬 광고 (경쾌하게)","👶 Thiếu nhi (vui tươi)":"👶 어린이 (밝게)","💾 Tạo & lưu giọng":"💾 음성 만들고 저장","📋 Đã sao chép khoá.":"📋 키를 복사했습니다.","📖 Kể chuyện":"📖 스토리텔링","📖 Truyện":"📖 이야기","📚 Sách nói":"📚 오디오북","📚 Tài liệu":"📚 다큐멘터리","📜 Văn bản dài — chia ":"📜 긴 텍스트 — 분할 ","📣 Quảng cáo":"📣 광고","📧 Đã gửi link đặt lại tới ":"📧 재설정 링크를 보냈습니다 ","📰 Tin tức":"📰 뉴스","🔍 Tìm giọng theo tên...":"🔍 이름으로 음성 검색...","🗑️ Đã xoá khoá.":"🗑️ 키를 삭제했습니다.","🚀 Tạo hàng loạt":"🚀 일괄 생성","🚦 Đang chờ lượt (giới hạn tốc độ)...":"🚦 대기 중 (속도 제한)...","🤖 Tự động (cân bằng)":"🤖 자동 (균형)","🧘 Thư giãn":"🧘 릴랙스","🧘 Tâm linh / Thiền":"🧘 명상 / 영성","🧬 Giọng Clone của bạn":"🧬 내 복제 음성","🧬 Giọng của tôi":"🧬 내 음성","🧬 Đang tạo...":"🧬 생성 중...","Anh–Anh":"영국식 영어 음성","Trung":"중국어 음성","Hindi":"힌디어 음성","Bạn tạo hơi nhanh — nghỉ chút rồi thử lại nhé.":"조금 빠르게 요청하고 있습니다 — 잠시 쉬었다가 다시 시도해 주세요.","🎬 Vlog":"🎬 브이로그","🎬 Trailer":"🎬 예고편","🎧 Trầm ấm":"🎧 저음의 따뜻한","Adam · Nam (Mỹ)":"Adam · 남성 (미국)","Aisha · Nữ":"Aisha · 여성","Alice · Nữ (Anh-Anh)":"Alice · 여성 (영국)","Anh · Nữ":"영국 · 여성","Aria · Nữ (Mỹ)":"Aria · 여성 (미국)","Ava · Nữ (Mỹ)":"Ava · 여성 (미국)","Beatriz · Nữ":"Beatriz · 여성","Bella · Nữ (Mỹ)":"Bella · 여성 (미국)","Chloé · Nữ":"Chloé · 여성","Eric · Nam (Mỹ)":"Eric · 남성 (미국)","Ethan · Nam (Mỹ)":"Ethan · 남성 (미국)","Giulia · Nữ":"Giulia · 여성","Ivy · Nữ (Anh-Anh)":"Ivy · 여성 (영국)","Jack · Nam (Mỹ)":"Jack · 남성 (미국)","Jessica · Nữ (Mỹ)":"Jessica · 여성 (미국)","Kaia · Nữ (Mỹ)":"Kaia · 여성 (미국)","Lan Anh · Nữ":"Lan Anh · 여성","Leo · Nam (Mỹ)":"Leo · 남성 (미국)","Liam · Nam (Mỹ)":"Liam · 남성 (미국)","Lily · Nữ (Anh-Anh)":"Lily · 여성 (영국)","Luna · Nữ (Mỹ)":"Luna · 여성 (미국)","Marcus · Nam (Mỹ)":"Marcus · 남성 (미국)","Mason · Nam (Mỹ)":"Mason · 남성 (미국)","Minh Đức · Nam":"Minh Đức · 남성","Mỹ · Nam":"미국 · 남성","Mỹ · Nữ":"미국 · 여성","Nam · Bắc":"남성 · 북부","Nhật · Nam":"일본 · 남성","Nhật · Nữ":"일본 · 여성","Nick · Nam (Mỹ)":"Nick · 남성 (미국)","Nicole · Nữ (Mỹ)":"Nicole · 여성 (미국)","Nova · Nữ (Mỹ)":"Nova · 여성 (미국)","Nữ · Bắc":"여성 · 북부","Nữ · Nam":"여성 · 남부","Nữ · Trung":"여성 · 중부","River · Nữ (Mỹ)":"River · 여성 (미국)","Rose · Nữ (Anh-Anh)":"Rose · 여성 (영국)","Sarah · Nữ (Mỹ)":"Sarah · 여성 (미국)","Sky · Nữ (Mỹ)":"Sky · 여성 (미국)","Sofía · Nữ":"Sofía · 여성","Trung · Nữ":"중국 · 여성"}};
+function t(s){ if(TS_LANG==='vi') return s; var d=TS_TR[TS_LANG]; return (d && d[s]!=null) ? d[s] : s; }
+</script>
 <script>
   // ====== CẤU HÌNH — điền sau khi tạo project Supabase ======
   const SUPABASE_URL = "https://idnfafxgrbabypfokgve.supabase.co";
@@ -665,7 +712,7 @@
       const { data: prof } = await sb.from('profiles').select('name, credits').eq('id', session.user.id).single();
       el('userName').textContent = (prof && prof.name) ? prof.name : session.user.email.split('@')[0];
       var creditVal = prof ? Number(prof.credits).toLocaleString('vi-VN') : '0';
-      el('creditNum').innerHTML = creditVal + '<small> ký tự</small>';
+      el('creditNum').innerHTML = creditVal + t('<small> ký tự</small>');
       if(el('creditMini')) el('creditMini').textContent = creditVal;
       loadAffiliate();
       akLoad();
@@ -680,23 +727,23 @@
   async function doRegister(){
     if(!sb) return;
     const name=el('rgName').value.trim(), email=el('rgEmail').value.trim(), pass=el('rgPass').value;
-    if(!name||!email||pass.length<6){ showMsg('Điền đủ tên, email, mật khẩu ≥6 ký tự.'); return; }
-    el('rgBtn').disabled=true; el('rgBtn').textContent='Đang tạo...';
+    if(!name||!email||pass.length<6){ showMsg(t('Điền đủ tên, email, mật khẩu ≥6 ký tự.')); return; }
+    el('rgBtn').disabled=true; el('rgBtn').textContent=t('Đang tạo...');
     var refBy = null; try { refBy = localStorage.getItem('ts_ref'); } catch(e){}
     const { data, error } = await sb.auth.signUp({ email, password: pass, options:{ data:{ name, ref_by: refBy } } });
-    el('rgBtn').disabled=false; el('rgBtn').textContent='Đăng ký miễn phí →';
+    el('rgBtn').disabled=false; el('rgBtn').textContent=t('Đăng ký miễn phí →');
     if(error){ showMsg(error.message); return; }
-    showMsg('🎉 Tạo tài khoản thành công! Đang vào tài khoản...', true);
+    showMsg(t('🎉 Tạo tài khoản thành công! Đang vào tài khoản...'), true);
   }
 
   async function doLogin(){
     if(!sb) return;
     const email=el('lgEmail').value.trim(), pass=el('lgPass').value;
-    if(!email||!pass){ showMsg('Nhập email và mật khẩu.'); return; }
-    el('lgBtn').disabled=true; el('lgBtn').textContent='Đang vào...';
+    if(!email||!pass){ showMsg(t('Nhập email và mật khẩu.')); return; }
+    el('lgBtn').disabled=true; el('lgBtn').textContent=t('Đang vào...');
     const { error } = await sb.auth.signInWithPassword({ email, password: pass });
-    el('lgBtn').disabled=false; el('lgBtn').textContent='Đăng nhập';
-    if(error){ showMsg('Sai email hoặc mật khẩu.'); return; }
+    el('lgBtn').disabled=false; el('lgBtn').textContent=t('Đăng nhập');
+    if(error){ showMsg(t('Sai email hoặc mật khẩu.')); return; }
   }
 
   async function doLogout(){ if(sb){ await sb.auth.signOut(); } }
@@ -704,7 +751,7 @@
   // đếm ký tự
   var _tt = document.getElementById('ttsText');
   if(_tt) _tt.addEventListener('input', function(){
-    document.getElementById('ttsCount').textContent = this.value.length + ' ký tự';
+    document.getElementById('ttsCount').textContent = this.value.length + t(' ký tự');
   });
 
   // tạo giọng
@@ -716,13 +763,13 @@
     var speed = parseFloat(document.getElementById('ttsSpeed').value) || 1.0;
     var msg = document.getElementById('ttsMsg');
     var res = document.getElementById('ttsResult');
-    if(!text){ msg.className='msg err'; msg.textContent='Nhập nội dung cần đọc.'; return; }
+    if(!text){ msg.className='msg err'; msg.textContent=t('Nhập nội dung cần đọc.'); return; }
     var btn = document.getElementById('ttsBtn');
     if(text.length > LONG_THRESHOLD){
-      return runLongGen({ fn:'smart-api', text:text, lang:lang, voiceLabel:voice, msg:msg, res:res, btn:btn, btnIdle:'🎙️ Tạo audio',
+      return runLongGen({ fn:'smart-api', text:text, lang:lang, voiceLabel:voice, msg:msg, res:res, btn:btn, btnIdle:t('🎙️ Tạo audio'),
         build:function(pt){ return { text:pt, voice:voice, lang:lang, speed:speed }; } });
     }
-    btn.disabled=true; btn.textContent='Đang tạo...';
+    btn.disabled=true; btn.textContent=t('Đang tạo...');
     msg.className='msg'; res.style.display='none'; progStart(estSec(text));
     try{
       var s = await sb.auth.getSession();
@@ -736,9 +783,9 @@
       if(isRateLimited(r, d)){
         progFail(); msg.className='msg warn'; msg.textContent=rateText(d); setCreditUI(d.credits);
       } else if(r.status===202 || d.warming){
-        progFail(); msg.className='msg warn'; msg.textContent='⏳ Máy chủ đang xử lý (văn bản dài có thể lâu hơn). Bấm “Tạo audio” lại sau chút nhé.';
+        progFail(); msg.className='msg warn'; msg.textContent=t('⏳ Máy chủ đang xử lý (văn bản dài có thể lâu hơn). Bấm “Tạo audio” lại sau chút nhé.');
       } else if(!r.ok || !d.audio_base64){
-        progFail(); msg.className='msg err'; msg.textContent = 'Lỗi: ' + (d.error || ('HTTP '+r.status));
+        progFail(); msg.className='msg err'; msg.textContent = t('Lỗi: ') + (d.error || ('HTTP '+r.status));
       } else {
         progDone();
         var src = 'data:audio/mpeg;base64,' + d.audio_base64;
@@ -749,14 +796,14 @@
         if(srtBtn) srtBtn.style.display = (window._ttsSegs.length ? 'inline-block' : 'none');
         res.style.display='block';
         msg.className='msg ok';
-        msg.textContent = '🎉 Xong! Trừ ' + d.cost + ' ký tự. Còn lại: ' + Number(d.credits).toLocaleString('vi-VN') + ' ký tự';
+        msg.textContent = t('🎉 Xong! Trừ ') + d.cost + t(' ký tự. Còn lại: ') + Number(d.credits).toLocaleString('vi-VN') + t(' ký tự');
         var cv = Number(d.credits).toLocaleString('vi-VN');
-        document.getElementById('creditNum').innerHTML = cv + '<small> ký tự</small>';
+        document.getElementById('creditNum').innerHTML = cv + t('<small> ký tự</small>');
         if(el('creditMini')) el('creditMini').textContent = cv;
         histAdd(text, voice, d.cost, d.audio_seconds, d.audio_base64);
       }
-    }catch(e){ progFail(); msg.className='msg err'; msg.textContent='Lỗi: '+String(e); }
-    btn.disabled=false; btn.textContent='🎙️ Tạo audio';
+    }catch(e){ progFail(); msg.className='msg err'; msg.textContent=t('Lỗi: ')+String(e); }
+    btn.disabled=false; btn.textContent=t('🎙️ Tạo audio');
   }
 
   // ====== AFFILIATE ======
@@ -769,7 +816,7 @@
       var base = location.origin + location.pathname.replace(/[^/]*$/, '');
       if(el('affLink'))  el('affLink').value = base + '?ref=' + a.aff_code;
       if(el('affCount')) el('affCount').textContent = Number(a.referral_count||0).toLocaleString('vi-VN');
-      if(el('affComm'))  el('affComm').textContent  = Number(a.commission_total||0).toLocaleString('vi-VN') + 'đ';
+      if(el('affComm'))  el('affComm').textContent  = Number(a.commission_total||0).toLocaleString('vi-VN') + t('đ');
     } catch(e){}
   }
 
@@ -777,7 +824,7 @@
     var i = el('affLink'); if(!i) return;
     var m = el('affMsg');
     i.select(); i.setSelectionRange(0, 99999);
-    var done = function(){ if(m){ m.className='msg ok'; m.textContent='✅ Đã copy link! Gửi cho bạn bè để kiếm hoa hồng.'; } };
+    var done = function(){ if(m){ m.className='msg ok'; m.textContent=t('✅ Đã copy link! Gửi cho bạn bè để kiếm hoa hồng.'); } };
     if(navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(i.value).then(done, function(){ try{document.execCommand('copy');}catch(e){} done(); });
     } else { try{document.execCommand('copy');}catch(e){} done(); }
@@ -791,12 +838,12 @@
     if(el('creditMini')) el('creditMini').textContent = cv;
   }
   function isRateLimited(r, d){ return !!(r && (r.status===429 || (d && d.rate_limited))); }
-  function rateText(d){ return '\ud83d\udea6 ' + ((d && d.error) || 'B\u1ea1n t\u1ea1o h\u01a1i nhanh \u2014 ngh\u1ec9 ch\u00fat r\u1ed3i th\u1eed l\u1ea1i nh\u00e9.'); }
+  function rateText(d){ return '\ud83d\udea6 ' + ((d && d.error) || t('Bạn tạo hơi nhanh — nghỉ chút rồi thử lại nhé.')); }
 
   // ====== NẠP TIỀN (Phase 4) ======
   var napPoll = null, napCode = null;
   function openNap(){
-    if(!sb){ alert('Vui lòng đăng nhập.'); return; }
+    if(!sb){ alert(t('Vui lòng đăng nhập.')); return; }
     el('napStep1').style.display='block';
     el('napStep2').style.display='none';
     el('napOverlay').style.display='flex';
@@ -809,13 +856,13 @@
     if(!sb) return;
     try{
       var { data, error } = await sb.rpc('create_order', { p_pack: pack });
-      if(error || !data || !data[0]){ alert('Lỗi tạo đơn: ' + (error?error.message:'?')); return; }
+      if(error || !data || !data[0]){ alert(t('Lỗi tạo đơn: ') + (error?error.message:'?')); return; }
       var o = data[0];
       napCode = o.code;
       el('napBank').textContent  = BANK_CODE;
       el('napAcc').textContent   = BANK_ACC;
       el('napOwner').textContent = BANK_OWNER;
-      el('napAmount').textContent = Number(o.amount_vnd).toLocaleString('vi-VN') + 'đ';
+      el('napAmount').textContent = Number(o.amount_vnd).toLocaleString('vi-VN') + t('đ');
       el('napCode').textContent  = o.code;
       el('napQR').src = 'https://qr.sepay.vn/img?acc=' + encodeURIComponent(BANK_ACC) +
         '&bank=' + encodeURIComponent(BANK_CODE) + '&amount=' + o.amount_vnd + '&des=' + encodeURIComponent(o.code);
@@ -825,7 +872,7 @@
       el('napDone').style.display='none';
       if(napPoll) clearInterval(napPoll);
       napPoll = setInterval(checkNap, 4000);
-    }catch(e){ alert('Lỗi: '+String(e)); }
+    }catch(e){ alert(t('Lỗi: ')+String(e)); }
   }
   async function checkNap(){
     if(!sb || !napCode) return;
@@ -857,13 +904,13 @@
   };
   function fillLangs(){
     var s = el('ttsLang'); if(!s) return;
-    s.innerHTML = TTS_LANGS.map(function(l){ return '<option value="'+l[0]+'">'+l[1]+'</option>'; }).join('');
+    s.innerHTML = TTS_LANGS.map(function(l){ return '<option value="'+l[0]+'">'+t(l[1])+'</option>'; }).join('');
     fillVoices();
   }
   function fillVoices(){
     var s = el('ttsVoice'); if(!s) return;
     var vs = TTS_VOICES[el('ttsLang').value] || [];
-    s.innerHTML = vs.map(function(v){ return '<option value="'+v[0]+'">'+v[1]+'</option>'; }).join('');
+    s.innerHTML = vs.map(function(v){ return '<option value="'+v[0]+'">'+t(v[1])+'</option>'; }).join('');
   }
   fillLangs();  // (cũ — vô hại, ttsLang/ttsVoice không còn nên tự bỏ qua)
 
@@ -899,41 +946,41 @@
   var selectedVoice={type:'vip',name:'Minh Đức',lang:'vi'};
   var vmLang='all', vmFav=false;
   var VOICE_LANGS=[['all','🌐 Tất cả ngôn ngữ'],['vi','🇻🇳 Tiếng Việt'],['en','🇺🇸🇬🇧 Tiếng Anh'],['zh','🇨🇳 Tiếng Trung'],['ja','🇯🇵 Tiếng Nhật'],['e','🇪🇸 Tây Ban Nha'],['p','🇵🇹 Bồ Đào Nha'],['h','🇮🇳 Hindi'],['f','🇫🇷 Tiếng Pháp'],['i','🇮🇹 Tiếng Ý'],['clone','🧬 Giọng của tôi']];
-  function fillVoiceLangs(){ var s=el('voiceLang'); if(s&&!s.options.length) s.innerHTML=VOICE_LANGS.map(function(l){return '<option value="'+l[0]+'">'+l[1]+'</option>';}).join(''); }
+  function fillVoiceLangs(){ var s=el('voiceLang'); if(s&&!s.options.length) s.innerHTML=VOICE_LANGS.map(function(l){return '<option value="'+l[0]+'">'+t(l[1])+'</option>';}).join(''); }
   function toggleFavFilter(){ vmFav=!vmFav; if(el('favToggle')) el('favToggle').classList.toggle('on',vmFav); renderVoiceModal(); }
   function loadFavs(){ try{ return new Set(JSON.parse(localStorage.getItem('ts_favs')||'[]')); }catch(e){ return new Set(); } }
   var favVoices=loadFavs();
   function saveFavs(){ try{ localStorage.setItem('ts_favs', JSON.stringify(Array.from(favVoices))); }catch(e){} }
   function toggleFav(k){ if(favVoices.has(k)) favVoices.delete(k); else favVoices.add(k); saveFavs(); renderVoiceModal(); }
   var GENRE_DESC={
-    "📰 Tin tức":["rõ ràng, dứt khoát, chuyên nghiệp","bản tin, thời sự, phóng sự, video cập nhật"],
-    "📖 Kể chuyện":["truyền cảm, cuốn hút","kể chuyện, truyện dài, podcast, review"],
-    "📖 Truyện":["truyền cảm, cuốn hút","kể chuyện, truyện dài, podcast"],
-    "🎧 Tự nhiên":["tự nhiên, gần gũi, dễ nghe","vlog, review, hướng dẫn, nội dung hằng ngày"],
-    "🎧 Đa dụng":["tự nhiên, đa năng","nhiều loại nội dung khác nhau"],
-    "📣 Quảng cáo":["sôi nổi, cuốn hút","quảng cáo, TVC, giới thiệu sản phẩm"],
-    "🎬 Vlog":["năng động, tươi mới","vlog, giải trí, review"],
-    "🎬 Trailer":["mạnh mẽ, kịch tính","trailer, giới thiệu, nội dung khí thế"],
-    "🧘 Thư giãn":["êm dịu, thư thái","thiền, ASMR, nội dung chữa lành"],
-    "🎧 Trầm ấm":["trầm ấm, sâu lắng","phim tài liệu, hồi ký, nội dung cảm xúc"],
-    "📚 Sách nói":["rõ ràng, điềm đạm","sách nói, tài liệu, nội dung dài"],
-    "📚 Tài liệu":["rõ ràng, điềm đạm","phim tài liệu, thuyết minh, nội dung dài"],
-    "🎄 Lễ hội":["vui tươi, ấm áp","video lễ hội, chúc mừng, nội dung gia đình"]
+    "📰 Tin tức":[t("rõ ràng, dứt khoát, chuyên nghiệp"),t("bản tin, thời sự, phóng sự, video cập nhật")],
+    "📖 Kể chuyện":[t("truyền cảm, cuốn hút"),t("kể chuyện, truyện dài, podcast, review")],
+    "📖 Truyện":[t("truyền cảm, cuốn hút"),t("kể chuyện, truyện dài, podcast")],
+    "🎧 Tự nhiên":[t("tự nhiên, gần gũi, dễ nghe"),t("vlog, review, hướng dẫn, nội dung hằng ngày")],
+    "🎧 Đa dụng":[t("tự nhiên, đa năng"),t("nhiều loại nội dung khác nhau")],
+    "📣 Quảng cáo":[t("sôi nổi, cuốn hút"),t("quảng cáo, TVC, giới thiệu sản phẩm")],
+    "🎬 Vlog":[t("năng động, tươi mới"),t("vlog, giải trí, review")],
+    "🎬 Trailer":[t("mạnh mẽ, kịch tính"),t("trailer, giới thiệu, nội dung khí thế")],
+    "🧘 Thư giãn":[t("êm dịu, thư thái"),t("thiền, ASMR, nội dung chữa lành")],
+    "🎧 Trầm ấm":[t("trầm ấm, sâu lắng"),t("phim tài liệu, hồi ký, nội dung cảm xúc")],
+    "📚 Sách nói":[t("rõ ràng, điềm đạm"),t("sách nói, tài liệu, nội dung dài")],
+    "📚 Tài liệu":[t("rõ ràng, điềm đạm"),t("phim tài liệu, thuyết minh, nội dung dài")],
+    "🎄 Lễ hội":[t("vui tươi, ấm áp"),t("video lễ hội, chúc mừng, nội dung gia đình")]
   };
   function jsq(s){ return String(s).replace(/'/g,"\\'"); }
   function pillInfo(v){
-    if(v.lang==='vi'){ return v.info.indexOf('Bắc')>-1?{cls:'bac',label:'Miền Bắc'}:(v.info.indexOf('Trung')>-1?{cls:'trung',label:'Miền Trung'}:{cls:'nam',label:'Miền Nam'}); }
-    if(v.lang==='en'){ return v.info.indexOf('Anh')>-1?{cls:'en',label:'🇬🇧 Anh–Anh'}:{cls:'en',label:'🇺🇸 Anh–Mỹ'}; }
-    var m={e:'🇪🇸 Tây Ban Nha',p:'🇵🇹 Bồ Đào Nha',f:'🇫🇷 Pháp',i:'🇮🇹 Ý',h:'🇮🇳 Hindi',ja:'🇯🇵 Nhật',zh:'🇨🇳 Trung'};
+    if(v.lang==='vi'){ return v.info.indexOf('Bắc')>-1?{cls:'bac',label:t('Miền Bắc')}:(v.info.indexOf('Trung')>-1?{cls:'trung',label:t('Miền Trung')}:{cls:'nam',label:t('Miền Nam')}); }
+    if(v.lang==='en'){ return v.info.indexOf('Anh')>-1?{cls:'en',label:'🇬🇧 Anh–Anh'}:{cls:'en',label:t('🇺🇸 Anh–Mỹ')}; }
+    var m={e:t('🇪🇸 Tây Ban Nha'),p:t('🇵🇹 Bồ Đào Nha'),f:t('🇫🇷 Pháp'),i:t('🇮🇹 Ý'),h:'🇮🇳 Hindi',ja:t('🇯🇵 Nhật'),zh:'🇨🇳 Trung'};
     return {cls:'other',label:m[v.lang]||v.lang};
   }
   function descOf(v){
-    var g=GENRE_DESC[v.genre]||["tự nhiên, dễ nghe","nhiều loại nội dung"];
-    var gender=v.info.indexOf('Nữ')>-1?'nữ':'nam', who;
-    if(v.lang==='vi'){ var reg=v.info.indexOf('Bắc')>-1?'miền Bắc':(v.info.indexOf('Trung')>-1?'miền Trung':'miền Nam'); who='Giọng '+gender+' '+reg; }
-    else if(v.lang==='en'){ who='Giọng '+gender+' '+(v.info.indexOf('Anh')>-1?'Anh–Anh':'Anh–Mỹ'); }
-    else { var mm={e:'Tây Ban Nha',p:'Bồ Đào Nha',f:'Pháp',i:'Ý',h:'Hindi',ja:'Nhật',zh:'Trung'}; who='Giọng '+gender+' '+(mm[v.lang]||''); }
-    return who+', '+g[0]+'. Hợp '+g[1]+'.';
+    var g=GENRE_DESC[v.genre]||[t("tự nhiên, dễ nghe"),t("nhiều loại nội dung")];
+    var gender=v.info.indexOf('Nữ')>-1?t('nữ'):t('nam'), who;
+    if(v.lang==='vi'){ var reg=v.info.indexOf('Bắc')>-1?t('miền Bắc'):(v.info.indexOf('Trung')>-1?t('miền Trung'):t('miền Nam')); who=t('Giọng ')+gender+' '+reg; }
+    else if(v.lang==='en'){ who=t('Giọng ')+gender+' '+(v.info.indexOf('Anh')>-1?'Anh–Anh':t('Anh–Mỹ')); }
+    else { var mm={e:t('Tây Ban Nha'),p:t('Bồ Đào Nha'),f:t('Pháp'),i:t('Ý'),h:'Hindi',ja:t('Nhật'),zh:'Trung'}; who=t('Giọng ')+gender+' '+(mm[v.lang]||''); }
+    return who+', '+g[0]+t('. Hợp ')+g[1]+'.';
   }
   function safeFile(n){ return String(n).replace(/[^0-9A-Za-z]/g,'_'); }
   var _prev=null;
@@ -941,9 +988,9 @@
     try{ if(_prev) _prev.pause(); }catch(e){}
     var old=btn.getAttribute('data-lbl'); if(!old){ old=btn.innerHTML; btn.setAttribute('data-lbl',old); }
     _prev=new Audio('previews/'+lang+'__'+safeFile(name)+'.wav');
-    btn.innerHTML='⏸ Đang phát';
+    btn.innerHTML=t('⏸ Đang phát');
     _prev.onended=function(){ btn.innerHTML=old; };
-    _prev.onerror=function(){ btn.innerHTML='⚠️ chưa có'; setTimeout(function(){ btn.innerHTML=old; },1500); };
+    _prev.onerror=function(){ btn.innerHTML=t('⚠️ chưa có'); setTimeout(function(){ btn.innerHTML=old; },1500); };
     _prev.play().catch(function(){ btn.innerHTML=old; });
   }
   function gradForName(n){ return gradFor({name:n}); }
@@ -963,35 +1010,35 @@
   function isCloneEngine(t){ return t==='clone'||t==='vipclone'; }
   function voiceModalCard(v){
     var on=isSel(v), fav=favVoices.has(v.key);
-    var heart='<button type="button" class="vc-fav" onclick="event.stopPropagation();toggleFav(\''+v.key+'\')" title="Yêu thích">'+(fav?'❤️':'🤍')+'</button>';
+    var heart='<button type="button" class="vc-fav" onclick="event.stopPropagation();toggleFav(\''+v.key+t('\')" title="Yêu thích">')+(fav?'❤️':'🤍')+'</button>';
     if(v.type==='vipclone'){
       var gnd=(v.info||'').indexOf('Nữ')>-1?'Nữ':'Nam';
       return '<div class="vcard'+(on?' on':'')+'">'+
         '<div class="vc-head"><span class="vc-ava" style="background:linear-gradient(135deg,#f59f00,#e8590c)">'+initsOf(v.name)+'</span>'+
         '<div style="flex:1"><div class="vc-name">'+esc(v.name)+' <span class="vc-vip" style="background:linear-gradient(135deg,#f59f00,#e8590c)">VIP+</span></div>'+
-        '<div class="vc-pills"><span class="vp g">'+esc(v.info)+'</span><span class="vp g">'+esc(v.genre)+'</span></div></div>'+heart+'</div>'+
-        '<p class="vc-desc">'+esc(v.desc||'Giọng độc quyền của Tân Seven — chọn được cảm xúc và ngôn ngữ khi đọc.')+'</p>'+
-        '<div class="vc-foot"><button type="button" class="vc-play" onclick="playPreview(this,\''+v.lang+'\',\''+jsq(v.name)+'\')">▶ Nghe thử</button>'+
-        '<button type="button" class="vc-pick" onclick="chooseVoice(\'vipclone\',\''+v.id+'\',\''+v.lang+'\')">'+(on?'Đang chọn ✓':'Dùng')+'</button></div>'+
+        '<div class="vc-pills"><span class="vp g">'+esc(t(v.info))+'</span><span class="vp g">'+esc(t(v.genre))+'</span></div></div>'+heart+'</div>'+
+        '<p class="vc-desc">'+esc(v.desc||t('Giọng độc quyền của Tân Seven — chọn được cảm xúc và ngôn ngữ khi đọc.'))+'</p>'+
+        '<div class="vc-foot"><button type="button" class="vc-play" onclick="playPreview(this,\''+v.lang+'\',\''+jsq(v.name)+t('\')">▶ Nghe thử</button>')+
+        '<button type="button" class="vc-pick" onclick="chooseVoice(\'vipclone\',\''+v.id+'\',\''+v.lang+'\')">'+(on?t('Đang chọn ✓'):t('Dùng'))+'</button></div>'+
       '</div>';
     }
     if(v.type==='clone'){
       return '<div class="vcard'+(on?' on':'')+'">'+
         '<div class="vc-head"><span class="vc-ava" style="background:linear-gradient(135deg,#9775fa,#7048e8)">🧬</span>'+
         '<div style="flex:1"><div class="vc-name">'+esc(v.name)+' <span class="vc-vip" style="background:linear-gradient(135deg,#9775fa,#7048e8)">CLONE</span></div>'+
-        '<div class="vc-pills"><span class="vp other">Giọng của bạn</span></div></div>'+heart+'</div>'+
-        '<p class="vc-desc">Giọng bạn tự nhân bản — đọc mọi văn bản bằng chính giọng này.</p>'+
-        '<div class="vc-foot"><button type="button" class="vc-pick" onclick="chooseVoice(\'clone\',\''+v.id+'\')">'+(on?'Đang chọn ✓':'Dùng')+'</button></div>'+
+        t('<div class="vc-pills"><span class="vp other">Giọng của bạn</span></div></div>')+heart+'</div>'+
+        t('<p class="vc-desc">Giọng bạn tự nhân bản — đọc mọi văn bản bằng chính giọng này.</p>')+
+        '<div class="vc-foot"><button type="button" class="vc-pick" onclick="chooseVoice(\'clone\',\''+v.id+'\')">'+(on?t('Đang chọn ✓'):t('Dùng'))+'</button></div>'+
       '</div>';
     }
     var pi=pillInfo(v), gender=v.info.indexOf('Nữ')>-1?'Nữ':'Nam', q=jsq(v.name);
     return '<div class="vcard'+(on?' on':'')+'">'+
       '<div class="vc-head"><span class="vc-ava" style="background:'+gradFor(v)+'">'+initsOf(v.name)+'</span>'+
       '<div style="flex:1"><div class="vc-name">'+v.name+' <span class="vc-vip">VIP</span></div>'+
-      '<div class="vc-pills"><span class="vp '+pi.cls+'">'+pi.label+'</span><span class="vp g">'+gender+'</span><span class="vp g">'+v.genre+'</span></div></div>'+heart+'</div>'+
+      '<div class="vc-pills"><span class="vp '+pi.cls+'">'+pi.label+'</span><span class="vp g">'+t(gender)+'</span><span class="vp g">'+t(v.genre)+'</span></div></div>'+heart+'</div>'+
       '<p class="vc-desc">'+descOf(v)+'</p>'+
-      '<div class="vc-foot"><button type="button" class="vc-play" onclick="playPreview(this,\''+v.lang+'\',\''+q+'\')">▶ Nghe thử</button>'+
-      '<button type="button" class="vc-pick" onclick="chooseVoice(\'vip\',\''+q+'\',\''+v.lang+'\')">'+(on?'Đang chọn ✓':'Dùng')+'</button></div>'+
+      '<div class="vc-foot"><button type="button" class="vc-play" onclick="playPreview(this,\''+v.lang+'\',\''+q+t('\')">▶ Nghe thử</button>')+
+      '<button type="button" class="vc-pick" onclick="chooseVoice(\'vip\',\''+q+'\',\''+v.lang+'\')">'+(on?t('Đang chọn ✓'):t('Dùng'))+'</button></div>'+
     '</div>';
   }
   function renderVoiceModal(){
@@ -1006,16 +1053,16 @@
       return true;
     });
     var g=el('voiceModalGrid'); if(!g) return;
-    if(!items.length){ g.innerHTML='<div class="mv-empty" style="grid-column:1/-1">'+(vmFav?'Chưa có giọng yêu thích ở mục này. Bấm 🤍 trên giọng để thêm.':(lang==='clone'?'Chưa có giọng clone. Vào tab “Nhân bản giọng nói” để tạo giọng của bạn.':'Không có giọng cho mục này.'))+'</div>'; return; }
+    if(!items.length){ g.innerHTML='<div class="mv-empty" style="grid-column:1/-1">'+(vmFav?t('Chưa có giọng yêu thích ở mục này. Bấm 🤍 trên giọng để thêm.'):(lang==='clone'?t('Chưa có giọng clone. Vào tab “Nhân bản giọng nói” để tạo giọng của bạn.'):t('Không có giọng cho mục này.')))+'</div>'; return; }
     g.innerHTML=items.map(voiceModalCard).join('');
   }
   function chooseVoice(type,idn,lang){
     if(type==='vip'){ selectedVoice={type:'vip',name:idn,lang:lang}; }
     else if(type==='vipclone'){
       var pv=(PUBLIC_VOICES||[]).filter(function(x){return x.id===idn;})[0];
-      selectedVoice={type:'vipclone',id:idn,name:pv?pv.name:'Giọng VIP',lang:lang||'en'};
+      selectedVoice={type:'vipclone',id:idn,name:pv?pv.name:t('Giọng VIP'),lang:lang||'en'};
     }
-    else { var v=(myVoices||[]).filter(function(x){return x.id===idn;})[0]; selectedVoice={type:'clone',id:idn,name:v?v.name:'Giọng clone',lang:'vi'}; }
+    else { var v=(myVoices||[]).filter(function(x){return x.id===idn;})[0]; selectedVoice={type:'clone',id:idn,name:v?v.name:t('Giọng clone'),lang:'vi'}; }
     updateVoiceBtn();
     if(el('genOpts')) el('genOpts').style.display=isCloneEngine(type)?'grid':'none';
     if(el('cloneAdv')) el('cloneAdv').style.display=isCloneEngine(type)?'block':'none';
@@ -1027,8 +1074,8 @@
     if(el('vsbName')) el('vsbName').textContent=sv.name;
     if(el('vsbAva')){ el('vsbAva').textContent=sv.type==='clone'?'🧬':initsOf(sv.name); el('vsbAva').style.background=sv.type==='clone'?'linear-gradient(135deg,#9775fa,#7048e8)':gradForName(sv.name); }
     if(el('vsbSub')){
-      if(sv.type==='clone') el('vsbSub').textContent='🧬 Giọng Clone của bạn';
-      else { var vv=ALL_VOICES.filter(function(x){return x.name===sv.name;})[0]; el('vsbSub').textContent='🌟 Giọng Tan Seven VIP'+(vv?' · '+vv.info:''); }
+      if(sv.type==='clone') el('vsbSub').textContent=t('🧬 Giọng Clone của bạn');
+      else { var vv=ALL_VOICES.filter(function(x){return x.name===sv.name;})[0]; el('vsbSub').textContent=t('🌟 Giọng Tan Seven VIP')+(vv?' · '+t(vv.info):''); }
     }
   }
   updateVoiceBtn();
@@ -1064,10 +1111,10 @@
   }
 
   function fillCloneUI(){
-    var st=el('cloneStyle'); if(st) st.innerHTML=CLONE_STYLES.map(function(s){ return '<option value="'+s[0]+'">'+s[0]+'</option>'; }).join('');
-    var lg=el('cloneLang'); if(lg) lg.innerHTML=CLONE_LANGS.map(function(l){ return '<option value="'+l[0]+'">'+l[1]+'</option>'; }).join('');
+    var st=el('cloneStyle'); if(st) st.innerHTML=CLONE_STYLES.map(function(s){ return '<option value="'+s[0]+'">'+t(s[0])+'</option>'; }).join('');
+    var lg=el('cloneLang'); if(lg) lg.innerHTML=CLONE_LANGS.map(function(l){ return '<option value="'+l[0]+'">'+t(l[1])+'</option>'; }).join('');
   }
-  function onExpr(){ var v=parseFloat(el('cloneExpr').value); el('cloneExprVal').textContent = v<0.3?'Ổn định':(v<0.6?'Vừa':(v<0.8?'Biểu cảm':'Rất biểu cảm')); }
+  function onExpr(){ var v=parseFloat(el('cloneExpr').value); el('cloneExprVal').textContent = v<0.3?t('Ổn định'):(v<0.6?t('Vừa'):(v<0.8?t('Biểu cảm'):t('Rất biểu cảm'))); }
   function onCloneStyle(){
     var m={}; CLONE_STYLES.forEach(function(s){ m[s[0]]=s[1]; });
     var sp=m[el('cloneStyle').value]||1.0;
@@ -1080,7 +1127,7 @@
     if(el('mdl30')) el('mdl30').classList.toggle('on', m==='3.0');
     if(el('mdl40')) el('mdl40').classList.toggle('on', m==='4.0');
     var st=el('ttsStyle');
-    if(m==='4.0' && st && !st.options.length){ st.innerHTML=CLONE_STYLES.map(function(s){ return '<option value="'+s[0]+'">'+s[0]+'</option>'; }).join(''); }
+    if(m==='4.0' && st && !st.options.length){ st.innerHTML=CLONE_STYLES.map(function(s){ return '<option value="'+s[0]+'">'+t(s[0])+'</option>'; }).join(''); }
     refreshModelUI();
   }
   function refreshModelUI(){ var show=(ttsModel==='4.0' && selectedVoice.type!=='clone'); if(el('mdl40box')) el('mdl40box').style.display=show?'block':'none'; }
@@ -1150,19 +1197,19 @@
     var click=pick?(' onclick="selectMyVoice(\''+v.id+'\')"'):'';
     return '<div class="mvcard'+(on?' on':'')+'"'+click+'>'+
       '<span class="mv-ava">🧬</span>'+
-      '<div><div class="mv-name">'+esc(v.name)+'</div><div class="mv-sub">'+(on?'Đang chọn ✓':(pick?'Bấm để chọn đọc':'Giọng clone của bạn'))+'</div></div>'+
-      '<button class="mv-del" title="Xoá" onclick="event.stopPropagation();deleteMyVoice(\''+v.id+'\')">🗑</button>'+
+      '<div><div class="mv-name">'+esc(v.name)+'</div><div class="mv-sub">'+(on?t('Đang chọn ✓'):(pick?t('Bấm để chọn đọc'):t('Giọng clone của bạn')))+'</div></div>'+
+      t('<button class="mv-del" title="Xoá" onclick="event.stopPropagation();deleteMyVoice(\'')+v.id+'\')">🗑</button>'+
     '</div>';
   }
   function renderMyVoices(){
-    if(el('myVoiceCount')) el('myVoiceCount').textContent=myVoices.length+' giọng';
+    if(el('myVoiceCount')) el('myVoiceCount').textContent=myVoices.length+t(' giọng');
     if(el('myVoiceCount2')) el('myVoiceCount2').textContent='('+myVoices.length+')';
     var g=el('myVoicesGrid');
     if(g) g.innerHTML=myVoices.length?myVoices.map(function(v){return mvCard(v,true);}).join('')
-      :'<div class="mv-empty">Chưa có giọng clone nào.<br>Bấm “➕ Tạo / quản lý giọng clone”.</div>';
+      :t('<div class="mv-empty">Chưa có giọng clone nào.<br>Bấm “➕ Tạo / quản lý giọng clone”.</div>');
     var l=el('myVoicesList');
     if(l) l.innerHTML=myVoices.length?myVoices.map(function(v){return mvCard(v,false);}).join('')
-      :'<div class="mv-empty">Chưa có giọng nói nào.<br>Tải lên tệp âm thanh để tạo giọng đầu tiên.</div>';
+      :t('<div class="mv-empty">Chưa có giọng nói nào.<br>Tải lên tệp âm thanh để tạo giọng đầu tiên.</div>');
     if(el('batchVoice')) fillBatchVoices();
     if(el('voiceOverlay')&&el('voiceOverlay').style.display==='flex') renderVoiceModal();
   }
@@ -1171,7 +1218,7 @@
   }
   async function deleteMyVoice(id){
     if(!sb) return;
-    if(!confirm('Xoá giọng clone này khỏi thư viện?')) return;
+    if(!confirm(t('Xoá giọng clone này khỏi thư viện?'))) return;
     try{ await sb.from('user_voices').delete().eq('id',id); }catch(e){}
     if(selectedVoice.type==='clone'&&selectedVoice.id===id){ selectedVoice={type:'vip',name:'Minh Đức',lang:'vi'}; updateVoiceBtn(); if(el('genOpts'))el('genOpts').style.display='none'; if(el('cloneAdv'))el('cloneAdv').style.display='none'; }
     loadMyVoices();
@@ -1218,8 +1265,8 @@
         + '<button class="mini-x" style="margin-left:auto" onclick="removeClip('+i+')">✕</button></div>';
     }).join('');
     var t=clipsTotal();
-    el('clipTotal').textContent='Tổng '+t.toFixed(1)+'s / '+CLONE_MAX_TOTAL+'s · '+cloneClips.length+'/'+CLONE_MAX_CLIPS+' đoạn'
-      + (t<10 ? ' — nên gom thêm cho đủ 10s trở lên' : '');
+    el('clipTotal').textContent=t('Tổng ')+t.toFixed(1)+'s / '+CLONE_MAX_TOTAL+'s · '+cloneClips.length+'/'+CLONE_MAX_CLIPS+t(' đoạn')
+      + (t<10 ? t(' — nên gom thêm cho đủ 10s trở lên') : '');
     var wav=buildRefWav();
     cloneRefB64=arrayBufferToBase64(wav);
     el('cloneRefAudio').src=URL.createObjectURL(new Blob([wav],{type:'audio/wav'}));
@@ -1228,25 +1275,25 @@
   async function useAudioFile(f){
     var m=el('cvMsg'); if(!f) return;
     if(cloneClips.length>=CLONE_MAX_CLIPS){
-      m.className='msg err'; m.textContent='Tối đa '+CLONE_MAX_CLIPS+' đoạn. Xoá bớt một đoạn rồi thêm lại nhé.'; return; }
-    if(f.size>12*1024*1024){ m.className='msg err'; m.textContent='File quá lớn (>12MB).'; return; }
-    m.className='msg'; m.textContent='⏳ Đang xử lý đoạn mẫu…';
+      m.className='msg err'; m.textContent=t('Tối đa ')+CLONE_MAX_CLIPS+t(' đoạn. Xoá bớt một đoạn rồi thêm lại nhé.'); return; }
+    if(f.size>12*1024*1024){ m.className='msg err'; m.textContent=t('File quá lớn (>12MB).'); return; }
+    m.className='msg'; m.textContent=t('⏳ Đang xử lý đoạn mẫu…');
     try{
       var c=await decodeMono(await f.arrayBuffer());
-      if(c.dur<1){ m.className='msg err'; m.textContent='Đoạn này ngắn quá ('+c.dur.toFixed(1)+'s).'; return; }
+      if(c.dur<1){ m.className='msg err'; m.textContent=t('Đoạn này ngắn quá (')+c.dur.toFixed(1)+'s).'; return; }
       var con=clipsTotal();
       if(con+c.dur>CLONE_MAX_TOTAL+0.9){
         m.className='msg err';
-        m.textContent='Tổng mẫu sẽ thành '+Math.round(con+c.dur)+'s — vượt mức '+CLONE_MAX_TOTAL+'s. Hãy cắt ngắn đoạn này lại.';
+        m.textContent=t('Tổng mẫu sẽ thành ')+Math.round(con+c.dur)+t('s — vượt mức ')+CLONE_MAX_TOTAL+t('s. Hãy cắt ngắn đoạn này lại.');
         return;
       }
       cloneClips.push({ name:(f.name||'ghi-am').replace(/\.[^.]+$/,''), data:c.data, dur:c.dur });
       renderClips();
       m.className='msg ok';
-      m.textContent='✅ Đã thêm đoạn '+cloneClips.length+' ('+c.dur.toFixed(1)+'s). Tổng '+clipsTotal().toFixed(1)+'s.'
-        + (cloneClips.length<CLONE_MAX_CLIPS ? ' Thêm đoạn nữa hoặc bấm lưu.' : '');
+      m.textContent=t('✅ Đã thêm đoạn ')+cloneClips.length+' ('+c.dur.toFixed(1)+t('s). Tổng ')+clipsTotal().toFixed(1)+'s.'
+        + (cloneClips.length<CLONE_MAX_CLIPS ? t(' Thêm đoạn nữa hoặc bấm lưu.') : '');
     }catch(e){
-      m.className='msg err'; m.textContent='Không đọc được file này. Hãy thử file .mp3 hoặc .wav khác.';
+      m.className='msg err'; m.textContent=t('Không đọc được file này. Hãy thử file .mp3 hoặc .wav khác.');
     }
   }
   function onCloneFile(inp){ var f=inp.files&&inp.files[0]; if(f) useAudioFile(f); }
@@ -1259,22 +1306,22 @@
   async function toggleRecord(){
     var b=el('recBtn');
     if(_rec && _rec.state==='recording'){ stopRecord(); return; }
-    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ el('cvMsg').className='msg err'; el('cvMsg').textContent='Trình duyệt không hỗ trợ ghi âm.'; return; }
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ el('cvMsg').className='msg err'; el('cvMsg').textContent=t('Trình duyệt không hỗ trợ ghi âm.'); return; }
     try{ _recStream=await navigator.mediaDevices.getUserMedia({audio:true}); }
-    catch(e){ el('cvMsg').className='msg err'; el('cvMsg').textContent='Cần cho phép quyền micro để ghi âm.'; return; }
+    catch(e){ el('cvMsg').className='msg err'; el('cvMsg').textContent=t('Cần cho phép quyền micro để ghi âm.'); return; }
     _recChunks=[]; _rec=new MediaRecorder(_recStream);
     _rec.ondataavailable=function(ev){ if(ev.data&&ev.data.size) _recChunks.push(ev.data); };
     _rec.onstop=function(){ var blob=new Blob(_recChunks,{type:(_recChunks[0]&&_recChunks[0].type)||'audio/webm'}); blobToWav(blob);
       if(_recStream){ _recStream.getTracks().forEach(function(t){t.stop();}); _recStream=null; } };
     var conLai=Math.max(3, Math.round(CLONE_MAX_TOTAL-clipsTotal()));
-    _rec.start(); _recSec=0; b.classList.add('rec'); b.textContent='⏹ Dừng (0s)';
-    _recTimer=setInterval(function(){ _recSec++; b.textContent='⏹ Dừng ('+_recSec+'s/'+conLai+'s)'; if(_recSec>=conLai) stopRecord(); },1000);
+    _rec.start(); _recSec=0; b.classList.add('rec'); b.textContent=t('⏹ Dừng (0s)');
+    _recTimer=setInterval(function(){ _recSec++; b.textContent=t('⏹ Dừng (')+_recSec+'s/'+conLai+'s)'; if(_recSec>=conLai) stopRecord(); },1000);
   }
-  function stopRecord(){ if(_recTimer){clearInterval(_recTimer);_recTimer=null;} var b=el('recBtn'); if(b){b.classList.remove('rec');b.textContent='🎙️ Ghi âm';}
+  function stopRecord(){ if(_recTimer){clearInterval(_recTimer);_recTimer=null;} var b=el('recBtn'); if(b){b.classList.remove('rec');b.textContent=t('🎙️ Ghi âm');}
     if(_rec&&_rec.state==='recording') _rec.stop(); }
   async function blobToWav(blob){
     try{ await useAudioFile(new File([blob],'ghi-am-'+(cloneClips.length+1)+'.wav',{type:blob.type||'audio/wav'})); }
-    catch(e){ el('cvMsg').className='msg err'; el('cvMsg').textContent='Lỗi xử lý ghi âm: '+String(e); }
+    catch(e){ el('cvMsg').className='msg err'; el('cvMsg').textContent=t('Lỗi xử lý ghi âm: ')+String(e); }
   }
   function encodeWAV(ab){ return pcmToWav(ab.getChannelData(0), ab.sampleRate); }
   function pcmToWav(ch0, sr){
@@ -1292,33 +1339,33 @@
   async function saveVoice(){
     if(!sb) return;
     var name=el('cvName').value.trim(), m=el('cvMsg'), btn=el('cvSaveBtn');
-    if(!cloneClips.length || !cloneRefB64){ m.className='msg err'; m.textContent='Hãy tải lên (hoặc ghi âm) mẫu giọng.'; return; }
-    if(clipsTotal()<CLONE_MIN_TOTAL){ m.className='msg err'; m.textContent='Mẫu ngắn quá ('+clipsTotal().toFixed(1)+'s). Cần ít nhất '+CLONE_MIN_TOTAL+'s, tốt nhất 20–60s.'; return; }
-    if(!name){ m.className='msg err'; m.textContent='Hãy đặt tên cho giọng.'; return; }
-    btn.disabled=true; btn.textContent='Đang lưu...'; m.className='msg';
+    if(!cloneClips.length || !cloneRefB64){ m.className='msg err'; m.textContent=t('Hãy tải lên (hoặc ghi âm) mẫu giọng.'); return; }
+    if(clipsTotal()<CLONE_MIN_TOTAL){ m.className='msg err'; m.textContent=t('Mẫu ngắn quá (')+clipsTotal().toFixed(1)+t('s). Cần ít nhất ')+CLONE_MIN_TOTAL+t('s, tốt nhất 20–60s.'); return; }
+    if(!name){ m.className='msg err'; m.textContent=t('Hãy đặt tên cho giọng.'); return; }
+    btn.disabled=true; btn.textContent=t('Đang lưu...'); m.className='msg';
     try{
       var r=await sb.from('user_voices').insert({ name:name, ref_b64:cloneRefB64 });
-      if(r.error){ m.className='msg err'; m.textContent='Lỗi lưu: '+r.error.message; }
-      else { m.className='msg ok'; m.textContent='✅ Đã tạo giọng “'+name+'”! Qua tab “Văn bản thành giọng nói” để dùng.';
+      if(r.error){ m.className='msg err'; m.textContent=t('Lỗi lưu: ')+r.error.message; }
+      else { m.className='msg ok'; m.textContent=t('✅ Đã tạo giọng “')+name+t('”! Qua tab “Văn bản thành giọng nói” để dùng.');
         cloneClips=[]; cloneRefB64=null; el('cvName').value=''; el('cloneFileInfo').style.display='none'; loadMyVoices(); }
-    }catch(e){ m.className='msg err'; m.textContent='Lỗi: '+String(e); }
-    btn.disabled=false; btn.textContent='💾 Tạo & lưu giọng';
+    }catch(e){ m.className='msg err'; m.textContent=t('Lỗi: ')+String(e); }
+    btn.disabled=false; btn.textContent=t('💾 Tạo & lưu giọng');
   }
 
   // ---- Tạo audio: điều hướng VIP / Clone ----
   function doGenerate(){ _origAudioSrc=null; document.querySelectorAll('.fx-btn').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-fx')==='none');}); if(isCloneEngine(selectedVoice.type)) return doCloneGen(); return doTTS(); }
   async function doCloneGen(){
-    if(!sb){ alert('Vui lòng đăng nhập.'); return; }
+    if(!sb){ alert(t('Vui lòng đăng nhập.')); return; }
     if(cloneBusy) return;
     var text=el('ttsText').value.trim();
     var msg=el('ttsMsg'), res=el('ttsResult'), btn=el('ttsBtn');
-    if(!text){ msg.className='msg err'; msg.textContent='Nhập nội dung cần đọc.'; return; }
-    if(selectedVoice.type!=='clone'){ msg.className='msg err'; msg.textContent='Hãy chọn 1 giọng clone (bấm “Chọn giọng nói” → mục 🧬 Giọng của tôi).'; return; }
+    if(!text){ msg.className='msg err'; msg.textContent=t('Nhập nội dung cần đọc.'); return; }
+    if(selectedVoice.type!=='clone'){ msg.className='msg err'; msg.textContent=t('Hãy chọn 1 giọng clone (bấm “Chọn giọng nói” → mục 🧬 Giọng của tôi).'); return; }
     if(text.length > LONG_THRESHOLD){
-      return runLongGen({ fn:'clone-voice', text:text, lang:el('cloneLang').value, voiceLabel:'🧬 '+selectedVoice.name, msg:msg, res:res, btn:btn, btnIdle:'🎙️ Tạo audio',
+      return runLongGen({ fn:'clone-voice', text:text, lang:el('cloneLang').value, voiceLabel:'🧬 '+selectedVoice.name, msg:msg, res:res, btn:btn, btnIdle:t('🎙️ Tạo audio'),
         build:function(pt){ return { text:pt, voice_id:selectedVoice.id, language:el('cloneLang').value, style:el('cloneStyle').value, speed:parseFloat(el('ttsSpeed').value)||1.0, format:'mp3', expressiveness:parseFloat(el('cloneExpr').value), denoise:(el('cloneDenoise')?el('cloneDenoise').checked:true) }; } });
     }
-    cloneBusy=true; btn.disabled=true; btn.textContent='🧬 Đang tạo...';
+    cloneBusy=true; btn.disabled=true; btn.textContent=t('🧬 Đang tạo...');
     msg.className='msg'; res.style.display='none'; progStart(estSec(text));
     try{
       var s=await sb.auth.getSession(); var token=s.data.session.access_token;
@@ -1335,9 +1382,9 @@
         progFail(); msg.className='msg warn'; msg.textContent=rateText(d); setCreditUI(d.credits);
       } else if(r.status===202 || d.warming){
         progFail(); msg.className='msg warn';
-        msg.textContent='⏳ Máy chủ AI đang khởi động (~1 phút). Bấm “Tạo audio” lại sau chút nhé.';
+        msg.textContent=t('⏳ Máy chủ AI đang khởi động (~1 phút). Bấm “Tạo audio” lại sau chút nhé.');
       } else if(!r.ok || !d.audio_base64){
-        progFail(); msg.className='msg err'; msg.textContent='Lỗi: '+(d.error||('HTTP '+r.status));
+        progFail(); msg.className='msg err'; msg.textContent=t('Lỗi: ')+(d.error||('HTTP '+r.status));
       } else {
         progDone();
         var src='data:audio/mpeg;base64,'+d.audio_base64;
@@ -1345,13 +1392,13 @@
         if(el('ttsSrt')) el('ttsSrt').style.display='none';
         res.style.display='block';
         msg.className='msg ok';
-        msg.textContent='🎉 Xong! Giọng “'+selectedVoice.name+'”. Trừ '+d.cost+' ký tự. Còn lại: '+Number(d.credits).toLocaleString('vi-VN')+' ký tự';
+        msg.textContent=t('🎉 Xong! Giọng “')+selectedVoice.name+t('”. Trừ ')+d.cost+t(' ký tự. Còn lại: ')+Number(d.credits).toLocaleString('vi-VN')+t(' ký tự');
         var cv=Number(d.credits).toLocaleString('vi-VN');
-        el('creditNum').innerHTML=cv+'<small> ký tự</small>'; if(el('creditMini')) el('creditMini').textContent=cv;
+        el('creditNum').innerHTML=cv+t('<small> ký tự</small>'); if(el('creditMini')) el('creditMini').textContent=cv;
         histAdd(text, '🧬 '+selectedVoice.name, d.cost, d.seconds, d.audio_base64);
       }
-    }catch(e){ progFail(); msg.className='msg err'; msg.textContent='Lỗi: '+String(e); }
-    cloneBusy=false; btn.disabled=false; btn.textContent='🎙️ Tạo audio';
+    }catch(e){ progFail(); msg.className='msg err'; msg.textContent=t('Lỗi: ')+String(e); }
+    cloneBusy=false; btn.disabled=false; btn.textContent=t('🎙️ Tạo audio');
   }
 
   // ====== VĂN BẢN SIÊU DÀI (xử lý nền: chia đoạn → ghép 1 file) ======
@@ -1399,10 +1446,10 @@
   async function runLongGen(opts){
     var msg=opts.msg, res=opts.res, btn=opts.btn;
     var chunks = splitLong(opts.text, LONG_CHUNK);
-    if(chunks.length > 40){ if(!confirm('Văn bản rất dài ('+chunks.length+' đoạn). Sẽ trừ nhiều ký tự và mất vài phút. Tiếp tục?')){ return; } }
+    if(chunks.length > 40){ if(!confirm(t('Văn bản rất dài (')+chunks.length+t(' đoạn). Sẽ trừ nhiều ký tự và mất vài phút. Tiếp tục?'))){ return; } }
     if(opts.fn==='clone-voice'){ if(cloneBusy) return; cloneBusy=true; }
     btn.disabled=true; res.style.display='none'; msg.className='msg';
-    msg.textContent='📜 Văn bản dài — chia '+chunks.length+' đoạn, xử lý SONG SONG cho nhanh...';
+    msg.textContent=t('📜 Văn bản dài — chia ')+chunks.length+t(' đoạn, xử lý SONG SONG cho nhanh...');
     longProgShow();
     var ac=null, pcm=[], allSegs=[], totalLen=0, sr=0, totalCost=0, lastCredits=null, ok=false, errMsg='';
     try{
@@ -1419,13 +1466,13 @@
               headers:{'Authorization':'Bearer '+token,'apikey':SUPABASE_ANON_KEY,'Content-Type':'application/json'},
               body:JSON.stringify(payload)});
             d=await r.json();
-            if(isRateLimited(r,d)){ waits++; if(waits>10) throw new Error((d&&d.error)||'Bị chặn tốc độ'); tries--; longProgLabel('🚦 Đang chờ lượt (giới hạn tốc độ)...'); await _sleep(((d&&d.retry_after)||60)*1000); d=null; continue; }
-            if(r.status===202 || (d&&d.warming)){ if(done===0) longProgLabel('⏳ Máy chủ đang khởi động (đoạn đầu hơi lâu)...'); await _sleep(12000); d=null; continue; }
+            if(isRateLimited(r,d)){ waits++; if(waits>10) throw new Error((d&&d.error)||t('Bị chặn tốc độ')); tries--; longProgLabel(t('🚦 Đang chờ lượt (giới hạn tốc độ)...')); await _sleep(((d&&d.retry_after)||60)*1000); d=null; continue; }
+            if(r.status===202 || (d&&d.warming)){ if(done===0) longProgLabel(t('⏳ Máy chủ đang khởi động (đoạn đầu hơi lâu)...')); await _sleep(12000); d=null; continue; }
             if(!r.ok || !d || !d.audio_base64){ if(tries<6){ await _sleep(8000); d=null; continue; } throw new Error((d&&d.error)||('HTTP '+r.status)); }
             break;
           }catch(ne){ if(tries<6){ await _sleep(6000); d=null; continue; } throw ne; }
         }
-        if(!d || !d.audio_base64) throw new Error('đoạn '+(ci+1)+' không tạo được');
+        if(!d || !d.audio_base64) throw new Error(t('đoạn ')+(ci+1)+t(' không tạo được'));
         var abuf = await ac.decodeAudioData(b64ToArrayBuffer(d.audio_base64));
         if(!sr) sr=abuf.sampleRate;
         parts[ci]={ i16:f32ToI16(abuf.getChannelData(0)), segs:(d.segments||[]), cost:(d.cost||0), credits:(d.credits!=null?d.credits:null) };
@@ -1435,8 +1482,8 @@
           if(nextI>=chunks.length) return;
           var ci=nextI++;
           try{ await _fetchChunk(ci); }catch(e){ hardErr=e; return; }
-          done++; longProgSet(done/chunks.length, 'đoạn '+done+'/'+chunks.length+' xong');
-          btn.textContent='Đang đọc '+done+'/'+chunks.length+'...';
+          done++; longProgSet(done/chunks.length, t('đoạn ')+done+'/'+chunks.length+' xong');
+          btn.textContent=t('Đang đọc ')+done+'/'+chunks.length+'...';
         }
       }
       var _ws=[]; for(var _w=0;_w<CONC;_w++) _ws.push(_pool());
@@ -1449,7 +1496,7 @@
         pcm.push(p.i16); totalLen+=p.i16.length;
         totalCost+=p.cost; if(p.credits!=null) lastCredits=(lastCredits==null?p.credits:Math.min(lastCredits,p.credits));
       }
-      longProgSet(1,'đang ghép file...');
+      longProgSet(1,t('đang ghép file...'));
       var all=new Int16Array(totalLen), off=0;
       for(var j=0;j<pcm.length;j++){ all.set(pcm[j], off); off+=pcm[j].length; }
       var wav = encodeWavI16(all, sr||24000);
@@ -1459,30 +1506,30 @@
       window._ttsSegs=allSegs; if(el('ttsSrt')) el('ttsSrt').style.display=(allSegs.length?'inline-block':'none');
       res.style.display='block';
       msg.className='msg ok';
-      msg.textContent='🎉 Xong '+chunks.length+' đoạn → 1 file ('+fmtDur(secs)+'). Trừ '+totalCost.toLocaleString('vi-VN')+' ký tự.'+(lastCredits!=null?(' Còn: '+Number(lastCredits).toLocaleString('vi-VN')+' ký tự'):'');
-      if(lastCredits!=null){ var cv=Number(lastCredits).toLocaleString('vi-VN'); el('creditNum').innerHTML=cv+'<small> ký tự</small>'; if(el('creditMini'))el('creditMini').textContent=cv; }
+      msg.textContent='🎉 Xong '+chunks.length+t(' đoạn → 1 file (')+fmtDur(secs)+t('). Trừ ')+totalCost.toLocaleString('vi-VN')+t(' ký tự.')+(lastCredits!=null?(t(' Còn: ')+Number(lastCredits).toLocaleString('vi-VN')+t(' ký tự')):'');
+      if(lastCredits!=null){ var cv=Number(lastCredits).toLocaleString('vi-VN'); el('creditNum').innerHTML=cv+t('<small> ký tự</small>'); if(el('creditMini'))el('creditMini').textContent=cv; }
       try{ await histAddBlob(opts.text, opts.voiceLabel, totalCost, secs, wav, 'wav'); }catch(e){}
       ok=true;
     }catch(e){ errMsg = String((e&&e.message)||e); }
     finally{ if(ac&&ac.close){ try{ ac.close(); }catch(e){} } }
     longProgHide();
-    if(!ok){ msg.className='msg err'; msg.textContent='Lỗi: '+errMsg; }
-    btn.disabled=false; btn.textContent=opts.btnIdle||'🎙️ Tạo audio';
+    if(!ok){ msg.className='msg err'; msg.textContent=t('Lỗi: ')+errMsg; }
+    btn.disabled=false; btn.textContent=opts.btnIdle||t('🎙️ Tạo audio');
     if(opts.fn==='clone-voice') cloneBusy=false;
   }
 
   // ====== TẠO HÀNG LOẠT ======
   function fillBatchStyle(){
-    var s=el('batchStyle'); if(s) s.innerHTML=CLONE_STYLES.map(function(x){return '<option value="'+x[0]+'">'+x[0]+'</option>';}).join('');
+    var s=el('batchStyle'); if(s) s.innerHTML=CLONE_STYLES.map(function(x){return '<option value="'+x[0]+'">'+t(x[0])+'</option>';}).join('');
   }
   function fillBatchVoices(){
     var s=el('batchVoice'); if(!s) return;
     var cur=s.value;
-    var h='<optgroup label="🌟 Giọng Tan Seven VIP">';
+    var h=t('<optgroup label="🌟 Giọng Tan Seven VIP">');
     ALL_VOICES.forEach(function(v){ h+='<option value="vip::'+v.name+'::'+v.lang+'">'+v.name+' — '+v.info+'</option>'; });
     h+='</optgroup>';
     if(myVoices.length){
-      h+='<optgroup label="🧬 Giọng Clone của tôi">';
+      h+=t('<optgroup label="🧬 Giọng Clone của tôi">');
       myVoices.forEach(function(v){ h+='<option value="clone::'+v.id+'">🧬 '+esc(v.name)+'</option>'; });
       h+='</optgroup>';
     }
@@ -1494,24 +1541,24 @@
     g.innerHTML=batchResults.map(function(it){
       var st=it.status==='ok'?'✅':(it.status==='run'?'⏳':(it.status==='warm'?'🕐':'❌'));
       var ac=it.audio?('<audio controls src="data:audio/mpeg;base64,'+it.audio+'"></audio><a class="act" style="margin:0;padding:6px 9px" download="audio-'+it.idx+'.mp3" href="data:audio/mpeg;base64,'+it.audio+'">⬇️</a>')
-        :('<span class="mv-sub">'+esc(it.err||'đang chờ...')+'</span>');
+        :('<span class="mv-sub">'+esc(it.err||t('đang chờ...'))+'</span>');
       return '<div class="batch-row"><span class="batch-st">'+st+'</span><span class="batch-tx">'+it.idx+'. '+esc(it.text.slice(0,70))+'</span><span class="batch-ac">'+ac+'</span></div>';
     }).join('');
   }
   async function doBatch(){
-    if(!sb){ alert('Vui lòng đăng nhập.'); return; }
+    if(!sb){ alert(t('Vui lòng đăng nhập.')); return; }
     if(batchBusy) return;
     var lines=el('batchText').value.split('\n').map(function(x){return x.trim();}).filter(Boolean);
     var msg=el('batchMsg');
-    if(!lines.length){ msg.className='msg err'; msg.textContent='Nhập ít nhất 1 dòng.'; return; }
-    if(!el('batchVoice').value){ msg.className='msg err'; msg.textContent='Chọn giọng đọc.'; return; }
+    if(!lines.length){ msg.className='msg err'; msg.textContent=t('Nhập ít nhất 1 dòng.'); return; }
+    if(!el('batchVoice').value){ msg.className='msg err'; msg.textContent=t('Chọn giọng đọc.'); return; }
     var sel=el('batchVoice').value.split('::');
     var speed=parseFloat(el('batchSpeed').value)||1.0;
     var style=el('batchStyle')?el('batchStyle').value:'🤖 Tự động (cân bằng)';
     batchBusy=true; batchResults=[]; var btn=el('batchBtn'); btn.disabled=true;
     msg.className='msg'; el('batchDl').style.display='none';
     for(var i=0;i<lines.length;i++){
-      btn.textContent='Đang tạo '+(i+1)+'/'+lines.length+'...';
+      btn.textContent=t('Đang tạo ')+(i+1)+'/'+lines.length+'...';
       var item={idx:i+1,text:fixCaps(lines[i]),status:'run',audio:null,err:''};
       batchResults.push(item); renderBatch();
       try{
@@ -1526,29 +1573,29 @@
             body:JSON.stringify(payload)});
           d=await r.json();
           if(isRateLimited(r,d) && waits<10){
-            waits++; item.status='warm'; item.err='đang chờ lượt (giới hạn tốc độ)...'; renderBatch();
+            waits++; item.status='warm'; item.err=t('đang chờ lượt (giới hạn tốc độ)...'); renderBatch();
             await _sleep(((d&&d.retry_after)||60)*1000);
             item.status='run'; item.err=''; renderBatch(); continue;
           }
           break;
         }
         if(d.audio_base64){ item.status='ok'; item.audio=d.audio_base64;
-          var cv=Number(d.credits).toLocaleString('vi-VN'); el('creditNum').innerHTML=cv+'<small> ký tự</small>'; if(el('creditMini'))el('creditMini').textContent=cv; }
-        else if(isRateLimited(r,d)){ item.status='warm'; item.err='bị chặn tốc độ, chạy lại sau'; }
-        else if(r.status===202||d.warming){ item.status='warm'; item.err='máy chủ đang khởi động, chạy lại sau'; }
+          var cv=Number(d.credits).toLocaleString('vi-VN'); el('creditNum').innerHTML=cv+t('<small> ký tự</small>'); if(el('creditMini'))el('creditMini').textContent=cv; }
+        else if(isRateLimited(r,d)){ item.status='warm'; item.err=t('bị chặn tốc độ, chạy lại sau'); }
+        else if(r.status===202||d.warming){ item.status='warm'; item.err=t('máy chủ đang khởi động, chạy lại sau'); }
         else { item.status='err'; item.err=d.error||('HTTP '+r.status); }
       }catch(e){ item.status='err'; item.err=String(e); }
       renderBatch();
     }
-    btn.disabled=false; btn.textContent='🚀 Tạo hàng loạt'; batchBusy=false;
+    btn.disabled=false; btn.textContent=t('🚀 Tạo hàng loạt'); batchBusy=false;
     var okc=batchResults.filter(function(x){return x.status==='ok';}).length;
     msg.className=okc?'msg ok':'msg err'; msg.textContent='✅ Xong '+okc+'/'+lines.length+' file.';
     if(okc>0) el('batchDl').style.display='inline-block';
   }
   async function downloadAllZip(){
     var ok=batchResults.filter(function(x){return x.audio;});
-    if(!ok.length){ alert('Chưa có file nào.'); return; }
-    if(typeof JSZip==='undefined'){ alert('Thư viện nén chưa sẵn sàng, thử lại sau.'); return; }
+    if(!ok.length){ alert(t('Chưa có file nào.')); return; }
+    if(typeof JSZip==='undefined'){ alert(t('Thư viện nén chưa sẵn sàng, thử lại sau.')); return; }
     var zip=new JSZip();
     ok.forEach(function(it){ zip.file('audio-'+it.idx+'.mp3', it.audio, {base64:true}); });
     var blob=await zip.generateAsync({type:'blob'});
@@ -1599,29 +1646,29 @@
   function histRender(){
     var g=el('histList'); if(!g) return;
     if(el('histCount')) el('histCount').textContent=histData.length?('('+histData.length+')'):'';
-    if(!histData.length){ g.innerHTML='<div class="mv-empty">Chưa có lịch sử.<br>Tạo audio để lưu vào đây.</div>'; return; }
+    if(!histData.length){ g.innerHTML=t('<div class="mv-empty">Chưa có lịch sử.<br>Tạo audio để lưu vào đây.</div>'); return; }
     g.innerHTML=histData.map(function(h){
       return '<div class="hist-item" id="hi_'+h.id+'">'+
         '<div class="hist-top"><span class="hist-ts">'+fmtTs(h.t)+'</span><span class="hist-badge ok">Xong</span>'+
-        '<button class="hist-del" title="Xoá" onclick="histDel(\''+h.id+'\')">🗑</button></div>'+
+        t('<button class="hist-del" title="Xoá" onclick="histDel(\'')+h.id+'\')">🗑</button></div>'+
         '<div class="hist-text">'+esc((h.text||'').slice(0,120))+'</div>'+
         '<div class="hist-acts"><button class="hist-play" onclick="histPlay(\''+h.id+'\',this)">▶ Nghe</button>'+
-        '<a class="act" style="margin:0;padding:6px 11px" onclick="histDownload(\''+h.id+'\');return false">⬇️ Tải</a></div>'+
-        '<div class="hist-meta">'+esc(h.voice||'')+' · '+h.cost+' ký tự'+(h.seconds?(' · '+h.seconds+'s'):'')+'</div>'+
+        '<a class="act" style="margin:0;padding:6px 11px" onclick="histDownload(\''+h.id+t('\');return false">⬇️ Tải</a></div>')+
+        '<div class="hist-meta">'+esc(h.voice||'')+' · '+h.cost+t(' ký tự')+(h.seconds?(' · '+h.seconds+'s'):'')+'</div>'+
       '</div>';
     }).join('');
   }
   async function histPlay(id,btn){
-    try{ var blob=await idbGet(id); if(!blob){ alert('Audio đã hết hạn (quá 24h).'); histDel(id); return; }
+    try{ var blob=await idbGet(id); if(!blob){ alert(t('Audio đã hết hạn (quá 24h).')); histDel(id); return; }
       var box=el('hi_'+id), ex=box.querySelector('audio'); if(ex){ ex.play(); return; }
       var a=document.createElement('audio'); a.controls=true; a.src=URL.createObjectURL(blob); a.autoplay=true; box.appendChild(a); if(btn)btn.style.display='none';
-    }catch(e){ alert('Không phát được.'); }
+    }catch(e){ alert(t('Không phát được.')); }
   }
   async function histDownload(id){
-    try{ var blob=await idbGet(id); if(!blob){ alert('Audio đã hết hạn (quá 24h).'); histDel(id); return; }
+    try{ var blob=await idbGet(id); if(!blob){ alert(t('Audio đã hết hạn (quá 24h).')); histDel(id); return; }
       var _h=histData.filter(function(x){return x.id===id;})[0]; var _ext=(_h&&_h.ext)||'mp3';
       var url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download='tanseven-'+id+'.'+_ext; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(function(){URL.revokeObjectURL(url);},1500);
-    }catch(e){ alert('Không tải được.'); }
+    }catch(e){ alert(t('Không tải được.')); }
   }
   function histDel(id){ histData=histData.filter(function(h){return h.id!==id;}); histSave(); idbDel(id); histRender(); }
   function estSec(t){ return Math.max(6, Math.min(90, Math.round((t||'').length/25))); }
@@ -1676,7 +1723,7 @@
   function pronSave(){ try{ localStorage.setItem('ts_pron', JSON.stringify(pronDict)); }catch(e){} }
   function pronAdd(){ var w=(el('pronWord').value||'').trim(), r=(el('pronRead').value||'').trim(); if(!w||!r) return; pronDict.unshift({w:w,r:r}); if(pronDict.length>200)pronDict=pronDict.slice(0,200); pronSave(); el('pronWord').value=''; el('pronRead').value=''; pronRender(); }
   function pronDel(i){ pronDict.splice(i,1); pronSave(); pronRender(); }
-  function pronRender(){ var g=el('pronList'); if(!g) return; if(!pronDict.length){ g.innerHTML='<div style="color:var(--muted);font-size:13px">Chưa có từ nào. Thêm từ khó để AI đọc đúng.</div>'; return; } g.innerHTML=pronDict.map(function(p,i){ return '<div class="pron-row"><span class="mono">'+esc(p.w)+'</span> <span style="color:var(--muted)">→</span> <b>'+esc(p.r)+'</b><button class="mini-x" style="margin-left:auto" onclick="pronDel('+i+')">✕</button></div>'; }).join(''); }
+  function pronRender(){ var g=el('pronList'); if(!g) return; if(!pronDict.length){ g.innerHTML=t('<div style="color:var(--muted);font-size:13px">Chưa có từ nào. Thêm từ khó để AI đọc đúng.</div>'); return; } g.innerHTML=pronDict.map(function(p,i){ return '<div class="pron-row"><span class="mono">'+esc(p.w)+'</span> <span style="color:var(--muted)">→</span> <b>'+esc(p.r)+'</b><button class="mini-x" style="margin-left:auto" onclick="pronDel('+i+')">✕</button></div>'; }).join(''); }
   function applyUserPron(t){ pronDict.forEach(function(p){ try{ t=t.replace(new RegExp("\\b"+p.w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+"\\b","gi"), p.r); }catch(e){} }); return t; }
   pronLoad();
 
@@ -1696,55 +1743,55 @@
   function akRender(){
     var g = el('akList'); if(!g) return;
     if(!apiKeys.length){
-      g.innerHTML = '<div style="color:var(--muted);font-size:13px">Chưa có khoá nào. Bấm “Tạo khoá mới” để lấy khoá dùng cho tool của bạn.</div>';
+      g.innerHTML = t('<div style="color:var(--muted);font-size:13px">Chưa có khoá nào. Bấm “Tạo khoá mới” để lấy khoá dùng cho tool của bạn.</div>');
       return;
     }
     g.innerHTML = apiKeys.map(function(k){
       var d = k.created_at ? new Date(k.created_at).toLocaleDateString('vi-VN') : '';
-      var used = k.last_used_at ? new Date(k.last_used_at).toLocaleString('vi-VN') : 'chưa dùng';
+      var used = k.last_used_at ? new Date(k.last_used_at).toLocaleString('vi-VN') : t('chưa dùng');
       return '<div class="pron-row"><span class="mono">'+esc(k.key_prefix)+'…</span>'
-        + ' <b style="margin-left:6px">'+esc(k.name||'Khoá API')+'</b>'
-        + ' <span style="color:var(--muted);font-size:12px;margin-left:6px">tạo '+d+' · '+(k.calls||0)+' lần gọi · dùng gần nhất: '+used+'</span>'
+        + ' <b style="margin-left:6px">'+esc(k.name||t('Khoá API'))+'</b>'
+        + t(' <span style="color:var(--muted);font-size:12px;margin-left:6px">tạo ')+d+' · '+(k.calls||0)+t(' lần gọi · dùng gần nhất: ')+used+'</span>'
         + '<button class="mini-x" style="margin-left:auto" onclick="akDel(\''+k.id+'\')">✕</button></div>';
     }).join('');
   }
   async function akCreate(){
-    if(!sb){ alert('Vui lòng đăng nhập.'); return; }
+    if(!sb){ alert(t('Vui lòng đăng nhập.')); return; }
     var m = el('akMsg'), b = el('akBtn');
-    b.disabled = true; b.textContent = 'Đang tạo...';
+    b.disabled = true; b.textContent = t('Đang tạo...');
     try{
       var q = await sb.rpc('create_api_key', { p_name: (el('akName').value||'').trim() });
       if(q.error) throw new Error(q.error.message);
       var row = Array.isArray(q.data) ? q.data[0] : q.data;
-      if(!row || !row.api_key) throw new Error('Không tạo được khoá');
+      if(!row || !row.api_key) throw new Error(t('Không tạo được khoá'));
       el('akName').value = '';
       var box = el('akNew');
       box.style.display = 'block';
       box.innerHTML = '<div style="margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--green-soft)">'
-        + '<div style="font-weight:700;margin-bottom:6px">🔑 Khoá của bạn (chỉ hiện MỘT LẦN — hãy lưu lại ngay)</div>'
+        + t('<div style="font-weight:700;margin-bottom:6px">🔑 Khoá của bạn (chỉ hiện MỘT LẦN — hãy lưu lại ngay)</div>')
         + '<div class="mono" id="akVal" style="word-break:break-all;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px">'+esc(row.api_key)+'</div>'
-        + '<button class="btn" style="margin-top:10px;width:auto;padding:10px 18px" onclick="akCopy()">📋 Sao chép</button>'
+        + t('<button class="btn" style="margin-top:10px;width:auto;padding:10px 18px" onclick="akCopy()">📋 Sao chép</button>')
         + '</div>';
-      m.className = 'msg ok'; m.textContent = '✅ Đã tạo khoá. Lưu lại ngay — đóng trang là không xem lại được nữa.';
+      m.className = 'msg ok'; m.textContent = t('✅ Đã tạo khoá. Lưu lại ngay — đóng trang là không xem lại được nữa.');
       akLoad();
     }catch(e){
-      m.className = 'msg err'; m.textContent = 'Lỗi: ' + String(e.message || e);
+      m.className = 'msg err'; m.textContent = t('Lỗi: ') + String(e.message || e);
     }
-    b.disabled = false; b.textContent = '+ Tạo khoá mới';
+    b.disabled = false; b.textContent = t('+ Tạo khoá mới');
   }
   function akCopy(){
     var t = el('akVal'); if(!t) return;
-    try{ navigator.clipboard.writeText(t.textContent); el('akMsg').className='msg ok'; el('akMsg').textContent='📋 Đã sao chép khoá.'; }
+    try{ navigator.clipboard.writeText(t.textContent); el('akMsg').className='msg ok'; el('akMsg').textContent=t('📋 Đã sao chép khoá.'); }
     catch(e){ alert(t.textContent); }
   }
   async function akDel(id){
-    if(!confirm('Xoá khoá này? Mọi tool đang dùng khoá sẽ ngừng chạy.')) return;
+    if(!confirm(t('Xoá khoá này? Mọi tool đang dùng khoá sẽ ngừng chạy.'))) return;
     try{
       var q = await sb.from('api_keys').delete().eq('id', id);
       if(q.error) throw new Error(q.error.message);
-      el('akMsg').className='msg ok'; el('akMsg').textContent='🗑️ Đã xoá khoá.';
+      el('akMsg').className='msg ok'; el('akMsg').textContent=t('🗑️ Đã xoá khoá.');
       akLoad();
-    }catch(e){ el('akMsg').className='msg err'; el('akMsg').textContent='Lỗi: '+String(e.message||e); }
+    }catch(e){ el('akMsg').className='msg err'; el('akMsg').textContent=t('Lỗi: ')+String(e.message||e); }
   }
   function prep(text, lang){ var raw=String(text||''); if(typeof ttsModel!=='undefined' && ttsModel==='4.0') raw=expressify(raw); var t=applyUserPron(raw.replace(/⏸/g,'. ')); return (lang==='vi'||!lang) ? normVi(t) : t; }
   // Chèn dấu nghỉ ⏸ vào vị trí con trỏ
@@ -1755,27 +1802,27 @@
   async function changePass(){
     if(!sb) return;
     var np = el('newPass').value, m = el('passMsg');
-    if(np.length < 6){ m.className='msg err'; m.textContent='Mật khẩu phải ≥ 6 ký tự.'; return; }
+    if(np.length < 6){ m.className='msg err'; m.textContent=t('Mật khẩu phải ≥ 6 ký tự.'); return; }
     var { error } = await sb.auth.updateUser({ password: np });
-    if(error){ m.className='msg err'; m.textContent='Lỗi: '+error.message; }
-    else { m.className='msg ok'; m.textContent='✅ Đã đổi mật khẩu thành công!'; el('newPass').value=''; }
+    if(error){ m.className='msg err'; m.textContent=t('Lỗi: ')+error.message; }
+    else { m.className='msg ok'; m.textContent=t('✅ Đã đổi mật khẩu thành công!'); el('newPass').value=''; }
   }
   async function forgotPass(){
     if(!sb) return;
-    var email = prompt('Nhập email đã đăng ký để nhận link đặt lại mật khẩu:');
+    var email = prompt(t('Nhập email đã đăng ký để nhận link đặt lại mật khẩu:'));
     if(!email) return;
     var base = location.origin + location.pathname;
     var { error } = await sb.auth.resetPasswordForEmail(email.trim(), { redirectTo: base });
-    if(error){ showMsg('Lỗi: '+error.message); }
-    else { showMsg('📧 Đã gửi link đặt lại tới '+email.trim()+'. Mở email (xem cả mục Spam) rồi bấm link trong đó.', true); }
+    if(error){ showMsg(t('Lỗi: ')+error.message); }
+    else { showMsg(t('📧 Đã gửi link đặt lại tới ')+email.trim()+t('. Mở email (xem cả mục Spam) rồi bấm link trong đó.'), true); }
   }
   async function doReset(){
     if(!sb) return;
     var np = el('resetPass').value, m = el('resetMsg');
-    if(np.length < 6){ m.className='msg err'; m.textContent='Mật khẩu phải ≥ 6 ký tự.'; return; }
+    if(np.length < 6){ m.className='msg err'; m.textContent=t('Mật khẩu phải ≥ 6 ký tự.'); return; }
     var { error } = await sb.auth.updateUser({ password: np });
-    if(error){ m.className='msg err'; m.textContent='Lỗi: '+error.message; }
-    else { m.className='msg ok'; m.textContent='✅ Đổi mật khẩu thành công! Đang vào tài khoản...';
+    if(error){ m.className='msg err'; m.textContent=t('Lỗi: ')+error.message; }
+    else { m.className='msg ok'; m.textContent=t('✅ Đổi mật khẩu thành công! Đang vào tài khoản...');
       setTimeout(function(){ location.href = location.origin + location.pathname; }, 1500); }
   }
 
@@ -1788,7 +1835,7 @@
   }
   function downloadSRT(){
     var segs = window._ttsSegs || [];
-    if(!segs.length){ alert('Chưa có dữ liệu phụ đề.'); return; }
+    if(!segs.length){ alert(t('Chưa có dữ liệu phụ đề.')); return; }
     var srt = segs.map(function(s,i){
       return (i+1)+'\n'+_srtTime(s.start)+' --> '+_srtTime(s.end)+'\n'+String(s.text||'').trim()+'\n';
     }).join('\n');
@@ -1799,4 +1846,45 @@
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
   }
+
+  /* ===== i18n: static markup + language switcher ===== */
+  var TS_I18N={"vi":{"nav.logout":"Đăng xuất","auth.tabLogin":"Đăng nhập","auth.tabReg":"Đăng ký","login.h1":"Đăng nhập","login.sub":"Vào tài khoản để dùng giọng đọc AI.","f.email":"Email","f.pass":"Mật khẩu","login.btn":"Đăng nhập","login.forgot":"Quên mật khẩu?","reg.h1":"Tạo tài khoản","reg.sub":"Đăng ký miễn phí — tặng ngay <b>2.000 ký tự</b> dùng thử.","f.name":"Họ và tên","f.pass6":"Mật khẩu (tối thiểu 6 ký tự)","reg.btn":"Đăng ký miễn phí →","rs.h1":"🔑 Đặt lại mật khẩu","rs.sub":"Nhập mật khẩu mới cho tài khoản của bạn.","rs.lbl":"Mật khẩu mới (≥ 6 ký tự)","rs.btn":"Đổi mật khẩu","nav.tts":"🎙️ Văn bản thành giọng nói","nav.clone":"🧬 Nhân bản giọng nói","nav.batch":"📚 Tạo hàng loạt","nav.aff":"🤝 Affiliate","nav.acc":"👤 Tài khoản","unit.chars":"ký tự","tts.h":"🎙️ Văn bản thành giọng nói","tts.pause":"⏸ Chèn nghỉ","tts.pauseHint":"Chèn dấu <b>⏸</b> vào chỗ muốn ngắt nghỉ — nhiều dấu = nghỉ lâu hơn. (Dấu phẩy/chấm cũng tạo nhịp nghỉ tự nhiên.)","tts.pickVoice":"🎙️ Chọn giọng nói","tts.changeVoice":"Đổi giọng →","tts.modelH":"🎛️ Chọn Model đọc","tts.mdl30":"<b>⚡ Tan Seven 3.0</b><small>Nhanh · chuẩn</small>","tts.mdl40":"<b>✨ Tan Seven 4.0<span class=\"mdl-vip\">VIP</span></b><small>Biểu cảm · hay hơn</small>","tts.mdlNote":"⏳ <b>Đọc chậm rãi + nhiều nhịp nghỉ</b> → nghe <b>cảm xúc, tự nhiên</b> hơn (hợp kể chuyện, quảng cáo, phim). Bù lại tạo lâu hơn chút.","tts.readStyle":"🎭 Cách đọc","tts.emotion":"🎭 Cảm xúc","tts.language":"🌍 Ngôn ngữ","tts.expr":"🎭 Độ biểu cảm:","tts.exprHint":"(trái = ổn định, rõ · phải = giàu cảm xúc)","tts.denoise":"🧹 Lọc tạp âm mẫu giọng","tts.denoiseHint":"(chỉ bật khi mẫu có tiếng ồn — mẫu sạch mà lọc sẽ kém giống)","tts.speed":"⚡ Tốc độ đọc:","tts.speedHint":"(trái = chậm · phải = nhanh)","tts.btn":"🎙️ Tạo audio","tts.progress":"đang tạo audio…","tts.dlMp3":"⬇️ Tải MP3","tts.dlSrt":"📝 Tải phụ đề SRT","fx.lbl":"🎚️ Hiệu ứng vui:","fx.none":"Gốc","fx.robot":"🤖 Robot","fx.deep":"🎙️ Trầm ấm","fx.high":"🐿️ Cao","fx.echo":"🏛️ Vang","fx.phone":"📞 Điện thoại","hist.h":"🕘 Lịch sử","hist.auto":"Tự động xoá sau 24 giờ.","cv.h":"🧬 Tạo giọng nhân bản","cv.name":"Tên giọng nói","cv.upload":"Tải lên tệp âm thanh","cv.drop":"<b>Nhấp hoặc kéo thả tệp vào đây</b>","cv.dropSub":"Ghép được <b>tối đa 3 đoạn</b> · tổng 3s – 60s · mỗi file ≤ 12MB · .mp3 .wav<br>Nhiều đoạn với giọng điệu khác nhau ⇒ máy bắt giọng chuẩn hơn hẳn.","cv.pickFile":"📁 Chọn File","cv.record":"🎙️ Ghi âm","cv.clearAll":"Xoá hết ✕","cv.tipsH":"💡 Lưu ý cho giọng mẫu","cv.tip1":"Âm thanh sạch, một người nói, không tạp âm.","cv.tip2":"Chất lượng mẫu quyết định chất lượng clone.","cv.tip3":"Nên gom 2–3 đoạn: một đoạn kể bình thường, một đoạn nhấn mạnh, một đoạn câu hỏi — máy học được cả ngữ điệu.","cv.tip4":"Mẫu đã sạch thì <b>đừng bật lọc tạp âm</b> — lọc sẽ bào mất chi tiết làm giọng kém giống.","cv.save":"💾 Tạo &amp; lưu giọng","cv.myVoices":"🎧 Giọng của tôi","bt.h":"📚 Tạo hàng loạt","bt.desc":"Mỗi <b>dòng</b> = 1 file audio riêng. Nhập nhiều dòng để tạo hàng loạt, rồi tải về từng file hoặc cả gói <b>.zip</b>.","bt.voice":"🎙️ Giọng đọc","bt.cloneOnly":"(giọng clone)","bt.speed":"⚡ Tốc độ:","bt.btn":"🚀 Tạo hàng loạt","bt.dlZip":"⬇️ Tải tất cả (.zip)","af.h":"🤝 Affiliate — hoa hồng 12%","af.refs":"Người giới thiệu","af.earned":"Hoa hồng đã kiếm","af.linkH":"🔗 Link giới thiệu của bạn","af.desc":"Chia sẻ link này cho bạn bè, hội nhóm. Ai bấm vào rồi <b>đăng ký + mua ký tự</b>, bạn nhận ngay <b>12%</b> số tiền họ mua — khách vẫn trả giá như thường, bạn có thêm thu nhập.","af.copy":"📋 Copy","ac.hello":"Chào","ac.creditH":"💎 Ký tự còn lại","ac.creditDesc":"Mỗi ký tự = 1 lần đọc. Hết thì nạp thêm.","ac.topup":"+ Nạp thêm","ac.passH":"🔒 Đổi mật khẩu","ac.passBtn":"Đổi mật khẩu","ac.pronH":"📖 Từ điển phát âm riêng","ac.pronDesc":"Dạy AI đọc đúng những từ khó (tên riêng, thương hiệu, từ nước ngoài). Áp dụng cho mọi giọng, lưu trên máy bạn.","ac.pronAdd":"+ Thêm","ac.apiH":"🔌 Khoá API cho lập trình viên","ac.apiDesc":"Nối Tân Seven Voice vào phần mềm khác (n8n, Make, Python, tool của bạn).\n          Khoá dùng chung số ký tự với tài khoản này. <a href=\"api.html\" target=\"_blank\"><b>Xem hướng dẫn →</b></a>","ac.akCreate":"+ Tạo khoá mới","cfg.warn":"\n    ⚙️ <b>Chưa nối Supabase.</b> Trang này đã sẵn sàng — chỉ cần điền <b>SUPABASE_URL</b> và <b>SUPABASE_ANON_KEY</b>\n    (lấy từ project Supabase) vào đầu file là chạy được đăng ký/đăng nhập thật.\n  ","np.h":"💳 Nạp thêm ký tự","np.sub":"Mua 1 lần — ký tự dùng <b>vĩnh viễn</b>, không hết hạn.","np.basic":"💚 Cơ bản","np.basicCr":"1.100.000 ký tự · ~18 giờ audio","np.badge":"LỢI NHẤT","np.pro":"💛 Pro","np.proCr":"3.800.000 ký tự · ~63 giờ audio","np.h2":"📲 Quét mã để chuyển khoản","np.bank":"Ngân hàng","np.acc":"Số tài khoản","np.owner":"Chủ tài khoản","np.amount":"Số tiền","np.code":"Nội dung CK","np.note":"⚠️ Chuyển <b>đúng số tiền</b> và <b>đúng nội dung</b> ở trên. Hệ thống tự cộng ký tự sau 1–2 phút.","np.wait":"⏳ Đang chờ chuyển khoản...","np.done":"🎉 Đã nhận tiền! Ký tự đã được cộng vào tài khoản.","vm.h":"🎙️ Chọn giọng nói","vm.fav":"❤️ Yêu thích","ph.email":"ban@email.com","ph.name":"Nguyễn Văn A","ph.ttsText":"Dán kịch bản cần đọc vào đây... (tối đa 200.000 ký tự)","ph.cvName":"Nhập tên giọng nói (VD: Giọng của tôi)","ph.batchText":"Dòng 1: Xin chào các bạn, đây là video hôm nay...\nDòng 2: Đừng quên like và đăng ký kênh nhé...\nDòng 3: Hẹn gặp lại các bạn ở video sau!","af.loginFirst":"Đăng nhập để lấy link...","ph.newPass":"Mật khẩu mới (≥ 6 ký tự)","ph.pronWord":"Từ (VD: Nguyễn)","ph.pronRead":"Đọc là (VD: Ngwiễn)","ph.akName":"Tên khoá (VD: Tool ghép video)","np.qrAlt":"QR","ph.voiceSearch":"t(\"🔍","doc.title":"Tài khoản · Tan Seven Voice","tts.count0":"0 ký tự","tts.exprVal":"Vừa","ac.creditInit":"—<small> ký tự</small>","ac.you":"bạn"},"en":{"nav.logout":"Sign out","auth.tabLogin":"Sign in","auth.tabReg":"Sign up","login.h1":"Sign in","login.sub":"Sign in to use the AI voices.","f.email":"Email","f.pass":"Password","login.btn":"Sign in","login.forgot":"Forgot your password?","reg.h1":"Create an account","reg.sub":"Sign up free — get <b>2,000 characters</b> to try right away.","f.name":"Full name","f.pass6":"Password (at least 6 characters)","reg.btn":"Sign up free →","rs.h1":"🔑 Reset password","rs.sub":"Enter a new password for your account.","rs.lbl":"New password (≥ 6 characters)","rs.btn":"Change password","nav.tts":"🎙️ Text to speech","nav.clone":"🧬 Voice cloning","nav.batch":"📚 Batch create","nav.aff":"🤝 Affiliate","nav.acc":"👤 Account","unit.chars":"characters","tts.h":"🎙️ Text to speech","tts.pause":"⏸ Insert pause","tts.pauseHint":"Insert a <b>⏸</b> wherever you want a pause — more marks = longer pause. (Commas and full stops also create a natural rhythm.)","tts.pickVoice":"🎙️ Choose a voice","tts.changeVoice":"Change voice →","tts.modelH":"🎛️ Choose a reading model","tts.mdl30":"<b>⚡ Tan Seven 3.0</b><small>Fast · reliable</small>","tts.mdl40":"<b>✨ Tan Seven 4.0<span class=\"mdl-vip\">VIP</span></b><small>Expressive · better</small>","tts.mdlNote":"⏳ <b>Slower reading + more pauses</b> → sounds <b>more emotional and natural</b> (great for storytelling, ads, films). It just takes a little longer to generate.","tts.readStyle":"🎭 Reading style","tts.emotion":"🎭 Emotion","tts.language":"🌍 Language","tts.expr":"🎭 Expressiveness:","tts.exprHint":"(left = steady and clear · right = full of emotion)","tts.denoise":"🧹 Clean up noise in the sample","tts.denoiseHint":"(turn this on only if the sample is noisy — cleaning a clean sample makes the clone less similar)","tts.speed":"⚡ Reading speed:","tts.speedHint":"(left = slower · right = faster)","tts.btn":"🎙️ Create audio","tts.progress":"creating audio…","tts.dlMp3":"⬇️ Download MP3","tts.dlSrt":"📝 Download SRT subtitles","fx.lbl":"🎚️ Fun effects:","fx.none":"Original","fx.robot":"🤖 Robot","fx.deep":"🎙️ Deep","fx.high":"🐿️ High","fx.echo":"🏛️ Echo","fx.phone":"📞 Telephone","hist.h":"🕘 History","hist.auto":"Automatically deleted after 24 hours.","cv.h":"🧬 Create a cloned voice","cv.name":"Voice name","cv.upload":"Upload an audio file","cv.drop":"<b>Click or drag a file here</b>","cv.dropSub":"You can combine <b>up to 3 clips</b> · 3s – 60s in total · each file ≤ 12MB · .mp3 .wav<br>Several clips with different tones ⇒ the model captures your voice far more accurately.","cv.pickFile":"📁 Choose file","cv.record":"🎙️ Record","cv.clearAll":"Clear all ✕","cv.tipsH":"💡 Tips for your voice sample","cv.tip1":"Clean audio, one speaker, no background noise.","cv.tip2":"The quality of the sample decides the quality of the clone.","cv.tip3":"Try 2–3 clips: one normal narration, one emphatic, one question — the model then learns your intonation too.","cv.tip4":"If the sample is already clean, <b>do not turn on noise cleanup</b> — it strips out detail and makes the clone less similar.","cv.save":"💾 Create &amp; save voice","cv.myVoices":"🎧 My voices","bt.h":"📚 Batch create","bt.desc":"Each <b>line</b> = one separate audio file. Enter several lines to create them all at once, then download them one by one or as a <b>.zip</b>.","bt.voice":"🎙️ Voice","bt.cloneOnly":"(cloned voices)","bt.speed":"⚡ Speed:","bt.btn":"🚀 Create batch","bt.dlZip":"⬇️ Download all (.zip)","af.h":"🤝 Affiliate — 12% commission","af.refs":"People referred","af.earned":"Commission earned","af.linkH":"🔗 Your referral link","af.desc":"Share this link with friends and groups. When someone clicks it and then <b>signs up + buys characters</b>, you get <b>12%</b> of what they spend — they still pay the normal price, and you earn extra income.","af.copy":"📋 Copy","ac.hello":"Hello","ac.creditH":"💎 Characters left","ac.creditDesc":"One character = one reading. Top up when you run out.","ac.topup":"+ Top up","ac.passH":"🔒 Change password","ac.passBtn":"Change password","ac.pronH":"📖 Your own pronunciation dictionary","ac.pronDesc":"Teach the AI to read difficult words correctly (names, brands, foreign words). Applies to every voice and is stored on your device.","ac.pronAdd":"+ Add","ac.apiH":"🔌 API key for developers","ac.apiDesc":"Connect Tan Seven Voice to other software (n8n, Make, Python, your own tools).\n          The key shares the character balance of this account. <a href=\"api.html\" target=\"_blank\"><b>Read the docs →</b></a>","ac.akCreate":"+ New API key","cfg.warn":"\n    ⚙️ <b>Supabase is not connected.</b> This page is ready — just fill in <b>SUPABASE_URL</b> and <b>SUPABASE_ANON_KEY</b>\n    (from your Supabase project) at the top of the file and real sign-up / sign-in will work.\n  ","np.h":"💳 Top up characters","np.sub":"Buy once — your characters last <b>forever</b>, they never expire.","np.basic":"💚 Basic","np.basicCr":"1,100,000 characters · ~18 hours of audio","np.badge":"BEST VALUE","np.pro":"💛 Pro","np.proCr":"3,800,000 characters · ~63 hours of audio","np.h2":"📲 Scan the code to transfer","np.bank":"Bank","np.acc":"Account number","np.owner":"Account holder","np.amount":"Amount","np.code":"Transfer note","np.note":"⚠️ Transfer the <b>exact amount</b> with the <b>exact note</b> above. Characters are added automatically within 1–2 minutes.","np.wait":"⏳ Waiting for your transfer...","np.done":"🎉 Payment received! The characters have been added to your account.","vm.h":"🎙️ Choose a voice","vm.fav":"❤️ Favourites","ph.email":"you@email.com","ph.name":"Your full name","ph.ttsText":"Paste the script you want read here... (up to 200,000 characters)","ph.cvName":"Name this voice (e.g. My voice)","ph.batchText":"Line 1: Hello everyone, here is today's video...&#10;Line 2: Don't forget to like and subscribe...&#10;Line 3: See you in the next video!","af.loginFirst":"Sign in to get your link...","ph.newPass":"New password (≥ 6 characters)","ph.pronWord":"Word (e.g. Nguyễn)","ph.pronRead":"Read as (e.g. Ngwiễn)","ph.akName":"Key name (e.g. Video editing tool)","np.qrAlt":"Bank transfer QR code","ph.voiceSearch":"🔍 Search voices by name...","doc.title":"Account · Tan Seven Voice","tts.count0":"0 characters","tts.exprVal":"Medium","ac.creditInit":"—<small> characters</small>","ac.you":"you"},"hi":{"nav.logout":"साइन आउट","auth.tabLogin":"साइन इन","auth.tabReg":"रजिस्टर","login.h1":"साइन इन","login.sub":"AI आवाज़ें इस्तेमाल करने के लिए साइन इन करें।","f.email":"ईमेल","f.pass":"पासवर्ड","login.btn":"साइन इन","login.forgot":"पासवर्ड भूल गए?","reg.h1":"खाता बनाएँ","reg.sub":"मुफ़्त रजिस्टर करें — तुरंत <b>2,000 अक्षर</b> मुफ़्त पाएँ।","f.name":"पूरा नाम","f.pass6":"पासवर्ड (कम से कम 6 अक्षर)","reg.btn":"मुफ़्त रजिस्टर करें →","rs.h1":"🔑 पासवर्ड रीसेट करें","rs.sub":"अपने खाते के लिए नया पासवर्ड डालें।","rs.lbl":"नया पासवर्ड (≥ 6 अक्षर)","rs.btn":"पासवर्ड बदलें","nav.tts":"🎙️ टेक्स्ट से आवाज़","nav.clone":"🧬 आवाज़ क्लोनिंग","nav.batch":"📚 बैच बनाएँ","nav.aff":"🤝 एफ़िलिएट","nav.acc":"👤 खाता","unit.chars":"अक्षर","tts.h":"🎙️ टेक्स्ट से आवाज़","tts.pause":"⏸ विराम डालें","tts.pauseHint":"जहाँ रुकना हो वहाँ <b>⏸</b> डालें — जितने ज़्यादा निशान, उतना लंबा विराम। (अल्पविराम और पूर्णविराम भी स्वाभाविक लय बनाते हैं।)","tts.pickVoice":"🎙️ आवाज़ चुनें","tts.changeVoice":"आवाज़ बदलें →","tts.modelH":"🎛️ पढ़ने का मॉडल चुनें","tts.mdl30":"<b>⚡ Tan Seven 3.0</b><small>तेज़ · भरोसेमंद</small>","tts.mdl40":"<b>✨ Tan Seven 4.0<span class=\"mdl-vip\">VIP</span></b><small>भावपूर्ण · बेहतर</small>","tts.mdlNote":"⏳ <b>धीमी रफ़्तार + ज़्यादा विराम</b> → सुनने में <b>ज़्यादा भावपूर्ण और स्वाभाविक</b> (कहानी, विज्ञापन, फ़िल्म के लिए बढ़िया)। बस बनने में थोड़ा ज़्यादा समय लगता है।","tts.readStyle":"🎭 पढ़ने की शैली","tts.emotion":"🎭 भावना","tts.language":"🌍 भाषा","tts.expr":"🎭 भावप्रवणता:","tts.exprHint":"(बाएँ = स्थिर और स्पष्ट · दाएँ = भावनाओं से भरपूर)","tts.denoise":"🧹 नमूने का शोर हटाएँ","tts.denoiseHint":"(सिर्फ़ तभी चालू करें जब नमूने में शोर हो — साफ़ नमूने पर फ़िल्टर लगाने से क्लोन कम मिलता-जुलता होगा)","tts.speed":"⚡ पढ़ने की गति:","tts.speedHint":"(बाएँ = धीमा · दाएँ = तेज़)","tts.btn":"🎙️ ऑडियो बनाएँ","tts.progress":"ऑडियो बन रहा है…","tts.dlMp3":"⬇️ MP3 डाउनलोड","tts.dlSrt":"📝 SRT सबटाइटल डाउनलोड","fx.lbl":"🎚️ मज़ेदार इफ़ेक्ट:","fx.none":"मूल","fx.robot":"🤖 रोबोट","fx.deep":"🎙️ गहरी","fx.high":"🐿️ ऊँची","fx.echo":"🏛️ गूँज","fx.phone":"📞 टेलीफ़ोन","hist.h":"🕘 इतिहास","hist.auto":"24 घंटे बाद अपने आप हट जाएगा।","cv.h":"🧬 क्लोन आवाज़ बनाएँ","cv.name":"आवाज़ का नाम","cv.upload":"ऑडियो फ़ाइल अपलोड करें","cv.drop":"<b>यहाँ क्लिक करें या फ़ाइल खींचकर छोड़ें</b>","cv.dropSub":"आप <b>अधिकतम 3 क्लिप</b> जोड़ सकते हैं · कुल 3s – 60s · हर फ़ाइल ≤ 12MB · .mp3 .wav<br>अलग-अलग लहजे वाली कई क्लिप ⇒ मॉडल आपकी आवाज़ कहीं बेहतर पकड़ता है।","cv.pickFile":"📁 फ़ाइल चुनें","cv.record":"🎙️ रिकॉर्ड","cv.clearAll":"सब हटाएँ ✕","cv.tipsH":"💡 आवाज़ के नमूने के लिए सुझाव","cv.tip1":"साफ़ ऑडियो, एक ही वक्ता, कोई पृष्ठभूमि शोर नहीं।","cv.tip2":"नमूने की गुणवत्ता ही क्लोन की गुणवत्ता तय करती है।","cv.tip3":"2–3 क्लिप लें: एक सामान्य कथन, एक ज़ोरदार, एक प्रश्न — तब मॉडल आपका सुर भी सीखता है।","cv.tip4":"अगर नमूना पहले से साफ़ है तो <b>शोर फ़िल्टर चालू न करें</b> — यह बारीकियाँ मिटा देता है और क्लोन कम मिलता-जुलता होता है।","cv.save":"💾 आवाज़ बनाएँ और सेव करें","cv.myVoices":"🎧 मेरी आवाज़ें","bt.h":"📚 बैच बनाएँ","bt.desc":"हर <b>पंक्ति</b> = एक अलग ऑडियो फ़ाइल। कई पंक्तियाँ डालकर एक साथ बनाएँ, फिर एक-एक करके या <b>.zip</b> के रूप में डाउनलोड करें।","bt.voice":"🎙️ आवाज़","bt.cloneOnly":"(क्लोन आवाज़ें)","bt.speed":"⚡ गति:","bt.btn":"🚀 बैच बनाएँ","bt.dlZip":"⬇️ सब डाउनलोड करें (.zip)","af.h":"🤝 एफ़िलिएट — 12% कमीशन","af.refs":"रेफ़र किए गए लोग","af.earned":"कमाया गया कमीशन","af.linkH":"🔗 आपका रेफ़रल लिंक","af.desc":"यह लिंक दोस्तों और ग्रुप में साझा करें। कोई इस पर क्लिक करके <b>रजिस्टर करे + अक्षर खरीदे</b>, तो आपको उनकी खरीद का <b>12%</b> मिलता है — उन्हें सामान्य कीमत ही देनी होती है और आपकी अतिरिक्त कमाई होती है।","af.copy":"📋 कॉपी","ac.hello":"नमस्ते","ac.creditH":"💎 शेष अक्षर","ac.creditDesc":"एक अक्षर = एक बार पढ़ना। खत्म होने पर टॉप-अप करें।","ac.topup":"+ टॉप-अप","ac.passH":"🔒 पासवर्ड बदलें","ac.passBtn":"पासवर्ड बदलें","ac.pronH":"📖 आपकी अपनी उच्चारण डिक्शनरी","ac.pronDesc":"AI को कठिन शब्द सही पढ़ना सिखाएँ (नाम, ब्रांड, विदेशी शब्द)। हर आवाज़ पर लागू होता है और आपके डिवाइस पर सेव रहता है।","ac.pronAdd":"+ जोड़ें","ac.apiH":"🔌 डेवलपर के लिए API कुंजी","ac.apiDesc":"Tan Seven Voice को दूसरे सॉफ़्टवेयर से जोड़ें (n8n, Make, Python, आपके अपने टूल)।\n          कुंजी इसी खाते के अक्षर इस्तेमाल करती है। <a href=\"api.html\" target=\"_blank\"><b>गाइड देखें →</b></a>","ac.akCreate":"+ नई कुंजी बनाएँ","cfg.warn":"\n    ⚙️ <b>Supabase जुड़ा नहीं है।</b> यह पेज तैयार है — बस फ़ाइल की शुरुआत में <b>SUPABASE_URL</b> और <b>SUPABASE_ANON_KEY</b>\n    (अपने Supabase प्रोजेक्ट से) भरें, फिर असली रजिस्टर/लॉगिन चलने लगेगा।\n  ","np.h":"💳 अक्षर टॉप-अप करें","np.sub":"एक बार खरीदें — आपके अक्षर <b>हमेशा</b> रहते हैं, कभी समाप्त नहीं होते।","np.basic":"💚 बेसिक","np.basicCr":"1,100,000 अक्षर · ~18 घंटे ऑडियो","np.badge":"सबसे फ़ायदेमंद","np.pro":"💛 प्रो","np.proCr":"3,800,000 अक्षर · ~63 घंटे ऑडियो","np.h2":"📲 ट्रांसफ़र के लिए कोड स्कैन करें","np.bank":"बैंक","np.acc":"खाता संख्या","np.owner":"खाताधारक","np.amount":"राशि","np.code":"ट्रांसफ़र नोट","np.note":"⚠️ ऊपर लिखी <b>ठीक वही राशि</b> और <b>ठीक वही नोट</b> भेजें। अक्षर 1–2 मिनट में अपने आप जुड़ जाते हैं।","np.wait":"⏳ आपके ट्रांसफ़र की प्रतीक्षा...","np.done":"🎉 भुगतान मिल गया! अक्षर आपके खाते में जुड़ गए हैं।","vm.h":"🎙️ आवाज़ चुनें","vm.fav":"❤️ पसंदीदा","ph.email":"you@email.com","ph.name":"आपका पूरा नाम","ph.ttsText":"जो टेक्स्ट पढ़वाना है उसे यहाँ पेस्ट करें... (अधिकतम 200,000 अक्षर)","ph.cvName":"इस आवाज़ का नाम दें (जैसे: मेरी आवाज़)","ph.batchText":"पंक्ति 1: नमस्ते दोस्तों, यह है आज का वीडियो...&#10;पंक्ति 2: लाइक और सब्सक्राइब करना न भूलें...&#10;पंक्ति 3: अगले वीडियो में मिलते हैं!","af.loginFirst":"लिंक पाने के लिए साइन इन करें...","ph.newPass":"नया पासवर्ड (≥ 6 अक्षर)","ph.pronWord":"शब्द (जैसे: Nguyễn)","ph.pronRead":"ऐसे पढ़ें (जैसे: Ngwiễn)","ph.akName":"कुंजी का नाम (जैसे: वीडियो टूल)","np.qrAlt":"बैंक ट्रांसफ़र QR कोड","ph.voiceSearch":"🔍 नाम से आवाज़ खोजें...","doc.title":"खाता · Tan Seven Voice","tts.count0":"0 अक्षर","tts.exprVal":"मध्यम","ac.creditInit":"—<small> अक्षर</small>","ac.you":"आप"},"ko":{"nav.logout":"로그아웃","auth.tabLogin":"로그인","auth.tabReg":"회원가입","login.h1":"로그인","login.sub":"AI 음성을 사용하려면 로그인하세요.","f.email":"이메일","f.pass":"비밀번호","login.btn":"로그인","login.forgot":"비밀번호를 잊으셨나요?","reg.h1":"계정 만들기","reg.sub":"무료 가입 — 바로 <b>2,000자</b>를 드립니다.","f.name":"이름","f.pass6":"비밀번호 (6자 이상)","reg.btn":"무료로 가입 →","rs.h1":"🔑 비밀번호 재설정","rs.sub":"계정에 사용할 새 비밀번호를 입력하세요.","rs.lbl":"새 비밀번호 (6자 이상)","rs.btn":"비밀번호 변경","nav.tts":"🎙️ 텍스트 음성 변환","nav.clone":"🧬 음성 복제","nav.batch":"📚 일괄 생성","nav.aff":"🤝 제휴","nav.acc":"👤 계정","unit.chars":"자","tts.h":"🎙️ 텍스트 음성 변환","tts.pause":"⏸ 쉼 넣기","tts.pauseHint":"쉬고 싶은 곳에 <b>⏸</b>를 넣으세요 — 기호가 많을수록 더 길게 쉽니다. (쉼표와 마침표도 자연스러운 쉼을 만듭니다.)","tts.pickVoice":"🎙️ 음성 선택","tts.changeVoice":"음성 변경 →","tts.modelH":"🎛️ 낭독 모델 선택","tts.mdl30":"<b>⚡ Tan Seven 3.0</b><small>빠르고 · 안정적</small>","tts.mdl40":"<b>✨ Tan Seven 4.0<span class=\"mdl-vip\">VIP</span></b><small>풍부한 감정 · 더 좋은 품질</small>","tts.mdlNote":"⏳ <b>더 천천히 읽고 쉼을 많이</b> → <b>감정이 살아 있고 자연스럽게</b> 들립니다 (스토리텔링, 광고, 영화에 적합). 대신 생성 시간이 조금 더 걸립니다.","tts.readStyle":"🎭 낭독 스타일","tts.emotion":"🎭 감정","tts.language":"🌍 언어","tts.expr":"🎭 감정 표현:","tts.exprHint":"(왼쪽 = 안정적이고 또렷하게 · 오른쪽 = 감정을 풍부하게)","tts.denoise":"🧹 샘플 잡음 제거","tts.denoiseHint":"(샘플에 잡음이 있을 때만 켜세요 — 깨끗한 샘플에 쓰면 유사도가 떨어집니다)","tts.speed":"⚡ 낭독 속도:","tts.speedHint":"(왼쪽 = 느리게 · 오른쪽 = 빠르게)","tts.btn":"🎙️ 오디오 만들기","tts.progress":"오디오 생성 중…","tts.dlMp3":"⬇️ MP3 다운로드","tts.dlSrt":"📝 SRT 자막 다운로드","fx.lbl":"🎚️ 재미 효과:","fx.none":"원본","fx.robot":"🤖 로봇","fx.deep":"🎙️ 저음","fx.high":"🐿️ 고음","fx.echo":"🏛️ 울림","fx.phone":"📞 전화","hist.h":"🕘 기록","hist.auto":"24시간 후 자동 삭제됩니다.","cv.h":"🧬 복제 음성 만들기","cv.name":"음성 이름","cv.upload":"오디오 파일 업로드","cv.drop":"<b>클릭하거나 파일을 여기로 끌어다 놓으세요</b>","cv.dropSub":"<b>최대 3개 클립</b>까지 합칠 수 있습니다 · 합계 3~60초 · 파일당 12MB 이하 · .mp3 .wav<br>어조가 다른 여러 클립을 넣으면 목소리를 훨씬 정확하게 학습합니다.","cv.pickFile":"📁 파일 선택","cv.record":"🎙️ 녹음","cv.clearAll":"모두 지우기 ✕","cv.tipsH":"💡 음성 샘플 팁","cv.tip1":"깨끗한 오디오, 한 사람만, 배경 소음 없이.","cv.tip2":"샘플 품질이 복제 품질을 좌우합니다.","cv.tip3":"2~3개 클립을 준비하세요: 평범한 낭독, 강조하는 말, 질문 — 억양까지 학습합니다.","cv.tip4":"샘플이 이미 깨끗하다면 <b>잡음 제거를 켜지 마세요</b> — 디테일이 깎여 유사도가 떨어집니다.","cv.save":"💾 음성 만들고 저장","cv.myVoices":"🎧 내 음성","bt.h":"📚 일괄 생성","bt.desc":"<b>한 줄</b>이 오디오 파일 하나입니다. 여러 줄을 넣어 한 번에 만들고, 개별 또는 <b>.zip</b>으로 내려받으세요.","bt.voice":"🎙️ 음성","bt.cloneOnly":"(복제 음성)","bt.speed":"⚡ 속도:","bt.btn":"🚀 일괄 생성","bt.dlZip":"⬇️ 전체 다운로드 (.zip)","af.h":"🤝 제휴 — 수수료 12%","af.refs":"추천한 사람","af.earned":"받은 수수료","af.linkH":"🔗 내 추천 링크","af.desc":"이 링크를 친구와 커뮤니티에 공유하세요. 링크로 들어와 <b>가입하고 글자를 구매</b>하면 결제 금액의 <b>12%</b>를 받습니다 — 구매자는 정가 그대로 내고, 여러분은 추가 수입을 얻습니다.","af.copy":"📋 복사","ac.hello":"안녕하세요","ac.creditH":"💎 남은 글자 수","ac.creditDesc":"1자 = 1회 낭독. 다 쓰면 충전하세요.","ac.topup":"+ 충전하기","ac.passH":"🔒 비밀번호 변경","ac.passBtn":"비밀번호 변경","ac.pronH":"📖 나만의 발음 사전","ac.pronDesc":"어려운 단어(고유명사, 브랜드, 외래어)를 AI가 정확히 읽도록 가르칩니다. 모든 음성에 적용되며 내 기기에 저장됩니다.","ac.pronAdd":"+ 추가","ac.apiH":"🔌 개발자용 API 키","ac.apiDesc":"Tan Seven Voice를 다른 소프트웨어(n8n, Make, Python, 자체 툴)에 연결하세요.\n          키는 이 계정의 글자 수를 함께 사용합니다. <a href=\"api.html\" target=\"_blank\"><b>문서 보기 →</b></a>","ac.akCreate":"+ 새 키 만들기","cfg.warn":"\n    ⚙️ <b>Supabase가 연결되지 않았습니다.</b> 페이지는 준비되어 있습니다 — 파일 상단에 <b>SUPABASE_URL</b>과 <b>SUPABASE_ANON_KEY</b>\n    (Supabase 프로젝트에서 확인)를 입력하면 실제 가입/로그인이 동작합니다.\n  ","np.h":"💳 글자 수 충전","np.sub":"한 번 구매하면 글자는 <b>영구히</b> 사용 — 만료되지 않습니다.","np.basic":"💚 베이직","np.basicCr":"110만 자 · 오디오 약 18시간","np.badge":"가장 이득","np.pro":"💛 프로","np.proCr":"380만 자 · 오디오 약 63시간","np.h2":"📲 코드를 스캔해 송금하세요","np.bank":"은행","np.acc":"계좌번호","np.owner":"예금주","np.amount":"금액","np.code":"이체 메모","np.note":"⚠️ 위의 <b>정확한 금액</b>과 <b>정확한 메모</b>로 이체하세요. 1~2분 안에 글자가 자동 충전됩니다.","np.wait":"⏳ 이체를 기다리는 중...","np.done":"🎉 입금을 확인했습니다! 글자가 계정에 추가되었습니다.","vm.h":"🎙️ 음성 선택","vm.fav":"❤️ 즐겨찾기","ph.email":"you@email.com","ph.name":"홍길동","ph.ttsText":"읽힐 대본을 여기에 붙여 넣으세요... (최대 200,000자)","ph.cvName":"음성 이름을 입력하세요 (예: 내 목소리)","ph.batchText":"1번 줄: 여러분 안녕하세요, 오늘의 영상입니다...&#10;2번 줄: 좋아요와 구독 잊지 마세요...&#10;3번 줄: 다음 영상에서 만나요!","af.loginFirst":"로그인하면 링크가 표시됩니다...","ph.newPass":"새 비밀번호 (6자 이상)","ph.pronWord":"단어 (예: Nguyễn)","ph.pronRead":"이렇게 읽기 (예: Ngwiễn)","ph.akName":"키 이름 (예: 영상 편집 툴)","np.qrAlt":"계좌 이체 QR 코드","ph.voiceSearch":"🔍 이름으로 음성 검색...","doc.title":"계정 · Tan Seven Voice","tts.count0":"0자","tts.exprVal":"보통","ac.creditInit":"—<small> 자</small>","ac.you":"회원님"}};
+  var TS_LANG_NAMES={vi:'Tiếng Việt',en:'English',hi:'हिन्दी',ko:'한국어'};
+  (function applyI18n(){
+    var dict=TS_I18N[TS_LANG]||TS_I18N.vi, base=TS_I18N.vi;
+    function val(k){ return (dict[k]!=null)?dict[k]:base[k]; }
+    document.querySelectorAll('[data-i18n]').forEach(function(e){ var v=val(e.getAttribute('data-i18n')); if(v!=null) e.innerHTML=v; });
+    document.querySelectorAll('[data-i18n-ph]').forEach(function(e){ var v=val(e.getAttribute('data-i18n-ph')); if(v!=null) e.placeholder=v; });
+    document.querySelectorAll('[data-i18n-val]').forEach(function(e){ var v=val(e.getAttribute('data-i18n-val')); if(v!=null) e.value=v; });
+    document.querySelectorAll('[data-i18n-alt]').forEach(function(e){ var v=val(e.getAttribute('data-i18n-alt')); if(v!=null) e.alt=v; });
+    if(val('doc.title')) document.title=val('doc.title');
+    var cur=document.getElementById('langswCur'); if(cur) cur.textContent=TS_LANG_NAMES[TS_LANG]||TS_LANG;
+    document.querySelectorAll('.langsw-item').forEach(function(it){ it.classList.toggle('on', it.getAttribute('data-lang')===TS_LANG); });
+    // restore drafts kept across the language reload
+    try{
+      var d=sessionStorage.getItem('ts_draft_tts'); if(d && el('ttsText') && !el('ttsText').value){ el('ttsText').value=d; el('ttsText').dispatchEvent(new Event('input')); }
+      var b=sessionStorage.getItem('ts_draft_batch'); if(b && el('batchText') && !el('batchText').value) el('batchText').value=b;
+      sessionStorage.removeItem('ts_draft_tts'); sessionStorage.removeItem('ts_draft_batch');
+    }catch(e){}
+  })();
+  (function(){
+    var box=document.getElementById('langsw'), btn=document.getElementById('langswBtn');
+    function close(){ if(box) box.classList.remove('open'); if(btn) btn.setAttribute('aria-expanded','false'); }
+    if(btn) btn.addEventListener('click', function(e){ e.stopPropagation(); var o=box.classList.toggle('open'); btn.setAttribute('aria-expanded', o?'true':'false'); });
+    document.querySelectorAll('.langsw-item').forEach(function(it){
+      it.addEventListener('click', function(e){
+        e.stopPropagation();
+        var code=it.getAttribute('data-lang'); close();
+        if(code===TS_LANG) return;
+        try{
+          localStorage.setItem('ts_lang', code);
+          if(el('ttsText')&&el('ttsText').value) sessionStorage.setItem('ts_draft_tts', el('ttsText').value);
+          if(el('batchText')&&el('batchText').value) sessionStorage.setItem('ts_draft_batch', el('batchText').value);
+        }catch(err){}
+        location.reload();   // the whole app (voice lists, dropdowns, messages) is rebuilt in the new language
+      });
+    });
+    document.addEventListener('click', function(e){ if(box && !box.contains(e.target)) close(); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+  })();
 </script>

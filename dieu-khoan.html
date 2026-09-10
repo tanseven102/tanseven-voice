@@ -19,9 +19,35 @@
   .brand .mk{width:30px;height:30px;border-radius:9px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:16px}
 
   nav{border-bottom:1px solid var(--line); background:rgba(251,250,248,.85); backdrop-filter:blur(10px); position:sticky; top:0; z-index:10}
-  .nav-in{max-width:1080px; margin:0 auto; padding:0 22px; height:64px; display:flex; align-items:center; justify-content:space-between}
+  .nav-in{max-width:1080px; margin:0 auto; padding:0 22px; height:64px; display:flex; align-items:center; gap:14px}
   .back{font-size:14.5px; font-weight:600; color:var(--ink2); display:inline-flex; align-items:center; gap:6px}
   .back:hover{color:var(--ink)}
+
+  /* language switcher (i18n) */
+  .langsw{position:relative; margin-left:auto}
+  .langsw-btn{display:inline-flex; align-items:center; gap:7px; font-family:inherit; font-size:14px; font-weight:600;
+    color:var(--ink2); background:var(--card); border:1px solid var(--line2); padding:7px 13px; border-radius:999px;
+    cursor:pointer; line-height:1; transition:border-color .15s, color .15s, box-shadow .2s}
+  .langsw-btn:hover{border-color:#bdb8ae; color:var(--ink)}
+  .langsw.open .langsw-btn{border-color:var(--ink)}
+  .langsw-globe{font-size:15px; line-height:1}
+  .langsw-cur{white-space:nowrap}
+  .langsw-chev{font-size:10px; color:var(--muted); transition:transform .18s}
+  .langsw.open .langsw-chev{transform:rotate(180deg)}
+  .langsw-menu{position:absolute; top:calc(100% + 8px); right:0; min-width:178px; background:var(--card);
+    border:1px solid var(--line2); border-radius:14px; padding:6px; display:none; flex-direction:column; gap:2px;
+    box-shadow:0 18px 44px -20px rgba(20,20,20,.34); z-index:80}
+  .langsw.open .langsw-menu{display:flex}
+  .langsw-item{display:flex; align-items:center; gap:10px; width:100%; font-family:inherit; font-size:14.5px;
+    font-weight:600; color:var(--ink2); background:transparent; border:0; padding:9px 11px; border-radius:9px;
+    cursor:pointer; text-align:left; transition:background .13s, color .13s}
+  .langsw-item:hover{background:var(--bg2); color:var(--ink)}
+  .langsw-flag{font-size:16px; flex:0 0 auto; line-height:1}
+  .langsw-name{flex:1}
+  .langsw-check{color:var(--good); font-weight:800; opacity:0; flex:0 0 auto}
+  .langsw-item.on{color:var(--ink)}
+  .langsw-item.on .langsw-check{opacity:1}
+  @media(max-width:520px){.langsw-cur{display:none} .brand span:last-child{display:none}}
 
   header{padding:56px 0 30px}
   .eyebrow{font-size:12.5px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--muted)}
@@ -52,68 +78,290 @@
 
 <nav><div class="nav-in">
   <div class="brand"><span class="mk">🎙️</span> Tan Seven <span style="color:var(--muted)">Voice</span></div>
-  <a class="back" href="index.html">← Về trang chủ</a>
+  <a class="back" href="index.html" data-i18n="nav.back">← Về trang chủ</a>
+  <div class="langsw" id="langsw">
+    <button class="langsw-btn" id="langswBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Chọn ngôn ngữ / Select language">
+      <span class="langsw-globe">🌐</span><span class="langsw-cur" id="langswCur">Tiếng Việt</span><span class="langsw-chev">▾</span>
+    </button>
+    <div class="langsw-menu" id="langswMenu" role="menu">
+      <button class="langsw-item" type="button" role="menuitem" data-lang="vi"><span class="langsw-flag">🇻🇳</span><span class="langsw-name">Tiếng Việt</span><span class="langsw-check">✓</span></button>
+      <button class="langsw-item" type="button" role="menuitem" data-lang="en"><span class="langsw-flag">🇺🇸</span><span class="langsw-name">English</span><span class="langsw-check">✓</span></button>
+      <button class="langsw-item" type="button" role="menuitem" data-lang="hi"><span class="langsw-flag">🇮🇳</span><span class="langsw-name">हिन्दी</span><span class="langsw-check">✓</span></button>
+      <button class="langsw-item" type="button" role="menuitem" data-lang="ko"><span class="langsw-flag">🇰🇷</span><span class="langsw-name">한국어</span><span class="langsw-check">✓</span></button>
+    </div>
+  </div>
 </div></nav>
 
 <header><div class="wrap">
-  <p class="eyebrow">Pháp lý</p>
-  <h1>Điều khoản sử dụng</h1>
-  <p class="upd">Cập nhật: 30/08/2026</p>
+  <p class="eyebrow" data-i18n="hd.eyebrow">Pháp lý</p>
+  <h1 data-i18n="hd.h1">Điều khoản sử dụng</h1>
+  <p class="upd" data-i18n="hd.upd">Cập nhật: 30/08/2026</p>
 </div></header>
 
 <div class="wrap">
-  <p class="intro">Khi tải, cài đặt hoặc sử dụng phần mềm / dịch vụ <b>Tan Seven Voice</b> (“Dịch vụ”), bạn (“Người dùng”) xác nhận đã đọc, hiểu và đồng ý với toàn bộ điều khoản dưới đây. Nếu không đồng ý, vui lòng không sử dụng.</p>
+  <p class="intro" data-i18n="intro">Khi tải, cài đặt hoặc sử dụng phần mềm / dịch vụ <b>Tan Seven Voice</b> (“Dịch vụ”), bạn (“Người dùng”) xác nhận đã đọc, hiểu và đồng ý với toàn bộ điều khoản dưới đây. Nếu không đồng ý, vui lòng không sử dụng.</p>
 
-  <section class="tos"><h2><span class="no">1</span> Giới thiệu dịch vụ</h2>
-    <p>Tan Seven Voice là công cụ tạo giọng nói và clone giọng bằng AI, phục vụ làm nội dung (video YouTube, podcast, sách nói, quảng cáo…).</p></section>
+  <section class="tos"><h2><span class="no">1</span> <span data-i18n="s1.h">Giới thiệu dịch vụ</span></h2>
+    <p data-i18n="s1.p">Tan Seven Voice là công cụ tạo giọng nói và clone giọng bằng AI, phục vụ làm nội dung (video YouTube, podcast, sách nói, quảng cáo…).</p></section>
 
-  <section class="tos"><h2><span class="no">2</span> Trách nhiệm về giọng nói</h2>
+  <section class="tos"><h2><span class="no">2</span> <span data-i18n="s2.h">Trách nhiệm về giọng nói</span></h2>
     <ul>
-      <li>Bạn <b>chỉ</b> được clone giọng của <b>chính mình</b>, hoặc giọng bạn <b>có quyền / được sự đồng ý</b> của chủ giọng để sử dụng.</li>
-      <li><b>Nghiêm cấm</b> clone giọng người khác nhằm mạo danh, lừa đảo, bôi nhọ, làm giả (deepfake) hoặc bất kỳ mục đích trái pháp luật nào.</li>
-      <li>Bạn <b>tự chịu hoàn toàn trách nhiệm</b> về giọng bạn clone và nội dung bạn tạo ra.</li>
+      <li data-i18n="s2.li1">Bạn <b>chỉ</b> được clone giọng của <b>chính mình</b>, hoặc giọng bạn <b>có quyền / được sự đồng ý</b> của chủ giọng để sử dụng.</li>
+      <li data-i18n="s2.li2"><b>Nghiêm cấm</b> clone giọng người khác nhằm mạo danh, lừa đảo, bôi nhọ, làm giả (deepfake) hoặc bất kỳ mục đích trái pháp luật nào.</li>
+      <li data-i18n="s2.li3">Bạn <b>tự chịu hoàn toàn trách nhiệm</b> về giọng bạn clone và nội dung bạn tạo ra.</li>
     </ul>
-    <div class="warn">⚠️ Tan Seven Voice chỉ <b>cung cấp công cụ</b> — không chịu trách nhiệm về cách bạn sử dụng.</div>
+    <div class="warn" data-i18n="s2.warn">⚠️ Tan Seven Voice chỉ <b>cung cấp công cụ</b> — không chịu trách nhiệm về cách bạn sử dụng.</div>
   </section>
 
-  <section class="tos"><h2><span class="no">3</span> Sử dụng hợp pháp</h2>
-    <p>Không dùng Dịch vụ để tạo nội dung vi phạm pháp luật Việt Nam, xâm phạm quyền của người/tổ chức khác, tin giả, lừa đảo, kích động thù hằn, khiêu dâm hoặc gây hại. Vi phạm sẽ bị khóa và không hoàn tiền.</p></section>
+  <section class="tos"><h2><span class="no">3</span> <span data-i18n="s3.h">Sử dụng hợp pháp</span></h2>
+    <p data-i18n="s3.p">Không dùng Dịch vụ để tạo nội dung vi phạm pháp luật Việt Nam, xâm phạm quyền của người/tổ chức khác, tin giả, lừa đảo, kích động thù hằn, khiêu dâm hoặc gây hại. Vi phạm sẽ bị khóa và không hoàn tiền.</p></section>
 
-  <section class="tos"><h2><span class="no">4</span> Bản quyền</h2>
+  <section class="tos"><h2><span class="no">4</span> <span data-i18n="s4.h">Bản quyền</span></h2>
     <ul>
-      <li><b>Âm thanh bạn tạo ra:</b> thuộc về bạn, được dùng tự do (kể cả thương mại), miễn tuân thủ Điều khoản này.</li>
-      <li><b>Phần mềm, giọng có sẵn, công nghệ:</b> thuộc sở hữu Tan Seven. Cấm sao chép, bán lại, chỉnh sửa hay dịch ngược (reverse engineer).</li>
+      <li data-i18n="s4.li1"><b>Âm thanh bạn tạo ra:</b> thuộc về bạn, được dùng tự do (kể cả thương mại), miễn tuân thủ Điều khoản này.</li>
+      <li data-i18n="s4.li2"><b>Phần mềm, giọng có sẵn, công nghệ:</b> thuộc sở hữu Tan Seven. Cấm sao chép, bán lại, chỉnh sửa hay dịch ngược (reverse engineer).</li>
     </ul></section>
 
-  <section class="tos"><h2><span class="no">5</span> Bản quyền sử dụng tài khoản</h2>
+  <section class="tos"><h2><span class="no">5</span> <span data-i18n="s5.h">Bản quyền sử dụng tài khoản</span></h2>
     <ul>
-      <li>Mỗi <b>tài khoản</b> dành cho cá nhân bạn sử dụng.</li>
-      <li>Cấm chia sẻ, cho mượn hoặc bán lại tài khoản.</li>
+      <li data-i18n="s5.li1">Mỗi <b>tài khoản</b> dành cho cá nhân bạn sử dụng.</li>
+      <li data-i18n="s5.li2">Cấm chia sẻ, cho mượn hoặc bán lại tài khoản.</li>
     </ul></section>
 
-  <section class="tos"><h2><span class="no">6</span> Thanh toán &amp; Credit</h2>
+  <section class="tos"><h2><span class="no">6</span> <span data-i18n="s6.h">Thanh toán &amp; Credit</span></h2>
     <ul>
-      <li>Credit / gói đã mua có thời hạn theo mô tả từng gói (một số gói dùng vĩnh viễn, giới hạn theo số ký tự).</li>
-      <li>Credit đã sử dụng thì <b>không hoàn lại</b>.</li>
-      <li><b>Hoàn tiền:</b> vì là sản phẩm số, chỉ xem xét khi có lỗi kỹ thuật từ Dịch vụ không khắc phục được, trong vòng 3 ngày kể từ khi mua và chưa sử dụng đáng kể.</li>
+      <li data-i18n="s6.li1">Credit / gói đã mua có thời hạn theo mô tả từng gói (một số gói dùng vĩnh viễn, giới hạn theo số ký tự).</li>
+      <li data-i18n="s6.li2">Credit đã sử dụng thì <b>không hoàn lại</b>.</li>
+      <li data-i18n="s6.li3"><b>Hoàn tiền:</b> vì là sản phẩm số, chỉ xem xét khi có lỗi kỹ thuật từ Dịch vụ không khắc phục được, trong vòng 3 ngày kể từ khi mua và chưa sử dụng đáng kể.</li>
     </ul></section>
 
-  <section class="tos"><h2><span class="no">7</span> Miễn trừ trách nhiệm</h2>
-    <p>Dịch vụ cung cấp “nguyên trạng”, kết quả AI có thể chưa hoàn hảo. Tan Seven <b>không chịu trách nhiệm</b> cho bất kỳ thiệt hại nào phát sinh từ việc bạn sử dụng Dịch vụ hoặc từ nội dung bạn tạo ra.</p></section>
+  <section class="tos"><h2><span class="no">7</span> <span data-i18n="s7.h">Miễn trừ trách nhiệm</span></h2>
+    <p data-i18n="s7.p">Dịch vụ cung cấp “nguyên trạng”, kết quả AI có thể chưa hoàn hảo. Tan Seven <b>không chịu trách nhiệm</b> cho bất kỳ thiệt hại nào phát sinh từ việc bạn sử dụng Dịch vụ hoặc từ nội dung bạn tạo ra.</p></section>
 
-  <section class="tos"><h2><span class="no">8</span> Chấm dứt</h2>
-    <p>Tan Seven có quyền khóa tài khoản vi phạm Điều khoản này mà không hoàn tiền.</p></section>
+  <section class="tos"><h2><span class="no">8</span> <span data-i18n="s8.h">Chấm dứt</span></h2>
+    <p data-i18n="s8.p">Tan Seven có quyền khóa tài khoản vi phạm Điều khoản này mà không hoàn tiền.</p></section>
 
-  <section class="tos"><h2><span class="no">9</span> Thay đổi điều khoản</h2>
-    <p>Điều khoản có thể được cập nhật. Việc tiếp tục sử dụng đồng nghĩa bạn đồng ý với phiên bản mới nhất.</p></section>
+  <section class="tos"><h2><span class="no">9</span> <span data-i18n="s9.h">Thay đổi điều khoản</span></h2>
+    <p data-i18n="s9.p">Điều khoản có thể được cập nhật. Việc tiếp tục sử dụng đồng nghĩa bạn đồng ý với phiên bản mới nhất.</p></section>
 
-  <div class="contact"><h2>10 · Liên hệ</h2>
+  <div class="contact"><h2>10 · <span data-i18n="s10.h">Liên hệ</span></h2>
     <div class="rows">
-      <span>👤 Facebook: <a href="https://www.facebook.com/tan.seven.833631/">Tan Seven</a></span>
-      <span>💬 Zalo: <a href="https://zalo.me/g/gqjcnwu1hfmqa1zk6iat">Nhóm Tan Seven</a></span>
-      <span>✉️ Email: ______________________</span>
+      <span>👤 <span data-i18n="c.fb">Facebook</span>: <a href="https://www.facebook.com/tan.seven.833631/">Tan Seven</a></span>
+      <span>💬 <span data-i18n="c.zalo">Zalo</span>: <a href="https://zalo.me/g/gqjcnwu1hfmqa1zk6iat" data-i18n="c.zalogroup">Nhóm Tan Seven</a></span>
+      <span>✉️ <span data-i18n="c.email">Email</span>: ______________________</span>
     </div>
   </div>
 </div>
 
-<footer>© 2026 Tan Seven Voice · Bằng việc sử dụng, bạn đồng ý với các điều khoản trên.</footer>
+<footer data-i18n="footer">© 2026 Tan Seven Voice · Bằng việc sử dụng, bạn đồng ý với các điều khoản trên.</footer>
+
+<script>
+  /* ===== i18n — multi-language switcher (self-contained, no libraries) ===== */
+  const I18N = {
+    vi: {
+      'doc.title':'Điều khoản Tan Seven',
+      'nav.back':'← Về trang chủ',
+      'hd.eyebrow':'Pháp lý',
+      'hd.h1':'Điều khoản sử dụng',
+      'hd.upd':'Cập nhật: 30/08/2026',
+      'intro':'Khi tải, cài đặt hoặc sử dụng phần mềm / dịch vụ <b>Tan Seven Voice</b> (“Dịch vụ”), bạn (“Người dùng”) xác nhận đã đọc, hiểu và đồng ý với toàn bộ điều khoản dưới đây. Nếu không đồng ý, vui lòng không sử dụng.',
+      's1.h':'Giới thiệu dịch vụ',
+      's1.p':'Tan Seven Voice là công cụ tạo giọng nói và clone giọng bằng AI, phục vụ làm nội dung (video YouTube, podcast, sách nói, quảng cáo…).',
+      's2.h':'Trách nhiệm về giọng nói',
+      's2.li1':'Bạn <b>chỉ</b> được clone giọng của <b>chính mình</b>, hoặc giọng bạn <b>có quyền / được sự đồng ý</b> của chủ giọng để sử dụng.',
+      's2.li2':'<b>Nghiêm cấm</b> clone giọng người khác nhằm mạo danh, lừa đảo, bôi nhọ, làm giả (deepfake) hoặc bất kỳ mục đích trái pháp luật nào.',
+      's2.li3':'Bạn <b>tự chịu hoàn toàn trách nhiệm</b> về giọng bạn clone và nội dung bạn tạo ra.',
+      's2.warn':'⚠️ Tan Seven Voice chỉ <b>cung cấp công cụ</b> — không chịu trách nhiệm về cách bạn sử dụng.',
+      's3.h':'Sử dụng hợp pháp',
+      's3.p':'Không dùng Dịch vụ để tạo nội dung vi phạm pháp luật Việt Nam, xâm phạm quyền của người/tổ chức khác, tin giả, lừa đảo, kích động thù hằn, khiêu dâm hoặc gây hại. Vi phạm sẽ bị khóa và không hoàn tiền.',
+      's4.h':'Bản quyền',
+      's4.li1':'<b>Âm thanh bạn tạo ra:</b> thuộc về bạn, được dùng tự do (kể cả thương mại), miễn tuân thủ Điều khoản này.',
+      's4.li2':'<b>Phần mềm, giọng có sẵn, công nghệ:</b> thuộc sở hữu Tan Seven. Cấm sao chép, bán lại, chỉnh sửa hay dịch ngược (reverse engineer).',
+      's5.h':'Bản quyền sử dụng tài khoản',
+      's5.li1':'Mỗi <b>tài khoản</b> dành cho cá nhân bạn sử dụng.',
+      's5.li2':'Cấm chia sẻ, cho mượn hoặc bán lại tài khoản.',
+      's6.h':'Thanh toán &amp; Credit',
+      's6.li1':'Credit / gói đã mua có thời hạn theo mô tả từng gói (một số gói dùng vĩnh viễn, giới hạn theo số ký tự).',
+      's6.li2':'Credit đã sử dụng thì <b>không hoàn lại</b>.',
+      's6.li3':'<b>Hoàn tiền:</b> vì là sản phẩm số, chỉ xem xét khi có lỗi kỹ thuật từ Dịch vụ không khắc phục được, trong vòng 3 ngày kể từ khi mua và chưa sử dụng đáng kể.',
+      's7.h':'Miễn trừ trách nhiệm',
+      's7.p':'Dịch vụ cung cấp “nguyên trạng”, kết quả AI có thể chưa hoàn hảo. Tan Seven <b>không chịu trách nhiệm</b> cho bất kỳ thiệt hại nào phát sinh từ việc bạn sử dụng Dịch vụ hoặc từ nội dung bạn tạo ra.',
+      's8.h':'Chấm dứt',
+      's8.p':'Tan Seven có quyền khóa tài khoản vi phạm Điều khoản này mà không hoàn tiền.',
+      's9.h':'Thay đổi điều khoản',
+      's9.p':'Điều khoản có thể được cập nhật. Việc tiếp tục sử dụng đồng nghĩa bạn đồng ý với phiên bản mới nhất.',
+      's10.h':'Liên hệ',
+      'c.fb':'Facebook',
+      'c.zalo':'Zalo',
+      'c.zalogroup':'Nhóm Tan Seven',
+      'c.email':'Email',
+      'footer':'© 2026 Tan Seven Voice · Bằng việc sử dụng, bạn đồng ý với các điều khoản trên.'
+    },
+    en: {
+      'doc.title':'Terms of Service — Tan Seven',
+      'nav.back':'← Back to home',
+      'hd.eyebrow':'Legal',
+      'hd.h1':'Terms of Service',
+      'hd.upd':'Updated: 30/08/2026',
+      'intro':'By downloading, installing or using the <b>Tan Seven Voice</b> software / service (the “Service”), you (the “User”) confirm that you have read, understood and agree to all of the terms below. If you do not agree, please do not use the Service.',
+      's1.h':'About the service',
+      's1.p':'Tan Seven Voice is an AI text-to-speech and voice-cloning tool for content creation (YouTube videos, podcasts, audiobooks, ads and more).',
+      's2.h':'Responsibility for voices',
+      's2.li1':'You may <b>only</b> clone <b>your own voice</b>, or a voice you <b>have the rights to / have the owner’s consent</b> to use.',
+      's2.li2':'It is <b>strictly forbidden</b> to clone someone else’s voice for impersonation, fraud, defamation, deepfakes or any other unlawful purpose.',
+      's2.li3':'You are <b>fully and solely responsible</b> for the voices you clone and the content you create.',
+      's2.warn':'⚠️ Tan Seven Voice only <b>provides the tool</b> — we are not responsible for how you use it.',
+      's3.h':'Lawful use',
+      's3.p':'Do not use the Service to create content that breaks the law, infringes the rights of any person or organisation, or that involves fake news, fraud, incitement to hatred, pornography or harm. Violations lead to account suspension with no refund.',
+      's4.h':'Copyright',
+      's4.li1':'<b>Audio you generate:</b> belongs to you and may be used freely (including commercially), as long as you follow these Terms.',
+      's4.li2':'<b>The software, built-in voices and technology:</b> belong to Tan Seven. Copying, reselling, modifying or reverse engineering them is prohibited.',
+      's5.h':'Account use',
+      's5.li1':'Each <b>account</b> is for your personal use only.',
+      's5.li2':'Sharing, lending or reselling an account is prohibited.',
+      's6.h':'Payment &amp; credits',
+      's6.li1':'Credits / plans you buy last as described for each plan (some plans never expire and are limited only by character count).',
+      's6.li2':'Credits already used are <b>non-refundable</b>.',
+      's6.li3':'<b>Refunds:</b> as this is a digital product, refunds are considered only for an unresolvable technical fault on our side, within 3 days of purchase and where the credits are largely unused.',
+      's7.h':'Disclaimer',
+      's7.p':'The Service is provided “as is” and AI output may not be perfect. Tan Seven is <b>not liable</b> for any damage arising from your use of the Service or from the content you create.',
+      's8.h':'Termination',
+      's8.p':'Tan Seven may suspend any account that violates these Terms, with no refund.',
+      's9.h':'Changes to these terms',
+      's9.p':'These Terms may be updated. Continuing to use the Service means you accept the latest version.',
+      's10.h':'Contact',
+      'c.fb':'Facebook',
+      'c.zalo':'Zalo',
+      'c.zalogroup':'Tan Seven group',
+      'c.email':'Email',
+      'footer':'© 2026 Tan Seven Voice · By using the Service, you agree to the terms above.'
+    },
+    hi: {
+      'doc.title':'सेवा की शर्तें — Tan Seven',
+      'nav.back':'← होम पर वापस',
+      'hd.eyebrow':'कानूनी',
+      'hd.h1':'सेवा की शर्तें',
+      'hd.upd':'अपडेट: 30/08/2026',
+      'intro':'<b>Tan Seven Voice</b> सॉफ़्टवेयर / सेवा (“सेवा”) को डाउनलोड, इंस्टॉल या उपयोग करके, आप (“उपयोगकर्ता”) पुष्टि करते हैं कि आपने नीचे दी गई सभी शर्तें पढ़ ली हैं, समझ ली हैं और उनसे सहमत हैं। यदि आप सहमत नहीं हैं, तो कृपया सेवा का उपयोग न करें।',
+      's1.h':'सेवा के बारे में',
+      's1.p':'Tan Seven Voice एक AI टेक्स्ट-टू-स्पीच और वॉइस-क्लोनिंग टूल है, जो कंटेंट बनाने के लिए है (YouTube वीडियो, पॉडकास्ट, ऑडियोबुक, विज्ञापन आदि)।',
+      's2.h':'आवाज़ की ज़िम्मेदारी',
+      's2.li1':'आप <b>केवल</b> <b>अपनी आवाज़</b> क्लोन कर सकते हैं, या ऐसी आवाज़ जिसके लिए आपके पास <b>अधिकार / मालिक की अनुमति</b> हो।',
+      's2.li2':'किसी और की आवाज़ को नकल, धोखाधड़ी, बदनामी, डीपफेक या किसी भी गैरकानूनी उद्देश्य के लिए क्लोन करना <b>सख़्त मना</b> है।',
+      's2.li3':'आपके द्वारा क्लोन की गई आवाज़ और बनाए गए कंटेंट की <b>पूरी ज़िम्मेदारी आपकी</b> है।',
+      's2.warn':'⚠️ Tan Seven Voice केवल <b>टूल उपलब्ध कराता है</b> — आप इसका उपयोग कैसे करते हैं, इसकी ज़िम्मेदारी हमारी नहीं है।',
+      's3.h':'वैध उपयोग',
+      's3.p':'सेवा का उपयोग ऐसा कंटेंट बनाने के लिए न करें जो कानून का उल्लंघन करता हो, किसी व्यक्ति या संस्था के अधिकारों का हनन करता हो, या जिसमें फ़र्ज़ी ख़बर, धोखाधड़ी, नफ़रत फैलाना, अश्लीलता या नुकसान शामिल हो। उल्लंघन पर खाता बंद कर दिया जाएगा और पैसा वापस नहीं होगा।',
+      's4.h':'कॉपीराइट',
+      's4.li1':'<b>आपके द्वारा बनाया गया ऑडियो:</b> आपका है और इन शर्तों का पालन करते हुए स्वतंत्र रूप से (व्यावसायिक रूप से भी) उपयोग किया जा सकता है।',
+      's4.li2':'<b>सॉफ़्टवेयर, पहले से मौजूद आवाज़ें और तकनीक:</b> Tan Seven की संपत्ति हैं। इन्हें कॉपी करना, दोबारा बेचना, बदलना या रिवर्स इंजीनियर करना मना है।',
+      's5.h':'खाते का उपयोग',
+      's5.li1':'हर <b>खाता</b> केवल आपके निजी उपयोग के लिए है।',
+      's5.li2':'खाता साझा करना, उधार देना या दोबारा बेचना मना है।',
+      's6.h':'भुगतान और क्रेडिट',
+      's6.li1':'खरीदे गए क्रेडिट / प्लान की अवधि हर प्लान के विवरण के अनुसार होती है (कुछ प्लान कभी समाप्त नहीं होते, केवल अक्षरों की संख्या की सीमा होती है)।',
+      's6.li2':'उपयोग किए जा चुके क्रेडिट <b>वापस नहीं किए जाते</b>।',
+      's6.li3':'<b>रिफ़ंड:</b> यह डिजिटल उत्पाद है, इसलिए रिफ़ंड केवल तब देखा जाता है जब हमारी ओर से कोई तकनीकी खराबी ठीक न हो पाए, खरीद के 3 दिन के भीतर और क्रेडिट लगभग अप्रयुक्त हों।',
+      's7.h':'अस्वीकरण',
+      's7.p':'सेवा “जैसी है वैसी” दी जाती है और AI का परिणाम सही न भी हो सकता है। सेवा के उपयोग या आपके बनाए कंटेंट से होने वाले किसी भी नुकसान के लिए Tan Seven <b>ज़िम्मेदार नहीं</b> है।',
+      's8.h':'समाप्ति',
+      's8.p':'इन शर्तों का उल्लंघन करने वाला कोई भी खाता Tan Seven बिना रिफ़ंड के बंद कर सकता है।',
+      's9.h':'शर्तों में बदलाव',
+      's9.p':'ये शर्तें अपडेट हो सकती हैं। सेवा का उपयोग जारी रखने का मतलब है कि आप नवीनतम संस्करण से सहमत हैं।',
+      's10.h':'संपर्क',
+      'c.fb':'Facebook',
+      'c.zalo':'Zalo',
+      'c.zalogroup':'Tan Seven ग्रुप',
+      'c.email':'ईमेल',
+      'footer':'© 2026 Tan Seven Voice · सेवा का उपयोग करके आप ऊपर दी गई शर्तों से सहमत होते हैं।'
+    },
+    ko: {
+      'doc.title':'이용약관 — Tan Seven',
+      'nav.back':'← 홈으로',
+      'hd.eyebrow':'법적 고지',
+      'hd.h1':'이용약관',
+      'hd.upd':'업데이트: 2026-08-30',
+      'intro':'<b>Tan Seven Voice</b> 소프트웨어 / 서비스(이하 “서비스”)를 다운로드, 설치 또는 사용함으로써 귀하(이하 “이용자”)는 아래의 모든 약관을 읽고 이해했으며 이에 동의함을 확인합니다. 동의하지 않으시면 서비스를 이용하지 마십시오.',
+      's1.h':'서비스 소개',
+      's1.p':'Tan Seven Voice는 콘텐츠 제작(유튜브 영상, 팟캐스트, 오디오북, 광고 등)을 위한 AI 음성 합성 및 음성 복제 도구입니다.',
+      's2.h':'음성에 대한 책임',
+      's2.li1':'<b>본인의 음성</b>, 또는 <b>사용 권한이 있거나 음성 소유자의 동의를 받은</b> 음성만 복제할 수 있습니다.',
+      's2.li2':'타인의 음성을 사칭, 사기, 명예훼손, 딥페이크 또는 기타 불법 목적으로 복제하는 것은 <b>엄격히 금지</b>됩니다.',
+      's2.li3':'복제한 음성과 생성한 콘텐츠에 대한 책임은 <b>전적으로 이용자</b>에게 있습니다.',
+      's2.warn':'⚠️ Tan Seven Voice는 <b>도구를 제공할 뿐</b>이며, 이용 방식에 대해서는 책임지지 않습니다.',
+      's3.h':'적법한 사용',
+      's3.p':'법률을 위반하거나 타인·기관의 권리를 침해하는 콘텐츠, 허위 정보, 사기, 혐오 조장, 음란물 또는 유해한 콘텐츠 제작에 서비스를 사용하지 마십시오. 위반 시 계정이 정지되며 환불되지 않습니다.',
+      's4.h':'저작권',
+      's4.li1':'<b>이용자가 생성한 오디오:</b> 이용자에게 귀속되며, 본 약관을 준수하는 한 상업적 용도를 포함해 자유롭게 사용할 수 있습니다.',
+      's4.li2':'<b>소프트웨어, 기본 제공 음성, 기술:</b> Tan Seven의 자산입니다. 복제, 재판매, 수정 또는 역설계를 금지합니다.',
+      's5.h':'계정 사용',
+      's5.li1':'각 <b>계정</b>은 이용자 개인 전용입니다.',
+      's5.li2':'계정 공유, 대여, 재판매를 금지합니다.',
+      's6.h':'결제 및 크레딧',
+      's6.li1':'구매한 크레딧 / 요금제의 유효 기간은 각 요금제 설명에 따릅니다(일부 요금제는 만료되지 않으며 글자 수로만 제한됩니다).',
+      's6.li2':'이미 사용한 크레딧은 <b>환불되지 않습니다</b>.',
+      's6.li3':'<b>환불:</b> 디지털 상품이므로, 당사 측의 해결 불가능한 기술적 결함이 있는 경우에 한해 구매 후 3일 이내, 크레딧을 거의 사용하지 않은 상태에서만 검토합니다.',
+      's7.h':'면책 조항',
+      's7.p':'서비스는 “있는 그대로” 제공되며 AI 결과물이 완벽하지 않을 수 있습니다. 서비스 이용 또는 이용자가 만든 콘텐츠로 발생한 손해에 대해 Tan Seven은 <b>책임지지 않습니다</b>.',
+      's8.h':'이용 종료',
+      's8.p':'Tan Seven은 본 약관을 위반한 계정을 환불 없이 정지할 수 있습니다.',
+      's9.h':'약관 변경',
+      's9.p':'본 약관은 변경될 수 있습니다. 서비스를 계속 이용하면 최신 버전에 동의한 것으로 간주됩니다.',
+      's10.h':'문의',
+      'c.fb':'Facebook',
+      'c.zalo':'Zalo',
+      'c.zalogroup':'Tan Seven 그룹',
+      'c.email':'이메일',
+      'footer':'© 2026 Tan Seven Voice · 서비스를 이용함으로써 위 약관에 동의하게 됩니다.'
+    }
+  };
+
+  const LANG_NAMES = { vi:'Tiếng Việt', en:'English', hi:'हिन्दी', ko:'한국어' };
+
+  function setLang(code){
+    if(!I18N[code]) code = 'vi';
+    document.documentElement.lang = code;
+    var dict = I18N[code], base = I18N.vi;
+    document.querySelectorAll('[data-i18n]').forEach(function(el){
+      var k = el.getAttribute('data-i18n');
+      var val = (dict && dict[k] != null) ? dict[k] : base[k];
+      if(val != null) el.innerHTML = val;
+    });
+    if(dict['doc.title']) document.title = dict['doc.title'];
+    var cur = document.getElementById('langswCur');
+    if(cur) cur.textContent = LANG_NAMES[code] || code;
+    document.querySelectorAll('.langsw-item').forEach(function(it){
+      it.classList.toggle('on', it.getAttribute('data-lang') === code);
+    });
+    try{ localStorage.setItem('ts_lang', code); }catch(e){}
+  }
+
+  (function(){
+    var langsw = document.getElementById('langsw');
+    var langswBtn = document.getElementById('langswBtn');
+    function close(){ if(langsw) langsw.classList.remove('open'); if(langswBtn) langswBtn.setAttribute('aria-expanded','false'); }
+    if(langswBtn){
+      langswBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var open = langsw.classList.toggle('open');
+        langswBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    }
+    document.querySelectorAll('.langsw-item').forEach(function(it){
+      it.addEventListener('click', function(e){
+        e.stopPropagation();
+        setLang(it.getAttribute('data-lang'));
+        close();
+      });
+    });
+    document.addEventListener('click', function(e){
+      if(langsw && !langsw.contains(e.target)) close();
+    });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape') close();
+    });
+    var saved = 'vi';
+    try{ saved = localStorage.getItem('ts_lang') || 'vi'; }catch(e){}
+    setLang(saved);
+  })();
+</script>
