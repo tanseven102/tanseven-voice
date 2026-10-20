@@ -269,7 +269,7 @@ function ketMan(kq, bang, matVia) {
     : kq === 'vua' ? 'Đoán đúng loài nên đè được nó xuống, nhưng còn chỗ sai nên nó chưa đi. Xem bảng dưới để biết sai ở đâu.'
     : 'Sai từ gốc: nhầm loài, hoặc chọn đúng cách mà sổ đã dặn là KỴ.';
   $('#ket-bang').innerHTML = (bang || []).map(([ten, dung]) => `<li><span>${ten}</span><b class="${dung ? 'dung' : 'sai'}">${dung ? '✓ đúng' : '✗ sai'}</b></li>`).join('');
-  $('#ket-manh').textContent = `Mảnh tên thật trong lề sổ: ${soManh()}/3.` + (cuoi ? ' Hình minh hoạ, nhạc và tiếng động trong trò chơi được tạo bằng AI (ai33 Pro); lời và luật chơi do người viết. Cảm ơn bạn đã chơi tới cuối.' : '');
+  $('#ket-manh').textContent = `Mảnh tên thật trong lề sổ: ${soManh()}/3.` + (cuoi ? ' Cảm ơn bạn đã chơi tới cuối.' : '');
   const nut = $('#ket-nut'); nut.innerHTML = '';
   const them = (chu, lam, chinh) => { const n = document.createElement('button'); n.className = 'nut' + (chinh ? ' chinh' : ''); n.textContent = chu; n.onclick = lam; nut.appendChild(n); };
   if (!matVia && kq !== 'tot') them('Lập đàn lại', () => { man('choi'); moDan(); }, kq === 'xau');
