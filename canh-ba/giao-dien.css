@@ -167,3 +167,4 @@ h2 { color: var(--giay); font-size: 1.35em; }
 #ban-anh { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
 #ban-ten { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40vw; }
 #ban-nguoi .nut-nho { border-radius: 99px; }
+#m-dang-nhap a { color: #c9a24a; }
