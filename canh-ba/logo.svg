@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="CANH BA">
+  <title>CANH BA</title>
+  <defs>
+    <radialGradient id="dem" cx="50%" cy="42%" r="60%">
+      <stop offset="0" stop-color="#1c1a16"/>
+      <stop offset="1" stop-color="#050606"/>
+    </radialGradient>
+    <linearGradient id="giay" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e6c766"/>
+      <stop offset="1" stop-color="#c79a35"/>
+    </linearGradient>
+    <mask id="khuyet">
+      <rect width="240" height="240" fill="#fff"/>
+      <circle cx="98" cy="68" r="33" fill="#000"/>
+    </mask>
+    <clipPath id="tron"><circle cx="120" cy="120" r="104"/></clipPath>
+  </defs>
+
+  <!-- nền đêm + vòng ấn -->
+  <circle cx="120" cy="120" r="116" fill="#0a0b0b"/>
+  <circle cx="120" cy="120" r="111" fill="none" stroke="#c9a24a" stroke-width="3"/>
+  <circle cx="120" cy="120" r="104" fill="url(#dem)" stroke="#6b5427" stroke-width="1.2"/>
+
+  <g clip-path="url(#tron)">
+    <!-- trăng khuyết canh ba, nằm sau lá bùa -->
+    <circle cx="86" cy="84" r="40" fill="#efe6cf" mask="url(#khuyet)" opacity=".96"/>
+    <path d="M24 122 q24 -12 50 -3 q16 -10 36 -3 M150 104 q20 -8 46 0" fill="none" stroke="#3d372d" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- lá bùa -->
+    <g transform="rotate(-5 120 130)">
+      <path d="M120 40 v18" stroke="#8a6a22" stroke-width="2"/>
+      <path d="M92 58 h56 l3 140 h-62 z" fill="url(#giay)"/>
+      <path d="M92 58 h56 l3 140 h-62 z" fill="none" stroke="#7a5c1c" stroke-width="1.4"/>
+      <path d="M97 63 h46 l2.4 130 h-50.8 z" fill="none" stroke="#9e1d12" stroke-width="1.2" opacity=".7"/>
+      <!-- ba nét mực đỏ: 三 = canh ba -->
+      <path d="M104 86 c12 -4 26 -5 38 -3 c3 .6 3 3.4 0 4.2 c-13 3 -26 4 -38 3 c-3 -.4 -3 -3.6 0 -4.2 z" fill="#9e1d12"/>
+      <path d="M108 108 c9 -3 20 -4 30 -2.6 c2.6 .5 2.6 3 0 3.6 c-10 2.4 -20 3 -30 2.2 c-2.6 -.4 -2.6 -2.8 0 -3.2 z" fill="#9e1d12"/>
+      <path d="M100 132 c15 -4 31 -5 46 -3 c3 .5 3 3.6 0 4.4 c-15 3.2 -31 4 -46 2.6 c-3 -.4 -3 -3.6 0 -4 z" fill="#9e1d12"/>
+      <!-- nét sổ dọc kiểu chữ bùa -->
+      <path d="M121 142 c2 14 1.6 26 -1 38 c-.6 2.6 -4 2.4 -3.8 -.2 c.6 -12 1.2 -25 1.2 -37.8 z" fill="#9e1d12"/>
+      <!-- con dấu -->
+      <rect x="128" y="168" width="15" height="15" rx="1.5" fill="#a8261c"/>
+      <path d="M131 172 h9 M131 179 h9 M135.5 170 v11" stroke="#e6c766" stroke-width="1.4"/>
+    </g>
+  </g>
+</svg>

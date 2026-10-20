@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>CANH BA — Bảng khách chơi</title>
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<style>
+:root { --nen: #0b0c0c; --mat: #141513; --mat-2: #1b1c19; --vien: #2c2a24; --chu: #e8e2d2; --chu-2: #b9b2a1; --mo: #8a8475;
+  --cot: #c9a24a; --cot-hover: #e2bd61; --do: #d8402f; --xanh: #6fae7a; --luoi: #2a2924; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--nen); color: var(--chu); font: 15px/1.5 system-ui, "Segoe UI", Roboto, "Noto Sans", sans-serif; }
+button { font: inherit; color: inherit; cursor: pointer; }
+.an { display: none !important; }
+header { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--vien); background: #080909; position: sticky; top: 0; z-index: 5; }
+header img.logo { width: 40px; height: 40px; }
+header h1 { white-space: nowrap; font-size: 17px; margin: 0; letter-spacing: .04em; }
+header h1 small { display: block; font-weight: 400; color: var(--mo); font-size: 12px; letter-spacing: 0; }
+.dau-phai { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.dau-phai img { width: 28px; height: 28px; border-radius: 50%; }
+.nut { white-space: nowrap; background: var(--mat-2); border: 1px solid var(--vien); border-radius: 8px; padding: 6px 12px; font-size: 13px; }
+.nut:hover { border-color: var(--cot); }
+main { max-width: 1180px; margin: 0 auto; padding: 20px 16px 60px; }
+#cong { max-width: 420px; margin: 12vh auto; text-align: center; background: var(--mat); border: 1px solid var(--vien); border-radius: 14px; padding: 32px 24px; }
+#cong img { width: 96px; }
+#nut-google { display: flex; justify-content: center; margin: 18px 0 8px; min-height: 44px; }
+.bao-loi { color: var(--do); min-height: 1.5em; }
+.o-so { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.the { background: var(--mat); border: 1px solid var(--vien); border-radius: 12px; padding: 14px 16px; }
+.the .ten { color: var(--chu-2); font-size: 13px; }
+.the .so { font-size: 30px; font-weight: 650; font-variant-numeric: tabular-nums; line-height: 1.2; margin-top: 4px; }
+.the .phu { color: var(--mo); font-size: 12px; }
+.khoi { background: var(--mat); border: 1px solid var(--vien); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+.khoi h2 { font-size: 15px; margin: 0 0 2px; }
+.khoi .ghi { color: var(--mo); font-size: 12px; margin: 0 0 12px; }
+.bieu-do { position: relative; }
+.bieu-do svg { display: block; width: 100%; height: 220px; overflow: visible; }
+.bieu-do .cot { fill: var(--cot); }
+.bieu-do .cot.sang { fill: var(--cot-hover); }
+.bieu-do text { fill: var(--mo); font-size: 11px; font-variant-numeric: tabular-nums; }
+.bieu-do .luoi { stroke: var(--luoi); stroke-width: 1; }
+#goi-y { position: absolute; pointer-events: none; background: #050505; border: 1px solid var(--vien); border-radius: 8px; padding: 6px 10px; font-size: 12px; white-space: nowrap; transform: translate(-50%, -110%); }
+#goi-y b { font-variant-numeric: tabular-nums; }
+.cuon { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--luoi); white-space: nowrap; }
+th { color: var(--chu-2); font-weight: 500; font-size: 12.5px; }
+td.s, th.s { text-align: right; font-variant-numeric: tabular-nums; }
+td .nguoi { display: flex; align-items: center; gap: 8px; }
+td .nguoi img { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; background: var(--mat-2); }
+td .email { color: var(--mo); font-size: 12px; }
+.huy { display: inline-block; font-size: 11.5px; padding: 1px 7px; border-radius: 99px; border: 1px solid var(--vien); color: var(--mo); margin-right: 3px; }
+.huy.tot { border-color: #3f6b47; color: #9ed3a8; }
+.huy.vua { border-color: #6b5a2c; color: #e2c879; }
+.huy.xau { border-color: #6b2f28; color: #f0a093; }
+.loc { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+.loc input { max-width: 100%; background: var(--mat-2); border: 1px solid var(--vien); border-radius: 8px; color: var(--chu); padding: 7px 10px; min-width: 240px; font: inherit; }
+.hai-cot { display: grid; grid-template-columns: 3fr 2fr; gap: 20px; }
+.hai-cot > .khoi { margin-bottom: 0; min-width: 0; }
+.dong-hd { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--luoi); font-size: 13px; }
+.dong-hd time { color: var(--mo); min-width: 92px; font-variant-numeric: tabular-nums; }
+#hoat-dong { max-height: 420px; overflow: auto; }
+.trong { color: var(--mo); padding: 20px; text-align: center; }
+@media (max-width: 820px) { header { padding: 10px 12px; } .dau-phai .nut { padding: 5px 8px; } .hai-cot { grid-template-columns: 1fr; } .hai-cot > .khoi { margin-bottom: 20px; } header h1 small { display: none; } #ten-ql { display: none; } }
+</style>
+</head>
+<body>
+<header>
+  <img class="logo" src="logo.svg" alt="">
+  <h1>CANH BA<small>Bảng khách chơi · chỉ quản trị xem được</small></h1>
+  <div class="dau-phai an" id="dau-phai">
+    <img id="anh-ql" alt="" referrerpolicy="no-referrer"><span id="ten-ql"></span>
+    <button class="nut" id="nut-moi">↻ Làm mới</button>
+    <button class="nut" id="nut-ra">Đăng xuất</button>
+  </div>
+</header>
+
+<div id="cong" class="an">
+  <img src="logo.svg" alt="">
+  <h2>Bảng khách chơi CANH BA</h2>
+  <p style="color:var(--chu-2)">Đăng nhập bằng Google của quản trị để xem ai đang chơi.</p>
+  <div id="nut-google"></div>
+  <p class="bao-loi" id="bao-cong"></p>
+</div>
+
+<main id="bang" class="an">
+  <p class="ghi" id="cap-nhat" style="color:var(--mo);margin:0 0 12px;font-size:12px"></p>
+  <div class="o-so" id="o-so"></div>
+
+  <section class="khoi">
+    <h2>Người chơi mỗi ngày</h2>
+    <p class="ghi">30 ngày gần nhất, giờ Việt Nam. Rê chuột lên cột để xem số người mới đăng ký hôm đó.</p>
+    <div class="bieu-do" id="bieu-do"><div id="goi-y" class="an"></div></div>
+  </section>
+
+  <section class="khoi">
+    <h2>Từng vụ</h2>
+    <p class="ghi">Số người (không trùng) đã vào, đã yên vụ; thất bại và mất vía tính theo số lần.</p>
+    <div class="cuon"><table id="bang-vu"></table></div>
+  </section>
+
+  <div class="hai-cot">
+    <section class="khoi">
+      <h2>Khách hàng</h2>
+      <div class="loc"><input id="tim" placeholder="Tìm tên hoặc email…" autocomplete="off"><span class="ghi" id="dem-khach" style="margin:0"></span></div>
+      <div class="cuon"><table id="bang-khach"></table></div>
+    </section>
+    <section class="khoi">
+      <h2>Hoạt động gần đây</h2>
+      <p class="ghi">150 sự kiện mới nhất.</p>
+      <div id="hoat-dong"></div>
+    </section>
+  </div>
+</main>
+
+<script src="cau-hinh.js"></script>
+<script src="tai-khoan.js"></script>
+<script>
+'use strict';
+const $ = (s) => document.querySelector(s);
+const VU_TEN = { v1: 'Vụ 1 · Tiếng gọi ngoài bến', v2: 'Vụ 2 · Đêm canh quan', v3: 'Vụ 3 · Cái huyệt thứ tư' };
+const KQ_TEN = { tot: 'Siêu thoát', vua: 'Trấn tạm', xau: 'Thất bại', mat_via: 'Mất vía' };
+const LOAI_TEN = { vao: 'vào game', bat_dau_vu: 'bắt đầu', ket: 'lập đàn', mat_via: 'mất vía', pha_dao: '🏆 phá đảo' };
+const so = (n) => Number(n || 0).toLocaleString('vi-VN');
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const gio = (giay) => { const p = Math.round(Number(giay || 0) / 60); return p < 60 ? p + ' phút' : (p / 60).toFixed(p < 600 ? 1 : 0).replace('.', ',') + ' giờ'; };
+const ngayGio = (t) => new Date(t).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+const ngay = (t) => new Date(t).toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+function truoc(t) {
+  const p = (Date.now() - new Date(t)) / 60000;
+  if (p < 2) return 'vừa xong'; if (p < 60) return Math.round(p) + ' phút trước';
+  if (p < 1440) return Math.round(p / 60) + ' giờ trước'; return Math.round(p / 1440) + ' ngày trước';
+}
+let DL = null;
+
+function moCong(loi) {
+  $('#bang').classList.add('an'); $('#dau-phai').classList.add('an'); $('#cong').classList.remove('an');
+  $('#bao-cong').textContent = loi || '';
+  TK.nutGoogle($('#nut-google'), () => tai(), (l) => { $('#bao-cong').textContent = 'Chưa đăng nhập được: ' + l; });
+}
+async function tai() {
+  if (!TK.phien) return moCong();
+  try { DL = await TK.goi({ hanh: 'bang', phien: TK.phien }); }
+  catch (e) { if (e.ma === 403) await TK.dangXuat(); return moCong(e.ma === 403 ? 'Tài khoản này không phải quản trị.' : e.ma === 401 ? '' : 'Lỗi: ' + e.message); }
+  $('#cong').classList.add('an'); $('#bang').classList.remove('an'); $('#dau-phai').classList.remove('an');
+  const n = TK.nguoi; $('#ten-ql').textContent = n.ten || n.email; $('#anh-ql').src = n.anh || 'logo.svg';
+  $('#cap-nhat').textContent = 'Cập nhật lúc ' + ngayGio(DL.luc);
+  veSo(); veBieuDo(); veVu(); veKhach(); veHoatDong();
+}
+
+function veSo() {
+  const t = DL.tong;
+  const o = [['Tổng người chơi', so(t.nguoi), 'đã đăng nhập Google'], ['Mới hôm nay', so(t.moi_hom_nay), 'đăng ký lần đầu'],
+    ['Chơi trong 24 giờ', so(t.choi_24h), 'có mở game'], ['Chơi trong 7 ngày', so(t.choi_7_ngay), 'có mở game'],
+    ['Tổng giờ chơi', gio(t.giay_choi), t.nguoi ? 'trung bình ' + gio(t.giay_choi / t.nguoi) + '/người' : ''], ['Phá đảo', so(t.pha_dao), 'qua hết vụ 3']];
+  $('#o-so').innerHTML = o.map(([ten, s, phu]) => `<div class="the"><div class="ten">${ten}</div><div class="so">${s}</div><div class="phu">${phu}</div></div>`).join('');
+}
+
+function veBieuDo() {
+  const ds = DL.ngay, W = $('#bieu-do').clientWidth || 800, H = 220, T = 10, B = 26, L = 30;
+  const max = Math.max(4, ...ds.map((d) => d.choi));
+  const buoc = Math.ceil(max / 4), dinh = buoc * 4, y = (v) => T + (H - T - B) * (1 - v / dinh);
+  const rong = (W - L) / ds.length, cot = Math.max(3, rong - 4);
+  let s = '';
+  for (let v = 0; v <= dinh; v += buoc) s += `<line class="luoi" x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v}</text>`;
+  ds.forEach((d, i) => {
+    const x = L + i * rong + (rong - cot) / 2, h = y(0) - y(d.choi);
+    if (d.choi > 0) s += `<path class="cot" data-i="${i}" d="M${x},${y(0)} v${-(h - 4)} q0,-4 4,-4 h${cot - 8} q4,0 4,4 v${h - 4} z"/>`;
+    if (i % 5 === 4 || i === ds.length - 1) s += `<text x="${x + cot / 2}" y="${H - 8}" text-anchor="middle">${d.ngay.slice(8)}/${d.ngay.slice(5, 7)}</text>`;
+    s += `<rect data-i="${i}" x="${L + i * rong}" y="${T}" width="${rong}" height="${H - T - B}" fill="transparent"/>`;
+  });
+  const bd = $('#bieu-do'), gy = $('#goi-y');
+  bd.querySelector('svg')?.remove();
+  bd.insertAdjacentHTML('afterbegin', `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Số người chơi mỗi ngày trong 30 ngày">${s}</svg>`);
+  const svg = bd.querySelector('svg');
+  svg.onmousemove = (e) => {
+    const i = e.target.dataset?.i; svg.querySelectorAll('.cot').forEach((c) => c.classList.toggle('sang', c.dataset.i === i));
+    if (i === undefined) return gy.classList.add('an');
+    const d = ds[i], r = bd.getBoundingClientRect();
+    gy.innerHTML = `${ngay(d.ngay + 'T12:00:00+07:00')}<br>Người chơi: <b>${d.choi}</b> · Mới đăng ký: <b>${d.moi}</b>`;
+    gy.style.left = Math.min(r.width - 90, Math.max(90, e.clientX - r.left)) + 'px'; gy.style.top = (e.clientY - r.top) + 'px'; gy.classList.remove('an');
+  };
+  svg.onmouseleave = () => { gy.classList.add('an'); svg.querySelectorAll('.cot').forEach((c) => c.classList.remove('sang')); };
+}
+
+function veVu() {
+  $('#bang-vu').innerHTML = '<tr><th>Vụ</th><th class="s">Người vào</th><th class="s">Siêu thoát</th><th class="s">Trấn tạm</th><th class="s">Tỉ lệ yên vụ</th><th class="s">Lần thất bại</th><th class="s">Lần mất vía</th></tr>'
+    + DL.vu.map((v) => `<tr><td>${VU_TEN[v.vu]}</td><td class="s">${so(v.bat_dau)}</td><td class="s">${so(v.sieu_thoat)}</td><td class="s">${so(v.tran_tam)}</td>
+      <td class="s">${v.bat_dau ? Math.round(100 * (v.sieu_thoat + v.tran_tam) / v.bat_dau) + '%' : '—'}</td><td class="s">${so(v.lan_that_bai)}</td><td class="s">${so(v.lan_mat_via)}</td></tr>`).join('');
+}
+
+function veKhach() {
+  const q = $('#tim').value.trim().toLowerCase();
+  const ds = DL.nguoi.filter((n) => !q || (n.ten || '').toLowerCase().includes(q) || n.email.includes(q));
+  $('#dem-khach').textContent = `${so(ds.length)} / ${so(DL.nguoi.length)} khách`;
+  if (!ds.length) { $('#bang-khach').innerHTML = `<tr><td class="trong">${DL.nguoi.length ? 'Không ai khớp.' : 'Chưa có khách nào đăng nhập.'}</td></tr>`; return; }
+  $('#bang-khach').innerHTML = '<tr><th>Khách</th><th>Tiến độ</th><th class="s">Giờ chơi</th><th class="s">Lần vào</th><th>Lần cuối</th><th>Đăng ký</th></tr>'
+    + ds.map((n) => {
+      const x = n.xong || {};
+      const td = ['v1', 'v2', 'v3'].map((v) => `<span class="huy ${x[v] || ''}" title="${VU_TEN[v]}: ${KQ_TEN[x[v]] || 'chưa xong'}">${v.slice(1)}${x[v] ? ' ' + KQ_TEN[x[v]] : ''}</span>`).join('');
+      return `<tr><td><div class="nguoi"><img src="${esc(n.anh || 'logo.svg')}" alt="" referrerpolicy="no-referrer" loading="lazy"><div>${esc(n.ten || '—')}<div class="email">${esc(n.email)}</div></div></div></td>
+        <td>${td}</td><td class="s">${gio(n.giay_choi)}</td><td class="s">${so(n.so_lan_vao)}</td><td title="${ngayGio(n.lan_cuoi)}">${truoc(n.lan_cuoi)}</td><td>${ngay(n.tao_luc)}</td></tr>`;
+    }).join('');
+}
+
+function veHoatDong() {
+  $('#hoat-dong').innerHTML = DL.gan_day.length ? DL.gan_day.map((s) => `<div class="dong-hd"><time>${ngayGio(s.luc)}</time><div><b>${esc(s.ten || s.email)}</b> ${LOAI_TEN[s.loai] || s.loai}${s.vu ? ' ' + VU_TEN[s.vu].split(' · ')[0].toLowerCase() : ''}${s.kq && s.loai === 'ket' ? ' → ' + KQ_TEN[s.kq] : ''}</div></div>`).join('')
+    : '<div class="trong">Chưa có hoạt động.</div>';
+}
+
+$('#tim').oninput = veKhach;
+$('#nut-moi').onclick = tai;
+$('#nut-ra').onclick = async () => { await TK.dangXuat(); moCong(); };
+addEventListener('resize', () => { if (DL) veBieuDo(); });
+setInterval(() => { if (DL && document.visibilityState === 'visible') tai(); }, 60000);
+tai();
+</script>
+</body>
+</html>

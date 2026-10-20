@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CANH BA — Sổ trừ tà</title>
+<meta name="description" content="Game kinh dị khám phá thuần Việt, 18+. Ba vụ trừ tà, một cuốn sổ, và món nợ ông nội để lại.">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="logo-180.png">
+<meta name="theme-color" content="#060808">
+<meta property="og:title" content="CANH BA — Sổ trừ tà">
+<meta property="og:description" content="Game kinh dị khám phá thuần Việt, 18+. Ba vụ trừ tà, một cuốn sổ, và món nợ ông nội để lại.">
+<meta property="og:image" content="https://tanseven.com/canh-ba/anh-chia-se.jpg">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="giao-dien.css">
+</head>
+<body>
+<div id="san">
+  <div id="canh"><div class="lop" id="lop-a"></div><div class="lop" id="lop-b"></div></div>
+  <div id="den"></div>
+  <img id="hien" alt="">
+  <div id="chop"></div>
+
+  <!-- 18+ -->
+  <section class="man" id="m-tuoi">
+    <div class="khung-giua">
+      <img class="logo-nho" src="logo.svg" alt="CANH BA">
+      <div class="nhan-18">18+</div>
+      <h2>Trò chơi dành cho người từ 18 tuổi</h2>
+      <p>Có hình ảnh, âm thanh ma quái, kinh dị; chuyện chết chóc, bạo lực gia đình, tang ma.
+         Có vài chỗ chớp sáng và tiếng động lớn bất ngờ.</p>
+      <p class="mo">Mọi nhân vật, địa danh, nghi lễ trong trò chơi là hư cấu dựa trên truyện dân gian, không phải hướng dẫn tín ngưỡng.
+         Nên đeo tai nghe, tắt bớt đèn.</p>
+      <div class="hang-nut">
+        <button class="nut chinh" id="nut-du-tuoi">Tôi đã đủ 18 tuổi</button>
+        <button class="nut" id="nut-chua-du">Tôi chưa đủ</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- đăng nhập Google -->
+  <section class="man an" id="m-dang-nhap">
+    <div class="khung-giua">
+      <img class="logo-vua" src="logo.svg" alt="">
+      <h2>CANH BA</h2>
+      <p>Đăng nhập bằng tài khoản Google để vào chơi. Tiến trình được lưu theo tài khoản, đổi máy vẫn chơi tiếp được.</p>
+      <div id="nut-google"></div>
+      <p class="mo" id="dang-nhap-bao"></p>
+      <p class="mo nho">Chỉ dùng tên, ảnh đại diện và email Google để giữ tiến trình chơi. Không đăng gì lên tài khoản của bạn.</p>
+    </div>
+  </section>
+
+  <!-- bìa -->
+  <section class="man an" id="m-bia">
+    <div id="ban-nguoi" class="an"><img id="ban-anh" alt=""><span id="ban-ten"></span><button class="nut-nho" id="nut-dang-xuat">Đăng xuất</button></div>
+    <div class="bia-chu">
+      <img class="logo-bia" src="logo.svg" alt="">
+      <div class="bia-nho">SỔ TRỪ TÀ CỦA ÔNG SÁU TRẦM</div>
+      <h1>CANH BA</h1>
+      <div class="bia-cau">Đừng trấn. Hỏi cho ra nó là ai, nó thiếu cái gì.</div>
+      <div class="cot-nut">
+        <button class="nut chinh" id="nut-tiep-tuc">Chơi tiếp</button>
+        <button class="nut" id="nut-moi">Bắt đầu</button>
+        <button class="nut" id="nut-cach-choi">Cách chơi</button>
+      </div>
+      <div class="bia-chan">18+ · Kinh dị khám phá · Thuần tiếng Việt · Hình minh hoạ và nhạc tạo bằng AI (ai33 Pro), do người soát từng tấm</div>
+    </div>
+  </section>
+
+  <!-- phòng ông nội: chọn vụ -->
+  <section class="man an" id="m-so">
+    <div class="so-khung">
+      <h2>Phòng ông nội</h2>
+      <p class="mo" id="so-le"></p>
+      <div id="ds-vu"></div>
+      <div class="hang-nut">
+        <button class="nut" data-mo-so="loai">📖 Mở sổ tay</button>
+        <button class="nut" id="nut-am-2">🔊 Âm thanh</button>
+        <button class="nut" id="nut-ve-bia">Về trang bìa</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- chơi -->
+  <section class="man an" id="m-choi">
+    <header id="hud">
+      <div class="hud-trai">
+        <div id="hud-noi"></div>
+        <div id="hud-gio"></div>
+      </div>
+      <div class="hud-phai">
+        <div class="via" title="Vía: hết vía là mất hồn">
+          <span>VÍA</span><div class="thanh"><i id="via-thanh"></i></div><b id="via-so"></b>
+        </div>
+        <button class="nut-nho" id="nut-gung" title="Ngậm gừng: +15 vía"></button>
+        <button class="nut-nho" data-mo-so="manh">📖 Sổ</button>
+        <button class="nut-nho" id="nut-am">🔊</button>
+        <button class="nut-nho" id="nut-thoat">✕</button>
+      </div>
+    </header>
+    <div id="bao"></div>
+    <div id="hop">
+      <div id="thoai" class="an">
+        <img id="chan-dung" alt="">
+        <div class="thoai-chu">
+          <div id="ten-nv"></div>
+          <div id="loi"></div>
+          <div class="thoai-chan"><span id="goi-y">Bấm để đọc tiếp ▸</span><button class="nut-nho" id="nut-bo-qua">Bỏ qua đoạn này »</button></div>
+        </div>
+      </div>
+      <div id="thuc-don" class="an">
+        <div id="ta-phong"></div>
+        <nav id="the"></nav>
+        <div id="muc"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- lập đàn -->
+  <section class="man an" id="m-dan">
+    <div class="dan-khung">
+      <div class="dan-dau"><h2 id="dan-tieu-de"></h2><div id="dan-buoc-so"></div></div>
+      <div id="dan-than"></div>
+      <div class="hang-nut">
+        <button class="nut" id="dan-lui">◂ Quay lại</button>
+        <button class="nut" data-mo-so="dau">📖 Mở sổ tay</button>
+        <button class="nut chinh" id="dan-toi">Tiếp ▸</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- kết -->
+  <section class="man an" id="m-ket">
+    <div class="khung-giua rong">
+      <div class="mo" id="ket-vu"></div>
+      <h2 id="ket-ten"></h2>
+      <p id="ket-ta"></p>
+      <ul id="ket-bang"></ul>
+      <p class="mo" id="ket-manh"></p>
+      <div class="hang-nut" id="ket-nut"></div>
+    </div>
+  </section>
+
+  <!-- sổ tay -->
+  <div id="so-tay" class="an">
+    <div class="so-giay">
+      <button class="nut-nho dong" id="so-dong">✕ Gấp sổ</button>
+      <nav id="so-the"></nav>
+      <div id="so-than"></div>
+    </div>
+  </div>
+</div>
+<script src="cau-hinh.js"></script>
+<script src="tai-khoan.js"></script>
+<script>const VU = [];</script>
+<script src="du-lieu/so-tay.js"></script>
+<script src="du-lieu/vu1.js"></script>
+<script src="du-lieu/vu2.js"></script>
+<script src="du-lieu/vu3.js"></script>
+<script src="may.js"></script>
+</body>
+</html>
